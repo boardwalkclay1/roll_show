@@ -10,3 +10,11 @@ site = { bucket = "./app" }
 binding = "DB"
 database_name = "roll_show"
 database_id = "fe6c6c63-9a89-4dfc-ad2f-0d69c8365bf2"
+{
+  "observability": {
+    "logs": {
+      "enabled": false,
+      "invocation_logs": true
+    }
+  }
+}
