@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Ticket – Roll Show</title>
+
+  <!-- Correct folder path -->
+  <link rel="stylesheet" href="styles/styles.css">
+</head>
+
+<body>
+
+<header class="header">
+  <div class="logo">ROLL SHOW</div>
+
+  <nav class="nav">
+    <a href="index.html">Explore</a>
+    <a href="buyer-profile.html">My Tickets</a>
+    <button id="themeToggle">Theme</button>
+  </nav>
+</header>
+
+<main class="ticket-view-page">
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <h1>Your Ticket</h1>
+    <p class="subtitle">This is your official stamped Roll Show ticket.</p>
+  </section>
+
+  <!-- Ticket Container -->
+  <section class="ticket-stage">
+
+    <div id="ticketRender" class="ticket-display">
+      <!-- JS injects the full ticket layout + stamp -->
+    </div>
+
+    <div class="ticket-actions">
+      <button id="downloadTicket" class="btn-primary">Download Ticket</button>
+      <p class="note">Your ticket includes a unique QR code and skater‑verified stamp.</p>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- Correct JS path -->
+<script src="js/app.js" defer></script>
+
+</body>
+</html>
