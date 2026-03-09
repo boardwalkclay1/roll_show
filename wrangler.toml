@@ -1,3 +1,11 @@
+name = "rollshow"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Serve your frontend from /app
+site = { bucket = "./app" }
+
+# Bind your D1 database
 [[d1_databases]]
 binding = "DB"
 database_name = "roll_show"
