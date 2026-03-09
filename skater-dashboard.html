@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>Skater Dashboard – Roll Show</title>
-  <link rel="stylesheet" href="styles.css">
+
+  <!-- Correct folder path -->
+  <link rel="stylesheet" href="styles/styles.css">
 </head>
 
 <body>
+
 <header class="header">
   <div class="logo">ROLL SHOW</div>
-  <nav>
+
+  <nav class="nav">
     <a href="create-show.html">Create Show</a>
     <a href="video-studio.html">Video Studio</a>
     <a href="branding-studio.html">Branding Studio</a>
@@ -17,26 +21,55 @@
   </nav>
 </header>
 
-<main class="dashboard">
-  <section class="stats">
-    <div class="stat-box">
+<main class="skater-dashboard-page">
+
+  <!-- Hero Welcome -->
+  <section class="dashboard-hero">
+    <h1 id="skaterWelcome">Welcome, Skater</h1>
+    <p class="subtitle">Manage your shows, track your sales, and build your brand.</p>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="quick-actions">
+    <button class="quick-btn" onclick="window.location.href='create-show.html'">+ New Show</button>
+    <button class="quick-btn" onclick="window.location.href='video-studio.html'">Open Video Studio</button>
+    <button class="quick-btn" onclick="window.location.href='branding-studio.html'">Open Branding Studio</button>
+  </section>
+
+  <!-- Stats Row -->
+  <section class="stats-row">
+    <div class="stat-card">
       <h3>Total Shows</h3>
       <p id="statShows">0</p>
     </div>
-    <div class="stat-box">
+
+    <div class="stat-card">
       <h3>Tickets Sold</h3>
       <p id="statTickets">0</p>
     </div>
-    <div class="stat-box">
-      <h3>Revenue</h3>
+
+    <div class="stat-card">
+      <h3>Total Revenue</h3>
       <p id="statRevenue">$0</p>
     </div>
   </section>
 
-  <section class="shows-list">
-    <h2>Your Shows</h2>
-    <div id="skaterShows" class="show-grid"></div>
+  <!-- Shows List -->
+  <section class="shows-section">
+    <div class="section-header">
+      <h2>Your Shows</h2>
+      <p class="section-subtitle">Manage your published and upcoming performances.</p>
+    </div>
+
+    <div id="skaterShows" class="show-grid">
+      <!-- JS injects show cards -->
+    </div>
   </section>
+
 </main>
+
+<!-- Correct JS path -->
+<script src="js/app.js" defer></script>
+
 </body>
 </html>
