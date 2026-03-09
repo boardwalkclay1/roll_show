@@ -3,17 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <title>My Tickets – Roll Show</title>
-  <link rel="stylesheet" href="styles.css">
+
+  <!-- Correct folder path -->
+  <link rel="stylesheet" href="styles/styles.css">
 </head>
 
 <body>
+
 <header class="header">
   <div class="logo">ROLL SHOW</div>
+
+  <nav class="nav">
+    <a href="index.html">Explore</a>
+    <a href="buyer-profile.html" class="active">My Tickets</a>
+    <button id="themeToggle">Theme</button>
+  </nav>
 </header>
 
-<main class="buyer-profile">
-  <h1>My Tickets</h1>
-  <div id="ticketList" class="ticket-list"></div>
+<main class="buyer-profile-page">
+
+  <!-- Page Title -->
+  <section class="page-header">
+    <h1>My Tickets</h1>
+    <p class="subtitle">Your purchased shows, ready to watch anytime within their access window.</p>
+  </section>
+
+  <!-- Ticket List -->
+  <section class="ticket-wallet">
+
+    <div class="ticket-wallet-header">
+      <h2>Your Ticket Wallet</h2>
+      <p id="ticketCount" class="ticket-count">0 tickets</p>
+    </div>
+
+    <div id="ticketList" class="ticket-list">
+      <!-- JS will inject ticket cards here -->
+    </div>
+
+  </section>
+
 </main>
+
+<!-- Correct JS path -->
+<script src="js/app.js" defer></script>
+
 </body>
 </html>
