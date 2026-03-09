@@ -3,54 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <title>Branding Studio – Roll Show</title>
-  <link rel="stylesheet" href="styles.css">
+
+  <!-- Correct folder path -->
+  <link rel="stylesheet" href="styles/styles.css">
 </head>
 
 <body>
+
 <header class="header">
   <div class="logo">ROLL SHOW</div>
+
+  <nav class="nav">
+    <a href="skater-dashboard.html">Dashboard</a>
+    <a href="video-studio.html">Video Studio</a>
+    <a href="branding-studio.html" class="active">Branding Studio</a>
+    <button id="themeToggle">Theme</button>
+  </nav>
 </header>
 
-<main class="branding">
-  <h1>Branding Studio</h1>
+<main class="branding-studio-page">
 
-  <div class="tabs">
-    <button class="tab active" data-tab="ticketTab">Ticket Layout</button>
-    <button class="tab" data-tab="stampTab">Stamp</button>
-    <button class="tab" data-tab="flyerTab">Flyers</button>
-  </div>
-
-  <!-- Ticket Layout -->
-  <section id="ticketTab" class="tab-content active">
-    <div id="ticketCanvas" class="canvas"></div>
-    <div class="controls">
-      <input type="color" id="ticketBg">
-      <input type="text" id="ticketHeader" placeholder="Header Text">
-      <input type="text" id="ticketFooter" placeholder="Footer Text">
-    </div>
+  <!-- Page Header -->
+  <section class="page-header">
+    <h1>Branding Studio</h1>
+    <p class="subtitle">Design your ticket, stamp, and flyers — all in one creative workspace.</p>
   </section>
 
-  <!-- Stamp -->
-  <section id="stampTab" class="tab-content">
-    <div id="stampCanvas" class="canvas"></div>
-    <div class="controls">
-      <input type="file" id="stampUpload" accept="image/*">
-      <input type="text" id="stampText" placeholder="Stamp Text">
-      <input type="color" id="stampColor">
-    </div>
-  </section>
+  <!-- Workspace Layout -->
+  <section class="branding-workspace">
 
-  <!-- Flyers -->
-  <section id="flyerTab" class="tab-content">
-    <div id="flyerCanvas" class="canvas"></div>
-    <div class="controls">
-      <input type="file" id="flyerImage" accept="image/*">
-      <input type="text" id="flyerTitle" placeholder="Flyer Title">
-      <input type="text" id="flyerDate" placeholder="Date/Time">
-      <button id="exportFlyer">Export Flyer</button>
-    </div>
+    <!-- Left: Tabs + Controls -->
+    <aside class="branding-sidebar">
+
+      <div class="tabs">
+        <button class="tab active" data-tab="ticketTab">Ticket Layout</button>
+        <button class="tab" data-tab="stampTab">Stamp</button>
+        <button class="tab" data-tab="flyerTab">Flyers</button>
+      </div>
+
+      <!-- Ticket Controls -->
+      <div id="ticketControls" class="control-panel active">
+        <h3>Ticket Controls</h3>
+
+        <label>Background Color</label>
+        <input type="color" id="ticketBg">
+
+        <label>Header Text</label>
+        <input type="text" id="ticketHeader" placeholder="Show Title">
+
+        <label>Footer Text</label>
+        <input type="text" id="ticketFooter" placeholder="Ticket ID • QR">
+
+        <p class="note">Your ticket will auto-fill buyer name, date, and QR code.</p>
+      </div>
+
+      <!-- Stamp Controls -->
+      <div id="stampControls" class="control-panel">
+        <h3>Stamp Controls</h3>
+
+        <label>Upload Stamp Image</label>
+        <input type="file" id="stampUpload" accept="image/*">
+
+        <label>Stamp Text</label>
+        <input type="text" id="stampText" placeholder="Your Signature">
+
+        <label>Stamp Color</label>
+        <input type="color" id="stampColor">
+      </div>
+
+      <!-- Flyer Controls -->
+      <div id="flyerControls" class="control-panel">
+        <h3>Flyer Controls</h3>
+
+        <label>Upload Background Image</label>
+        <input type="file" id="flyerImage" accept="image/*">
+
+        <label>Flyer Title</label>
+        <input type="text" id="flyerTitle" placeholder="Show Title">
+
+        <label>Date & Time</label>
+        <input type="text" id="flyerDate" placeholder="March 20 • 7PM">
+
+        <button id="exportFlyer" class="btn-primary">Export Flyer</button>
+      </div>
+
+    </aside>
+
+    <!-- Right: Canvas -->
+    <section class="branding-canvas">
+
+      <!-- Ticket Canvas -->
+      <div id="ticketTab" class="canvas-panel active">
+        <h2>Ticket Preview</h2>
+        <div id="ticketCanvas" class="canvas"></div>
+      </div>
+
+      <!-- Stamp Canvas -->
+      <div id="stampTab" class="canvas-panel">
+        <h2>Stamp Preview</h2>
+        <div id="stampCanvas" class="canvas"></div>
+      </div>
+
+      <!-- Flyer Canvas -->
+      <div id="flyerTab" class="canvas-panel">
+        <h2>Flyer Preview</h2>
+        <div id="flyerCanvas" class="canvas"></div>
+      </div>
+
+    </section>
+
   </section>
 
 </main>
+
+<!-- Correct JS path -->
+<script src="js/app.js" defer></script>
+
 </body>
 </html>
