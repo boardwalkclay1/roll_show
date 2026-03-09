@@ -3,7 +3,16 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // ROUTES
+    // AUTH ROUTES
+    if (path === "/api/signup" && request.method === "POST") {
+      return signup(request, env);
+    }
+
+    if (path === "/api/login" && request.method === "POST") {
+      return login(request, env);
+    }
+
+    // SHOW ROUTES
     if (path === "/api/create-show" && request.method === "POST") {
       return createShow(request, env);
     }
@@ -16,7 +25,7 @@ export default {
       return buyTicket(request, env);
     }
 
-    // STATIC FALLBACK (if using site bucket)
+    // STATIC FALLBACK
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
@@ -25,6 +34,85 @@ export default {
   }
 };
 
+// -----------------------------
+// AUTH HELPERS
+// -----------------------------
+
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+// -----------------------------
+// SIGNUP
+// -----------------------------
+async function signup(request, env) {
+  try {
+    const data = await request.json();
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+
+    const passwordHash = await hashPassword(data.password);
+
+    await env.DB.prepare(`
+      INSERT INTO users (id, name, email, password_hash, role, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(
+      id,
+      data.name,
+      data.email,
+      passwordHash,
+      data.role,
+      now
+    ).run();
+
+    return Response.json({ success: true, user_id: id });
+
+  } catch (err) {
+    return Response.json({ success: false, error: err.message }, { status: 500 });
+  }
+}
+
+// -----------------------------
+// LOGIN
+// -----------------------------
+async function login(request, env) {
+  try {
+    const data = await request.json();
+    const passwordHash = await hashPassword(data.password);
+
+    const user = await env.DB.prepare(`
+      SELECT * FROM users WHERE email = ?
+    `).bind(data.email).first();
+
+    if (!user) {
+      return Response.json({ success: false, error: "User not found" }, { status: 404 });
+    }
+
+    if (user.password_hash !== passwordHash) {
+      return Response.json({ success: false, error: "Invalid password" }, { status: 401 });
+    }
+
+    return Response.json({
+      success: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+
+  } catch (err) {
+    return Response.json({ success: false, error: err.message }, { status: 500 });
+  }
+}
+
+// -----------------------------
+// EXISTING ROUTES (unchanged)
+// -----------------------------
 async function createShow(request, env) {
   try {
     const data = await request.json();
@@ -88,8 +176,6 @@ async function buyTicket(request, env) {
       now,
       "valid"
     ).run();
-
-    // TODO: payout workflow (15% platform fee)
 
     return Response.json({ success: true, ticket_id: id });
 
