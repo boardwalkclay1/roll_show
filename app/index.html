@@ -8,34 +8,43 @@
   <link rel="icon" href="favicon.ico">
 </head>
 
-<body style="background:none !important;">
+<body style="background:black !important;">
 
-  <!-- FULL CINEMATIC BACKGROUND -->
-  <img src="images/roll-index.jpg" class="framed-photo" alt="Background">
-  <div class="photo-overlay"></div>
+  <!-- FULL BACKGROUND IMAGE — YOU CONTROL IT -->
+  <img 
+    src="images/roll-index.jpg"
+    alt="Background"
+    style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+    "
+  >
 
   <!-- HEADER -->
-  <header class="header" style="background:none !important; border:none !important;">
-    <div class="logo" style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">ROLL SHOW</div>
+  <header class="header">
+    <div class="logo">ROLL SHOW</div>
 
     <nav class="nav">
-      <a href="auth-login.html" style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">Login</a>
-      <a href="buyer-profile.html" style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">My Tickets</a>
-      <button id="themeToggle" style="background:none; border:1px solid white; color:white;">Theme</button>
+      <a href="auth-login.html">Login</a>
+      <a href="buyer-profile.html">My Tickets</a>
+      <button id="themeToggle">Theme</button>
     </nav>
   </header>
 
   <!-- MAIN CONTENT -->
-  <main class="landing-page" style="background:none !important;">
+  <main class="landing-page">
 
     <!-- HERO -->
-    <section class="hero" style="position:relative; z-index:1;">
+    <section class="hero">
       <div class="hero-content">
-        <h1 style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">
-          Skate Performances From Every Discipline
-        </h1>
+        <h1>Skate Performances From Every Discipline</h1>
 
-        <p class="subtitle" style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">
+        <p class="subtitle">
           Buy tickets, watch shows, support skaters, and experience the culture.
         </p>
 
@@ -44,15 +53,15 @@
     </section>
 
     <!-- FEATURED SHOWS -->
-    <section class="featured-section" style="position:relative; z-index:1;">
-      <h2 style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">Featured Shows</h2>
+    <section class="featured-section">
+      <h2>Featured Shows</h2>
       <div id="featuredShows" class="featured-grid"></div>
     </section>
 
     <!-- EXPLORE -->
-    <section class="explore-section" style="position:relative; z-index:1;">
-      <h2 style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">Explore All Shows</h2>
-      <p class="section-subtitle" style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">
+    <section class="explore-section">
+      <h2>Explore All Shows</h2>
+      <p class="section-subtitle">
         Discover performances from skaters across every style and discipline.
       </p>
       <div id="showGrid" class="show-grid"></div>
@@ -61,8 +70,8 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="footer" style="background:none !important; border:none !important;">
-    <p style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">© Roll Show</p>
+  <footer class="footer">
+    <p>© Roll Show</p>
   </footer>
 
   <script src="js/app.js" defer></script>
