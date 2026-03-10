@@ -9,28 +9,28 @@
 
 <body style="background:black;">
 
-  <!-- FULL BACKGROUND IMAGE — DIRECT CONTROL -->
+  <!-- FULL BACKGROUND IMAGE -->
   <img 
     src="images/roll-show.jpg"
     alt="Background"
     style="
       position: fixed;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      z-index: -1;
+      z-index: 0;
     "
   >
 
-  <main class="auth-container" style="position:relative; z-index:5;">
+  <!-- PAGE CONTENT (FLOATS ABOVE IMAGE) -->
+  <main style="position: relative; z-index: 5; display: flex; justify-content: center; padding: 100px 20px;">
 
-    <div class="auth-box" style="background:none; border:none; box-shadow:none;">
+    <div style="width: 100%; max-width: 420px; background: transparent; border: none; box-shadow: none;">
 
       <h1>Create Your Account</h1>
 
-      <form id="signupForm" class="auth-form">
+      <form id="signupForm">
         <input type="text" id="signupName" placeholder="Name" required>
         <input type="email" id="signupEmail" placeholder="Email" required>
         <input type="password" id="signupPassword" placeholder="Password" required>
@@ -43,7 +43,7 @@
         <button type="submit" class="btn-primary">Create Account</button>
       </form>
 
-      <p class="switch-link">
+      <p style="margin-top: 20px;">
         Already have an account?
         <a href="auth-login.html">Login</a>
       </p>
