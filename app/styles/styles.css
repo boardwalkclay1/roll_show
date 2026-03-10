@@ -1,20 +1,16 @@
 /* ============================================================
    ROLL SHOW — CINEMATIC GLOBAL STYLE SYSTEM
-   Location: /app/styles/styles.css
    ============================================================ */
 
 /* ------------------------------
    FONTS
    ------------------------------ */
-
 @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
 
 /* ============================================================
    GLOBAL FRAMED PHOTO SYSTEM
-   Called from page using:
-   <img src="images/whatever.jpg" class="framed-photo">
    ============================================================ */
 
 html, body {
@@ -22,28 +18,27 @@ html, body {
   padding: 0;
   height: 100%;
   overflow-x: hidden;
+  background: none !important;
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  padding-bottom: 60px;
+  color: white;
   position: relative;
 }
 
-/* Cinematic full-screen photo with 0.5in top/bottom margin */
+/* Full cinematic background */
 .framed-photo {
   position: fixed;
   top: 0.5in;
   left: 0;
   width: 100vw;
   height: calc(100vh - 1in);
-  object-fit: contain;
+  object-fit: cover; /* FULL COVER, NO WHITE */
   z-index: -1;
   pointer-events: none;
 }
 
-/* Optional overlay for readability */
+/* Overlay for readability */
 .photo-overlay {
   position: fixed;
   top: 0.5in;
@@ -53,37 +48,6 @@ body {
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(2px);
   z-index: -1;
-}
-
-
-/* ============================================================
-   THEME VARIABLES
-   ============================================================ */
-
-:root {
-  --bg: #faf7f2;
-  --bg-alt: #fff;
-  --text: #222;
-  --text-light: #555;
-  --accent: #ff6f61;
-  --accent-2: #4cc9f0;
-  --accent-3: #ffbe0b;
-  --border: #ddd;
-  --card-bg: #ffffff;
-  --shadow: rgba(0,0,0,0.08);
-}
-
-[data-theme="dark"] {
-  --bg: #0f0e17;
-  --bg-alt: #1a1923;
-  --text: #f5f5f5;
-  --text-light: #bbb;
-  --accent: #ff6f61;
-  --accent-2: #4cc9f0;
-  --accent-3: #ffbe0b;
-  --border: #2a2935;
-  --card-bg: #1a1923;
-  --shadow: rgba(0,0,0,0.4);
 }
 
 
@@ -99,8 +63,8 @@ body {
 }
 
 a {
-  color: var(--accent);
-  text-decoration: none;
+  color: white;
+  text-decoration: underline;
 }
 
 button {
@@ -109,12 +73,14 @@ button {
 
 
 /* ============================================================
-   ARTISTIC HEADINGS
+   HEADINGS
    ============================================================ */
 
 h1, h2, h3, .logo, .cta {
   font-family: "Lobster", cursive;
   letter-spacing: 0.5px;
+  color: white;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
 }
 
 
@@ -125,8 +91,8 @@ h1, h2, h3, .logo, .cta {
 .header {
   width: 100%;
   padding: 20px 40px;
-  background: var(--bg-alt);
-  border-bottom: 1px solid var(--border);
+  background: none !important;
+  border: none !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -137,21 +103,22 @@ h1, h2, h3, .logo, .cta {
 .logo {
   font-size: 32px;
   font-weight: 400;
-  color: var(--text);
+  color: white;
 }
 
 .nav a {
   margin-left: 20px;
   font-weight: 600;
+  color: white;
 }
 
 #themeToggle {
   margin-left: 20px;
   padding: 8px 14px;
   border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--bg-alt);
-  color: var(--text);
+  border: 1px solid white;
+  background: none;
+  color: white;
 }
 
 
@@ -172,30 +139,28 @@ h1, h2, h3, .logo, .cta {
   max-width: 600px;
 }
 
-.hero h1 {
-  font-size: 64px;
-  line-height: 1.1;
-}
-
 .hero .subtitle {
   margin-top: 10px;
   font-size: 22px;
   font-weight: 300;
+  color: white;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
 }
 
 .cta {
   display: inline-block;
   margin-top: 30px;
   padding: 14px 24px;
-  background: var(--accent);
-  color: #fff;
+  background: rgba(255,255,255,0.2);
+  color: white;
   border-radius: 10px;
   font-size: 22px;
   transition: 0.2s;
+  backdrop-filter: blur(3px);
 }
 
 .cta:hover {
-  background: var(--accent-2);
+  background: rgba(255,255,255,0.35);
 }
 
 
@@ -213,12 +178,13 @@ h1, h2, h3, .logo, .cta {
 }
 
 .show-card {
-  background: var(--card-bg);
+  background: rgba(0,0,0,0.4);
   padding: 20px;
   border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 10px var(--shadow);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: none;
   transition: 0.2s;
+  color: white;
 }
 
 .show-card:hover {
@@ -242,17 +208,17 @@ form textarea {
   padding: 12px;
   margin-top: 6px;
   border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-alt);
-  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(0,0,0,0.4);
+  color: white;
 }
 
 .btn-primary {
   margin-top: 30px;
   padding: 14px 20px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.4);
   border-radius: 8px;
   font-weight: 700;
   font-size: 16px;
@@ -260,5 +226,5 @@ form textarea {
 }
 
 .btn-primary:hover {
-  background: var(--accent-2);
+  background: rgba(255,255,255,0.35);
 }
