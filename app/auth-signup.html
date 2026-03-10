@@ -3,38 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <title>Roll Show – Signup</title>
+
+  <!-- Correct path for Cloudflare Pages -->
   <link rel="stylesheet" href="styles/styles.css">
   <link rel="icon" href="favicon.ico">
 </head>
 
 <body>
 
-<main class="auth-container">
-  <div class="auth-box">
+  <!-- CINEMATIC BACKGROUND PHOTO -->
+  <img src="images/roll-show.jpg" class="framed-photo" alt="Background">
+  <div class="photo-overlay"></div>
 
-    <h1>Create Your Account</h1>
+  <main class="auth-container">
+    <div class="auth-box">
 
-    <form id="signupForm" class="auth-form">
-      <input type="text" id="signupName" placeholder="Name" required>
-      <input type="email" id="signupEmail" placeholder="Email" required>
-      <input type="password" id="signupPassword" placeholder="Password" required>
+      <h1>Create Your Account</h1>
 
-      <select id="signupRole" required>
-        <option value="buyer">Ticket Buyer</option>
-        <option value="skater">Skater</option>
-      </select>
+      <form id="signupForm" class="auth-form">
+        <input type="text" id="signupName" placeholder="Name" required>
+        <input type="email" id="signupEmail" placeholder="Email" required>
+        <input type="password" id="signupPassword" placeholder="Password" required>
 
-      <button type="submit" class="btn-primary">Create Account</button>
-    </form>
+        <select id="signupRole" required>
+          <option value="buyer">Ticket Buyer</option>
+          <option value="skater">Skater</option>
+        </select>
 
-    <p class="switch-link">
-      Already have an account?  
-      <a href="auth-login.html">Login</a>
-    </p>
+        <button type="submit" class="btn-primary">Create Account</button>
+      </form>
 
-  </div>
-</main>
+      <p class="switch-link">
+        Already have an account?
+        <a href="auth-login.html">Login</a>
+      </p>
 
-<script src="js/app.js" defer></script>
+    </div>
+  </main>
+
+  <script src="js/app.js" defer></script>
 </body>
 </html>
