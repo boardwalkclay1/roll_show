@@ -9,25 +9,29 @@
 
 <body>
 
-<main class="auth-container">
-  <div class="auth-box">
+  <!-- CINEMATIC BACKGROUND PHOTO -->
+  <img src="images/roll-show.jpg" class="framed-photo" alt="Background">
+  <div class="photo-overlay"></div>
 
-    <h1>Welcome Back</h1>
+  <main class="auth-container">
+    <div class="auth-box">
 
-    <form id="loginForm" class="auth-form">
-      <input type="email" id="loginEmail" placeholder="Email" required>
-      <input type="password" id="loginPassword" placeholder="Password" required>
-      <button type="submit" class="btn-primary">Login</button>
-    </form>
+      <h1>Welcome Back</h1>
 
-    <p class="switch-link">
-      Don’t have an account?  
-      <a href="auth-signup.html">Create one</a>
-    </p>
+      <form id="loginForm" class="auth-form">
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <button type="submit" class="btn-primary">Login</button>
+      </form>
 
-  </div>
-</main>
+      <p class="switch-link">
+        Don’t have an account?
+        <a href="auth-signup.html">Create one</a>
+      </p>
 
-<script src="js/app.js" defer></script>
+    </div>
+  </main>
+
+  <script src="js/app.js" defer></script>
 </body>
 </html>
