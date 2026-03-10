@@ -1,10 +1,8 @@
 /* ============================================================
-   ROLL SHOW — GLOBAL STYLE SYSTEM (NO BACKGROUND CONTROL)
+   ROLL SHOW — CLEAN GLOBAL STYLE (NO BACKGROUND CONTROL)
    ============================================================ */
 
-/* ------------------------------
-   FONTS
-   ------------------------------ */
+/* FONTS */
 @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
@@ -17,10 +15,19 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow-x: hidden;
-  background: #000; /* PURE BLACK — BEHIND your image */
+  background: #000; /* PURE BLACK BEHIND YOUR IMAGE */
   color: white;
   font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+/* Every page’s content sits ABOVE the background image */
+.landing-page,
+.auth-container,
+.header,
+.footer {
+  position: relative;
+  z-index: 5;
 }
 
 
@@ -57,25 +64,21 @@ button {
 .header {
   width: 100%;
   padding: 20px 40px;
-  background: none;
-  border: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative;
-  z-index: 10;
+  background: none;
+  border: none;
 }
 
 .logo {
   font-size: 32px;
   font-weight: 400;
-  color: white;
 }
 
 .nav a {
   margin-left: 20px;
   font-weight: 600;
-  color: white;
 }
 
 #themeToggle {
@@ -97,8 +100,6 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative;
-  z-index: 10;
 }
 
 .hero-content {
@@ -109,7 +110,6 @@ button {
   margin-top: 10px;
   font-size: 22px;
   font-weight: 300;
-  color: white;
   text-shadow: 0 3px 8px rgba(0,0,0,0.6);
 }
 
@@ -118,7 +118,6 @@ button {
   margin-top: 30px;
   padding: 14px 24px;
   background: rgba(255,255,255,0.2);
-  color: white;
   border-radius: 10px;
   font-size: 22px;
   transition: 0.2s;
@@ -139,8 +138,6 @@ button {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 20px;
   padding: 20px 40px;
-  position: relative;
-  z-index: 10;
 }
 
 .show-card {
@@ -148,9 +145,7 @@ button {
   padding: 20px;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.2);
-  box-shadow: none;
   transition: 0.2s;
-  color: white;
 }
 
 .show-card:hover {
@@ -162,9 +157,15 @@ button {
    FORMS
    ============================================================ */
 
-form {
-  position: relative;
-  z-index: 10;
+.auth-container {
+  display: flex;
+  justify-content: center;
+  padding: 100px 20px;
+}
+
+.auth-box {
+  width: 100%;
+  max-width: 420px;
 }
 
 form input,
@@ -183,7 +184,6 @@ form textarea {
   margin-top: 30px;
   padding: 14px 20px;
   background: rgba(255,255,255,0.2);
-  color: white;
   border: 1px solid rgba(255,255,255,0.4);
   border-radius: 8px;
   font-weight: 700;
