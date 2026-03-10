@@ -6,79 +6,58 @@
 
   <link rel="stylesheet" href="styles/styles.css">
   <link rel="icon" href="favicon.ico">
-
-  <style>
-    /* Full-screen background that shows the entire image */
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      width: 100vw;
-      overflow-x: hidden;
-
-      background-image: url("images/roll-index.jpg");
-      background-size: contain;        /* show the whole image */
-      background-repeat: no-repeat;    /* no tiling */
-      background-position: top center; /* show the top of the image */
-      background-color: #000;          /* fills any leftover space */
-    }
-
-    /* Overlay for readability */
-    .landing-page {
-      min-height: 100vh;
-      width: 100%;
-      background: rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(2px);
-      padding-bottom: 80px;
-    }
-  </style>
 </head>
 
 <body>
 
-<header class="header">
-  <div class="logo">ROLL SHOW</div>
+  <!-- CINEMATIC BACKGROUND PHOTO -->
+  <img src="images/roll-index.jpg" class="framed-photo" alt="Background">
+  <div class="photo-overlay"></div>
 
-  <nav class="nav">
-    <a href="auth-login.html">Login</a>
-    <a href="buyer-profile.html">My Tickets</a>
-    <button id="themeToggle">Theme</button>
-  </nav>
-</header>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">ROLL SHOW</div>
 
-<main class="landing-page">
+    <nav class="nav">
+      <a href="auth-login.html">Login</a>
+      <a href="buyer-profile.html">My Tickets</a>
+      <button id="themeToggle">Theme</button>
+    </nav>
+  </header>
 
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Skate Performances From Every Discipline</h1>
-      <p class="subtitle">Buy tickets, watch shows, support skaters, and experience the culture.</p>
-      <a class="cta" href="auth-signup.html">Become a Skater</a>
-    </div>
+  <!-- MAIN CONTENT -->
+  <main class="landing-page">
 
-    <div class="hero-art">
-      <div class="hero-circle"></div>
-      <div class="hero-glow"></div>
-    </div>
-  </section>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Skate Performances From Every Discipline</h1>
+        <p class="subtitle">Buy tickets, watch shows, support skaters, and experience the culture.</p>
+        <a class="cta" href="auth-signup.html">Become a Skater</a>
+      </div>
+    </section>
 
-  <section class="featured-section">
-    <h2>Featured Shows</h2>
-    <div id="featuredShows" class="featured-grid"></div>
-  </section>
+    <!-- FEATURED SHOWS -->
+    <section class="featured-section">
+      <h2>Featured Shows</h2>
+      <div id="featuredShows" class="featured-grid"></div>
+    </section>
 
-  <section class="explore-section">
-    <h2>Explore All Shows</h2>
-    <p class="section-subtitle">Discover performances from skaters across every style and discipline.</p>
-    <div id="showGrid" class="show-grid"></div>
-  </section>
+    <!-- EXPLORE ALL SHOWS -->
+    <section class="explore-section">
+      <h2>Explore All Shows</h2>
+      <p class="section-subtitle">Discover performances from skaters across every style and discipline.</p>
+      <div id="showGrid" class="show-grid"></div>
+    </section>
 
-</main>
+  </main>
 
-<footer class="footer">
-  <p>© Roll Show</p>
-</footer>
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© Roll Show</p>
+  </footer>
 
-<script src="js/app.js" defer></script>
+  <script src="js/app.js" defer></script>
 
 </body>
 </html>
