@@ -285,3 +285,84 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+// =============================
+// GLOBAL HELPERS
+// =============================
+function saveUser(user) {
+  localStorage.setItem("rollshow_user", JSON.stringify(user));
+}
+
+function getUser() {
+  const raw = localStorage.getItem("rollshow_user");
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+// =============================
+// LOGIN PAGE
+// =============================
+document.addEventListener("DOMContentLoaded", () => {
+  const loginForm = document.getElementById("loginForm");
+  if (!loginForm) return;
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      alert("Login failed: " + data.error);
+      return;
+    }
+
+    saveUser(data.user);
+
+    if (data.user.role === "skater") {
+      window.location.href = "/create-show.html";
+    } else {
+      window.location.href = "/index.html";
+    }
+  });
+});
+
+// =============================
+// SIGNUP PAGE
+// =============================
+document.addEventListener("DOMContentLoaded", () => {
+  const signupForm = document.getElementById("signupForm");
+  if (!signupForm) return;
+
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("signupName").value;
+    const email = document.getElementById("signupEmail").value;
+    const password = document.getElementById("signupPassword").value;
+    const role = document.getElementById("signupRole").value;
+
+    const res = await fetch("/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password, role })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      alert("Signup failed: " + data.error);
+      return;
+    }
+
+    alert("Account created! Please log in.");
+    window.location.href = "/auth-login.html";
+  });
+});
