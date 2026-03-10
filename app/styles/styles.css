@@ -1,50 +1,196 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-  <meta charset="UTF-8">
-  <title>Roll Show – Login</title>
-  <link rel="stylesheet" href="styles/styles.css">
-  <link rel="icon" href="favicon.ico">
-</head>
+/* ============================================================
+   ROLL SHOW — GLOBAL STYLE SYSTEM (NO BACKGROUND CONTROL)
+   ============================================================ */
 
-<body style="background:black;">
+/* ------------------------------
+   FONTS
+   ------------------------------ */
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
-  <!-- FULL BACKGROUND IMAGE — DIRECT CONTROL -->
-  <img 
-    src="images/roll-show.jpg"
-    alt="Background"
-    style="
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      z-index: -1;
-    "
-  >
 
-  <main class="auth-container">
+/* ============================================================
+   GLOBAL RESET
+   ============================================================ */
 
-    <div class="auth-box" style="background:none; border:none; box-shadow:none;">
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  background: #000; /* PURE BLACK — BEHIND your image */
+  color: white;
+  font-family: "Inter", sans-serif;
+}
 
-      <h1>Welcome Back</h1>
 
-      <form id="loginForm" class="auth-form">
-        <input type="email" id="loginEmail" placeholder="Email" required>
-        <input type="password" id="loginPassword" placeholder="Password" required>
-        <button type="submit" class="btn-primary">Login</button>
-      </form>
+/* ============================================================
+   HEADINGS
+   ============================================================ */
 
-      <p class="switch-link">
-        Don’t have an account?
-        <a href="auth-signup.html">Create one</a>
-      </p>
+h1, h2, h3, .logo, .cta {
+  font-family: "Lobster", cursive;
+  letter-spacing: 0.5px;
+  color: white;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
+}
 
-    </div>
 
-  </main>
+/* ============================================================
+   LINKS + BUTTONS
+   ============================================================ */
 
-  <script src="js/app.js" defer></script>
-</body>
-</html>
+a {
+  color: white;
+  text-decoration: underline;
+}
+
+button {
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+  width: 100%;
+  padding: 20px 40px;
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 32px;
+  font-weight: 400;
+  color: white;
+}
+
+.nav a {
+  margin-left: 20px;
+  font-weight: 600;
+  color: white;
+}
+
+#themeToggle {
+  margin-left: 20px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid white;
+  background: none;
+  color: white;
+}
+
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+
+.hero {
+  padding: 120px 40px 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.hero-content {
+  max-width: 600px;
+}
+
+.hero .subtitle {
+  margin-top: 10px;
+  font-size: 22px;
+  font-weight: 300;
+  color: white;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
+}
+
+.cta {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 14px 24px;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border-radius: 10px;
+  font-size: 22px;
+  transition: 0.2s;
+  backdrop-filter: blur(3px);
+}
+
+.cta:hover {
+  background: rgba(255,255,255,0.35);
+}
+
+
+/* ============================================================
+   SHOW GRID + CARDS
+   ============================================================ */
+
+.show-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  padding: 20px 40px;
+  position: relative;
+  z-index: 10;
+}
+
+.show-card {
+  background: rgba(0,0,0,0.4);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: none;
+  transition: 0.2s;
+  color: white;
+}
+
+.show-card:hover {
+  transform: translateY(-4px);
+}
+
+
+/* ============================================================
+   FORMS
+   ============================================================ */
+
+form {
+  position: relative;
+  z-index: 10;
+}
+
+form input,
+form select,
+form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(0,0,0,0.4);
+  color: white;
+}
+
+.btn-primary {
+  margin-top: 30px;
+  padding: 14px 20px;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background: rgba(255,255,255,0.35);
+}
