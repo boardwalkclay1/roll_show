@@ -1,5 +1,5 @@
 /* ============================================================
-   ROLL SHOW — CINEMATIC GLOBAL STYLE SYSTEM
+   ROLL SHOW — GLOBAL STYLE SYSTEM (NO BACKGROUND CONTROL)
    ============================================================ */
 
 /* ------------------------------
@@ -10,7 +10,7 @@
 
 
 /* ============================================================
-   GLOBAL FRAMED PHOTO SYSTEM
+   GLOBAL RESET
    ============================================================ */
 
 html, body {
@@ -18,57 +18,9 @@ html, body {
   padding: 0;
   height: 100%;
   overflow-x: hidden;
-  background: none !important;
-}
-
-body {
+  background: #000 !important; /* PURE BLACK — NO WHITE EVER */
   color: white;
-  position: relative;
-}
-
-/* Full cinematic background */
-.framed-photo {
-  position: fixed;
-  top: 0.5in;
-  left: 0;
-  width: 100vw;
-  height: calc(100vh - 1in);
-  object-fit: cover; /* FULL COVER, NO WHITE */
-  z-index: -1;
-  pointer-events: none;
-}
-
-/* Overlay for readability */
-.photo-overlay {
-  position: fixed;
-  top: 0.5in;
-  left: 0;
-  width: 100vw;
-  height: calc(100vh - 1in);
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(2px);
-  z-index: -1;
-}
-
-
-/* ============================================================
-   GLOBAL RESET
-   ============================================================ */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
   font-family: "Inter", sans-serif;
-}
-
-a {
-  color: white;
-  text-decoration: underline;
-}
-
-button {
-  cursor: pointer;
 }
 
 
@@ -85,6 +37,20 @@ h1, h2, h3, .logo, .cta {
 
 
 /* ============================================================
+   LINKS + BUTTONS
+   ============================================================ */
+
+a {
+  color: white;
+  text-decoration: underline;
+}
+
+button {
+  cursor: pointer;
+}
+
+
+/* ============================================================
    HEADER
    ============================================================ */
 
@@ -97,7 +63,7 @@ h1, h2, h3, .logo, .cta {
   justify-content: space-between;
   align-items: center;
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 
 .logo {
@@ -132,7 +98,7 @@ h1, h2, h3, .logo, .cta {
   justify-content: space-between;
   align-items: center;
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 
 .hero-content {
@@ -174,7 +140,7 @@ h1, h2, h3, .logo, .cta {
   gap: 20px;
   padding: 20px 40px;
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 
 .show-card {
@@ -198,7 +164,7 @@ h1, h2, h3, .logo, .cta {
 
 form {
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 
 form input,
