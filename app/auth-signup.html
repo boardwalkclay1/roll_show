@@ -7,18 +7,28 @@
   <link rel="icon" href="favicon.ico">
 </head>
 
-<body style="background:none !important;">
+<body style="background:black !important;">
 
-  <!-- FULL CINEMATIC BACKGROUND -->
-  <img src="images/roll-show.jpg" class="framed-photo" alt="Background">
-  <div class="photo-overlay"></div>
+  <!-- FULL BACKGROUND IMAGE — DIRECT CONTROL -->
+  <img 
+    src="images/roll-show.jpg"
+    alt="Background"
+    style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+    "
+  >
 
-  <main class="auth-container" style="background:none !important;">
-    <div class="auth-box" style="background:none !important; box-shadow:none !important; border:none !important;">
+  <main class="auth-container">
 
-      <h1 style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">
-        Create Your Account
-      </h1>
+    <div class="auth-box" style="background:none; border:none; box-shadow:none;">
+
+      <h1>Create Your Account</h1>
 
       <form id="signupForm" class="auth-form">
         <input type="text" id="signupName" placeholder="Name" required>
@@ -33,12 +43,13 @@
         <button type="submit" class="btn-primary">Create Account</button>
       </form>
 
-      <p class="switch-link" style="color:white; text-shadow:0 3px 8px rgba(0,0,0,0.6);">
+      <p class="switch-link">
         Already have an account?
-        <a href="auth-login.html" style="color:white; text-decoration:underline;">Login</a>
+        <a href="auth-login.html">Login</a>
       </p>
 
     </div>
+
   </main>
 
   <script src="js/app.js" defer></script>
