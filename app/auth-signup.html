@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>Roll Show – Signup</title>
+  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="icon" href="favicon.ico">
+</head>
+
+<body>
+
+<main class="auth-container">
+  <div class="auth-box">
+
+    <h1>Create Your Account</h1>
+
+    <form id="signupForm" class="auth-form">
+      <input type="text" id="signupName" placeholder="Name" required>
+      <input type="email" id="signupEmail" placeholder="Email" required>
+      <input type="password" id="signupPassword" placeholder="Password" required>
+
+      <select id="signupRole" required>
+        <option value="buyer">Ticket Buyer</option>
+        <option value="skater">Skater</option>
+      </select>
+
+      <button type="submit" class="btn-primary">Create Account</button>
+    </form>
+
+    <p class="switch-link">
+      Already have an account?  
+      <a href="auth-login.html">Login</a>
+    </p>
+
+  </div>
+</main>
+
+<script src="js/app.js" defer></script>
+</body>
+</html>
