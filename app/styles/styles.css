@@ -1,7 +1,46 @@
 /* ============================================================
-   ROLL SHOW — GLOBAL STYLE SYSTEM
+   ROLL SHOW — CINEMATIC GLOBAL STYLE SYSTEM
    Location: /app/styles/styles.css
    ============================================================ */
+
+/* ------------------------------
+   FONTS
+   ------------------------------ */
+
+/* Artistic bold cursive for headings + logo */
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
+/* Clean readable body font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+
+/* ------------------------------
+   LANDING PAGE BACKGROUND
+   ------------------------------ */
+
+body[data-page="landing"] {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+
+  background-image: url("../images/roll-index.jpg");
+  background-size: contain;        /* show entire image */
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-color: #000;          /* fills leftover space */
+}
+
+/* Overlay for readability */
+.landing-overlay {
+  min-height: 100vh;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  padding-bottom: 80px;
+}
+
 
 /* ------------------------------
    THEME VARIABLES
@@ -12,9 +51,9 @@
   --bg-alt: #fff;
   --text: #222;
   --text-light: #555;
-  --accent: #ff6f61;     /* groovy coral */
-  --accent-2: #4cc9f0;   /* neon teal */
-  --accent-3: #ffbe0b;   /* disco yellow */
+  --accent: #ff6f61;
+  --accent-2: #4cc9f0;
+  --accent-3: #ffbe0b;
   --border: #ddd;
   --card-bg: #ffffff;
   --shadow: rgba(0,0,0,0.08);
@@ -32,6 +71,7 @@
   --card-bg: #1a1923;
   --shadow: rgba(0,0,0,0.4);
 }
+
 
 /* ------------------------------
    GLOBAL RESET
@@ -59,6 +99,25 @@ button {
   cursor: pointer;
 }
 
+
+/* ------------------------------
+   ARTISTIC HEADINGS
+   ------------------------------ */
+
+h1, h2, h3, .logo, .cta {
+  font-family: "Lobster", cursive;
+  letter-spacing: 0.5px;
+}
+
+/* Landing page text glow */
+body[data-page="landing"] h1,
+body[data-page="landing"] .subtitle,
+body[data-page="landing"] .cta {
+  color: #fff;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
+}
+
+
 /* ------------------------------
    HEADER
    ------------------------------ */
@@ -74,20 +133,19 @@ button {
 }
 
 .logo {
-  font-weight: 800;
-  font-size: 24px;
-  letter-spacing: 1px;
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--text);
 }
 
-.nav a,
-.admin-nav a {
+body[data-page="landing"] .logo {
+  color: #fff;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
+}
+
+.nav a {
   margin-left: 20px;
   font-weight: 600;
-}
-
-.nav a.active,
-.admin-nav a.active {
-  color: var(--accent-2);
 }
 
 #themeToggle {
@@ -99,33 +157,77 @@ button {
   color: var(--text);
 }
 
+
 /* ------------------------------
-   PAGE HEADERS
+   HERO SECTION
    ------------------------------ */
 
-.page-header {
-  padding: 40px;
+.hero {
+  padding: 120px 40px 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.page-header h1 {
-  font-size: 36px;
-  margin-bottom: 10px;
+.hero-content {
+  max-width: 600px;
 }
 
-.page-header .subtitle {
-  font-size: 18px;
-  color: var(--text-light);
+.hero h1 {
+  font-size: 64px;
+  line-height: 1.1;
 }
+
+.hero .subtitle {
+  margin-top: 10px;
+  font-size: 22px;
+  font-weight: 300;
+}
+
+.cta {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 14px 24px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 10px;
+  font-size: 22px;
+  transition: 0.2s;
+}
+
+.cta:hover {
+  background: var(--accent-2);
+}
+
+
+/* ------------------------------
+   SHOW GRID + CARDS
+   ------------------------------ */
+
+.show-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  padding: 20px 40px;
+}
+
+.show-card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 10px var(--shadow);
+  transition: 0.2s;
+}
+
+.show-card:hover {
+  transform: translateY(-4px);
+}
+
 
 /* ------------------------------
    FORMS
    ------------------------------ */
-
-form label {
-  display: block;
-  margin-top: 20px;
-  font-weight: 600;
-}
 
 form input,
 form select,
@@ -153,233 +255,4 @@ form textarea {
 
 .btn-primary:hover {
   background: var(--accent-2);
-}
-
-/* ------------------------------
-   GRID + CARDS
-   ------------------------------ */
-
-.show-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-  padding: 20px 40px;
-}
-
-.show-card {
-  background: var(--card-bg);
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 10px var(--shadow);
-  transition: 0.2s;
-}
-
-.show-card:hover {
-  transform: translateY(-4px);
-}
-
-/* ------------------------------
-   CREATE SHOW PAGE
-   ------------------------------ */
-
-.create-show-page {
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-}
-
-.show-builder {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-}
-
-.show-form {
-  background: var(--card-bg);
-  padding: 30px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 10px var(--shadow);
-}
-
-.show-preview {
-  background: var(--card-bg);
-  padding: 30px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 10px var(--shadow);
-}
-
-.preview-card {
-  border: 1px dashed var(--border);
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.preview-card h3 {
-  font-size: 24px;
-}
-
-.preview-meta {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-  font-weight: 600;
-}
-
-.preview-video {
-  margin-top: 20px;
-}
-
-.video-placeholder {
-  width: 100%;
-  height: 180px;
-  background: var(--bg-alt);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-light);
-}
-
-/* ------------------------------
-   VIDEO STUDIO
-   ------------------------------ */
-
-.studio {
-  padding: 40px;
-}
-
-.record-section video {
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-}
-
-.controls button {
-  margin-right: 10px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-alt);
-}
-
-.clip-list,
-.timeline {
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg-alt);
-}
-
-.clip-item,
-.timeline-block {
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-}
-
-/* ------------------------------
-   BRANDING STUDIO
-   ------------------------------ */
-
-.tabs {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.tab {
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-alt);
-  font-weight: 600;
-}
-
-.tab.active {
-  background: var(--accent);
-  color: #fff;
-}
-
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-.canvas {
-  width: 100%;
-  min-height: 300px;
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  background: var(--bg-alt);
-}
-
-.ticket-preview,
-.flyer-preview,
-.stamp-preview {
-  width: 100%;
-  height: 100%;
-}
-
-/* ------------------------------
-   TICKET VIEW
-   ------------------------------ */
-
-.ticket-view {
-  padding: 40px;
-}
-
-.ticket {
-  background: var(--card-bg);
-  padding: 30px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 10px var(--shadow);
-}
-
-/* ------------------------------
-   ADMIN PAYOUTS
-   ------------------------------ */
-
-.payout-summary {
-  display: flex;
-  gap: 20px;
-  padding: 20px 40px;
-}
-
-.summary-card {
-  flex: 1;
-  background: var(--card-bg);
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 10px var(--shadow);
-}
-
-.payout-table-section {
-  padding: 20px 40px;
-}
-
-.payout-table-header,
-.payout-row {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.payout-row span {
-  display: flex;
-  align-items: center;
 }
