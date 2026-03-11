@@ -9,6 +9,7 @@
 
 <body style="background:black;">
 
+  <!-- FULL BACKGROUND IMAGE WITH FULL CONTROL -->
   <img 
     src="images/roll-show.jpg"
     alt="Background"
@@ -17,20 +18,35 @@
       inset: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: contain;
-      object-position: center bottom;
+      object-fit: cover;        /* FULL SCREEN, NO BLACK BARS */
+      object-position: center 88%; /* ← ADJUST THIS (X/Y CONTROL) */
       z-index: 0;
-      background:black;
     "
   >
 
-  <main style="position:relative; z-index:5; display:flex; justify-content:center; padding:100px 20px;">
+  <!-- SIGNUP CONTAINER -->
+  <main style="
+      position:relative; 
+      z-index:5; 
+      display:flex; 
+      justify-content:center; 
+      padding:120px 20px;
+    ">
 
-    <div style="width:100%; max-width:420px; background:transparent;">
+    <div style="
+        width:100%; 
+        max-width:420px; 
+        background:rgba(0,0,0,0.55); 
+        padding:40px; 
+        border-radius:12px; 
+        backdrop-filter:blur(6px);
+        color:white;
+      ">
 
-      <h1>Create Your Account</h1>
+      <h1 style="margin-bottom:20px;">Create Your Account</h1>
 
-      <form id="signupForm">
+      <form id="signupForm" style="display:flex; flex-direction:column; gap:15px;">
+
         <input type="text" id="signupName" placeholder="Name" required>
         <input type="email" id="signupEmail" placeholder="Email" required>
         <input type="password" id="signupPassword" placeholder="Password" required>
@@ -43,9 +59,9 @@
         <button type="submit" class="btn-primary">Create Account</button>
       </form>
 
-      <p style="margin-top:20px;">
+      <p style="margin-top:20px; text-align:center;">
         Already have an account?
-        <a href="auth-login.html">Login</a>
+        <a href="auth-login.html" style="color:white; text-decoration:underline;">Login</a>
       </p>
 
     </div>
