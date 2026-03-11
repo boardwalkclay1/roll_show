@@ -9,17 +9,23 @@
 
 <body style="background:black;">
 
-  <!-- FULL BACKGROUND IMAGE, FULL SCREEN, ADJUSTABLE FRAMING -->
+  <!-- FULL BACKGROUND IMAGE WITH FULL CONTROL -->
   <img 
     src="images/roll-index.jpg"
     alt="Background"
     style="
       position: fixed;
       inset: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      object-position: center 90%; /* ← CHANGE THIS NUMBER ONLY */
+      width: 100vw;          /* FULL SCREEN WIDTH */
+      height: 100vh;         /* FULL SCREEN HEIGHT */
+      object-fit: cover;     /* FULL SCREEN IMAGE */
+      
+      /* ⭐ THIS IS THE PART YOU ADJUST ⭐ */
+      object-position: center 88%; 
+      /* X = left / center / right
+         Y = 0%–100% (vertical shift)
+      */
+
       z-index: 0;
     "
   >
