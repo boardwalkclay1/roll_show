@@ -1,20 +1,25 @@
 // =============================
-// GLOBAL STATE HELPERS
+// GLOBAL HELPERS
 // =============================
-function getCurrentUser() {
+function saveUser(user) {
+  localStorage.setItem("rollshow_user", JSON.stringify(user));
+}
+
+function getUser() {
   const raw = localStorage.getItem("rollshow_user");
   if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+function logout() {
+  localStorage.removeItem("rollshow_user");
+  window.location.href = "/auth-login.html";
 }
 
 function requireUser(roles = null) {
-  const user = getCurrentUser();
+  const user = getUser();
   if (!user) {
-    window.location.href = "/auth.html";
+    window.location.href = "/auth-login.html";
     return null;
   }
   if (roles && !roles.includes(user.role)) {
@@ -25,12 +30,7 @@ function requireUser(roles = null) {
   return user;
 }
 
-function logout() {
-  localStorage.removeItem("rollshow_user");
-  window.location.href = "/auth.html";
-}
-
-// Attach logout to any .logout-btn if present
+// Attach logout to any .logout-btn
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".logout-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
@@ -41,72 +41,37 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =============================
-// AUTH PAGE (auth.html)
+// AUTH PAGES (LOGIN + SIGNUP)
 // =============================
 document.addEventListener("DOMContentLoaded", () => {
-  const signupForm = document.getElementById("signupForm");
   const loginForm = document.getElementById("loginForm");
-
-  // SIGNUP
-  if (signupForm) {
-    signupForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const signupName = document.getElementById("signupName");
-      const signupEmail = document.getElementById("signupEmail");
-      const signupPassword = document.getElementById("signupPassword");
-      const signupRole = document.getElementById("signupRole");
-
-      const res = await fetch("/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: signupName.value,
-          email: signupEmail.value,
-          password: signupPassword.value,
-          role: signupRole.value
-        })
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        alert("Account created! You can now log in.");
-        signupForm.reset();
-      } else {
-        alert("Signup failed: " + (data.error || "Unknown error"));
-      }
-    });
-  }
+  const signupForm = document.getElementById("signupForm");
 
   // LOGIN
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const loginEmail = document.getElementById("loginEmail");
-      const loginPassword = document.getElementById("loginPassword");
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
 
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: loginEmail.value,
-          password: loginPassword.value
-        })
+        body: JSON.stringify({ email, password })
       });
 
-      const data = await res.json();
+      let data;
+      try { data = await res.json(); }
+      catch { return alert("Server error. Try again."); }
 
       if (!data.success) {
-        alert("Login failed: " + (data.error || "Unknown error"));
+        alert("Login failed: " + data.error);
         return;
       }
 
-      // Save user locally
-      localStorage.setItem("rollshow_user", JSON.stringify(data.user));
+      saveUser(data.user);
 
-      // Redirect based on role
       if (data.user.role === "skater") {
         window.location.href = "/create-show.html";
       } else {
@@ -114,10 +79,40 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // SIGNUP
+  if (signupForm) {
+    signupForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("signupName").value;
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+      const role = document.getElementById("signupRole").value;
+
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, role })
+      });
+
+      let data;
+      try { data = await res.json(); }
+      catch { return alert("Server error. Try again."); }
+
+      if (!data.success) {
+        alert("Signup failed: " + data.error);
+        return;
+      }
+
+      alert("Account created! Please log in.");
+      window.location.href = "/auth-login.html";
+    });
+  }
 });
 
 // =============================
-// HOMEPAGE (index.html) — LIST SHOWS
+// HOMEPAGE — LIST SHOWS
 // =============================
 document.addEventListener("DOMContentLoaded", () => {
   const showsContainer = document.getElementById("showsList");
@@ -152,14 +147,13 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = `/show-page.html?id=${encodeURIComponent(showId)}`;
       });
     })
-    .catch(err => {
-      console.error(err);
+    .catch(() => {
       showsContainer.innerHTML = "<p>Error loading shows.</p>";
     });
 });
 
 // =============================
-// CREATE SHOW PAGE (create-show.html)
+// CREATE SHOW PAGE
 // =============================
 document.addEventListener("DOMContentLoaded", () => {
   const createShowForm = document.getElementById("createShowForm");
@@ -194,7 +188,9 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     });
 
-    const data = await res.json();
+    let data;
+    try { data = await res.json(); }
+    catch { return alert("Server error. Try again."); }
 
     if (data.success) {
       alert("Show created!");
@@ -206,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =============================
-// SHOW PAGE (show-page.html) — BUY TICKET
+// SHOW PAGE — BUY TICKET
 // =============================
 document.addEventListener("DOMContentLoaded", () => {
   const buyTicketBtn = document.getElementById("buyTicketBtn");
@@ -217,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const showId = url.searchParams.get("id");
   if (!showId) return;
 
-  // Load show details (reuse /api/get-shows and filter client-side for now)
+  // Load show details
   if (showMeta) {
     fetch("/api/get-shows")
       .then(res => res.json())
@@ -239,8 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p><strong>Price:</strong> $${show.price?.toFixed ? show.price.toFixed(2) : show.price}</p>
         `;
       })
-      .catch(err => {
-        console.error(err);
+      .catch(() => {
         showMeta.innerHTML = "<p>Error loading show.</p>";
       });
   }
@@ -260,11 +255,12 @@ document.addEventListener("DOMContentLoaded", () => {
         })
       });
 
-      const data = await res.json();
+      let data;
+      try { data = await res.json(); }
+      catch { return alert("Server error. Try again."); }
 
       if (data.success) {
         alert("Ticket purchased! Ticket ID: " + data.ticket_id);
-        // You could redirect to ticket view page here
       } else {
         alert("Failed to buy ticket: " + (data.error || "Unknown error"));
       }
@@ -273,96 +269,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =============================
-// SIMPLE ROLE-BASED GUARDS (OPTIONAL)
-// Attach data-require-role="skater" or "buyer" to any element
+// ROLE-BASED ELEMENT HIDING
 // =============================
 document.addEventListener("DOMContentLoaded", () => {
-  const user = getCurrentUser();
+  const user = getUser();
   document.querySelectorAll("[data-require-role]").forEach(el => {
     const needed = el.getAttribute("data-require-role");
     if (!user || user.role !== needed) {
       el.style.display = "none";
     }
-  });
-});
-// =============================
-// GLOBAL HELPERS
-// =============================
-function saveUser(user) {
-  localStorage.setItem("rollshow_user", JSON.stringify(user));
-}
-
-function getUser() {
-  const raw = localStorage.getItem("rollshow_user");
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
-}
-
-// =============================
-// LOGIN PAGE
-// =============================
-document.addEventListener("DOMContentLoaded", () => {
-  const loginForm = document.getElementById("loginForm");
-  if (!loginForm) return;
-
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      alert("Login failed: " + data.error);
-      return;
-    }
-
-    saveUser(data.user);
-
-    if (data.user.role === "skater") {
-      window.location.href = "/create-show.html";
-    } else {
-      window.location.href = "/index.html";
-    }
-  });
-});
-
-// =============================
-// SIGNUP PAGE
-// =============================
-document.addEventListener("DOMContentLoaded", () => {
-  const signupForm = document.getElementById("signupForm");
-  if (!signupForm) return;
-
-  signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("signupName").value;
-    const email = document.getElementById("signupEmail").value;
-    const password = document.getElementById("signupPassword").value;
-    const role = document.getElementById("signupRole").value;
-
-    const res = await fetch("/api/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, role })
-    });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      alert("Signup failed: " + data.error);
-      return;
-    }
-
-    alert("Account created! Please log in.");
-    window.location.href = "/auth-login.html";
   });
 });
