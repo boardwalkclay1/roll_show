@@ -1,4 +1,11 @@
 // =============================
+// CONFIG — POINT FRONTEND TO WORKER API
+// =============================
+const API_BASE = "https://rollshow.<YOUR-WORKER-SUBDOMAIN>.workers.dev"; 
+// Replace <YOUR-WORKER-SUBDOMAIN> with your actual Worker domain
+
+
+// =============================
 // GLOBAL HELPERS
 // =============================
 function saveUser(user) {
@@ -40,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+
 // =============================
 // AUTH PAGES (LOGIN + SIGNUP)
 // =============================
@@ -55,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const email = document.getElementById("loginEmail").value;
       const password = document.getElementById("loginPassword").value;
 
-      const res = await fetch("/api/login", {
+      const res = await fetch(`${API_BASE}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -90,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const password = document.getElementById("signupPassword").value;
       const role = document.getElementById("signupRole").value;
 
-      const res = await fetch("/api/signup", {
+      const res = await fetch(`${API_BASE}/api/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, role })
@@ -111,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+
 // =============================
 // HOMEPAGE — LIST SHOWS
 // =============================
@@ -118,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const showsContainer = document.getElementById("showsList");
   if (!showsContainer) return;
 
-  fetch("/api/get-shows")
+  fetch(`${API_BASE}/api/get-shows`)
     .then(res => res.json())
     .then(shows => {
       if (!Array.isArray(shows) || shows.length === 0) {
@@ -152,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+
 // =============================
 // CREATE SHOW PAGE
 // =============================
@@ -173,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const premiereDate = document.getElementById("showPremiereDate").value;
     const videoSource = document.getElementById("showVideoSource").value;
 
-    const res = await fetch("/api/create-show", {
+    const res = await fetch(`${API_BASE}/api/create-show`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -201,6 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+
 // =============================
 // SHOW PAGE — BUY TICKET
 // =============================
@@ -215,7 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Load show details
   if (showMeta) {
-    fetch("/api/get-shows")
+    fetch(`${API_BASE}/api/get-shows`)
       .then(res => res.json())
       .then(shows => {
         const show = Array.isArray(shows)
@@ -246,7 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const user = requireUser(["buyer", "skater"]);
       if (!user) return;
 
-      const res = await fetch("/api/buy-ticket", {
+      const res = await fetch(`${API_BASE}/api/buy-ticket`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -267,6 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
 
 // =============================
 // ROLE-BASED ELEMENT HIDING
