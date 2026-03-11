@@ -1,7 +1,7 @@
 // =============================
 // CONFIG — POINT FRONTEND TO WORKER API
 // =============================
-const API_BASE = " https://rollshow.boardwalkclay1.workers.dev"; 
+const API_BASE = "https://roll-worker.boardwalkclay1.workers.dev"; 
 // Replace <YOUR-WORKER-SUBDOMAIN> with your actual Worker domain
 
 
