@@ -5,6 +5,11 @@ compatibility_date = "2024-01-01"
 # Serve your frontend from /app (Worker mode)
 assets = { directory = "./app" }
 
+# Required when using assets in Worker mode
+routes = [
+  { pattern = "roll-show.pages.dev/*", zone_name = "pages.dev" }
+]
+
 # Bind your D1 database
 [[d1_databases]]
 binding = "DB"
