@@ -3,58 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <title>Roll Show – Skate Performances</title>
+
+  <!-- MOBILE + PWA -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+
+  <!-- SOCIAL SHARE / LINK PREVIEW -->
+  <meta property="og:title" content="Roll Show – Skate Performances">
+  <meta property="og:description" content="Buy tickets, watch shows, support skaters, and experience the culture.">
+  <meta property="og:image" content="/app/images/roll-index.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://roll-show.pages.dev/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Roll Show – Skate Performances">
+  <meta name="twitter:description" content="Experience skate culture from every discipline.">
+  <meta name="twitter:image" content="/app/images/roll-index.jpg">
+
+  <!-- ICONS -->
+  <link rel="icon" href="/app/images/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
+
+  <!-- MANIFEST -->
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <!-- STYLES -->
   <link rel="stylesheet" href="/app/styles/styles.css">
-  <link rel="icon" href="favicon.ico">
+
+  <!-- SERVICE WORKER -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js");
+    }
+  </script>
 </head>
 
 <body style="background:black;">
 
-  <!-- FULL BACKGROUND IMAGE WITH FULL CONTROL -->
+  <!-- FULL BACKGROUND IMAGE -->
   <img 
     src="/app/images/roll-index.jpg"
     alt="Background"
     style="
       position: fixed;
       inset: 0;
-      width: 100vw;          
-      height: 100vh;         
-      object-fit: cover;     
-      object-position: center 88%; /* ← ADJUST THIS */
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center 88%;
       z-index: 0;
     "
   >
 
-  <!-- HEADER WITH CENTERED LINKS -->
-  <header class="header" style="
-      position:relative; 
-      z-index:5; 
-      width:100%; 
-      display:flex; 
-      justify-content:center; 
+  <!-- HEADER -->
+  <header style="
+      position:relative;
+      z-index:5;
+      width:100%;
+      display:flex;
+      justify-content:center;
       padding:20px 0;
     ">
-    
-    <nav class="nav" style="
-        display:flex; 
-        gap:40px; 
-        font-size:18px;
-      ">
+    <nav style="display:flex; gap:40px; font-size:18px;">
       <a href="/pages/auth-login.html" style="color:white;">Login</a>
       <a href="/pages/buyer-profile.html" style="color:white;">My Tickets</a>
     </nav>
-
   </header>
 
-  <main class="landing-page" style="position:relative; z-index:5;">
+  <!-- MAIN CONTENT -->
+  <main style="position:relative; z-index:5;">
 
     <section class="hero">
       <div class="hero-content">
         <h1>Skate Performances From Every Discipline</h1>
-
         <p class="subtitle">
           Buy tickets, watch shows, support skaters, and experience the culture.
         </p>
-
         <a class="cta" href="/pages/auth-signup.html">Become a Skater</a>
       </div>
     </section>
@@ -74,7 +98,8 @@
 
   </main>
 
-  <footer class="footer" style="position:relative; z-index:5;">
+  <!-- FOOTER -->
+  <footer style="position:relative; z-index:5;">
     <p>© Roll Show</p>
   </footer>
 
