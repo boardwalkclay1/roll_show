@@ -67,33 +67,134 @@
     <nav style="display:flex; gap:40px; font-size:18px;">
       <a href="/pages/auth-login.html" style="color:white;">Login</a>
       <a href="/pages/buyer-profile.html" style="color:white;">My Tickets</a>
+      <a href="/pages/skater-dashboard.html" style="color:white;">Skater Dashboard</a>
+      <a href="/pages/business-dashboard.html" style="color:white;">Business/Celebrity</a>
     </nav>
   </header>
 
   <!-- MAIN CONTENT -->
   <main style="position:relative; z-index:5;">
 
+    <!-- HERO: THREE ENTRY PATHS -->
     <section class="hero">
       <div class="hero-content">
         <h1>Skate Performances From Every Discipline</h1>
         <p class="subtitle">
-          Buy tickets, watch shows, support skaters, and experience the culture.
+          Buy tickets, watch shows, support skaters, and build real deals between performers, brands, and music.
         </p>
-        <a class="cta" href="/pages/auth-signup.html">Become a Skater</a>
+
+        <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-top:20px;">
+          <a class="cta" href="/pages/signup-buyer.html">Buy Tickets</a>
+          <a class="cta" href="/pages/signup-skater.html">Become a Skater</a>
+          <a class="cta" href="/pages/signup-business.html">Register Business / Celebrity</a>
+        </div>
       </div>
     </section>
 
+    <!-- FEATURED SHOWS -->
     <section class="featured-section">
       <h2>Featured Shows</h2>
       <div id="featuredShows" class="featured-grid"></div>
     </section>
 
+    <!-- PERFORMER FEED (SKATER PROFILES + CLIPS) -->
     <section class="explore-section">
-      <h2>Explore All Shows</h2>
+      <h2>Performer Feed</h2>
       <p class="section-subtitle">
-        Discover performances from skaters across every style and discipline.
+        Browse skaters by discipline, watch short clips, and discover who you want to work with.
       </p>
-      <div id="showGrid" class="show-grid"></div>
+      <div id="performerFeed" class="show-grid">
+        <!-- app.js will later render skater cards:
+             - profile image
+             - name
+             - discipline(s)
+             - short clip thumbnail
+             - “View Profile” / “Make Offer” buttons
+        -->
+      </div>
+      <div style="text-align:center; margin-top:20px;">
+        <a class="cta" href="/pages/skaters-feed.html">View Full Skater Feed</a>
+      </div>
+    </section>
+
+    <!-- BUSINESS / CELEBRITY SECTION -->
+    <section class="explore-section">
+      <h2>For Businesses & Celebrities</h2>
+      <p class="section-subtitle">
+        Create a verified profile, make offers to skaters, negotiate deals, and sign contracts directly in the app.
+      </p>
+
+      <div style="
+        max-width:900px;
+        margin:0 auto;
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+        gap:20px;
+      ">
+        <div class="info-card">
+          <h3>Register Your Business</h3>
+          <p>
+            Submit your business or brand details for verification before accessing the offer dashboard.
+          </p>
+          <a class="cta" href="/pages/signup-business.html">Register Business</a>
+        </div>
+
+        <div class="info-card">
+          <h3>Make Offers to Skaters</h3>
+          <p>
+            Browse skater profiles by discipline and send structured offers with terms, rates, and deliverables.
+          </p>
+          <a class="cta" href="/pages/business-dashboard.html">Business Dashboard</a>
+        </div>
+
+        <div class="info-card">
+          <h3>Contracts Inside the App</h3>
+          <p>
+            Negotiate, approve, and store contracts directly in Roll Show so every performance is protected and clear.
+          </p>
+          <a class="cta" href="/pages/contracts.html">View Contract Tools</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- MUSIC LIBRARY / LICENSING SECTION -->
+    <section class="explore-section">
+      <h2>Music for Performances</h2>
+      <p class="section-subtitle">
+        Musicians can upload tracks. Skaters can use free tracks or license premium songs for their shows.
+      </p>
+
+      <div style="
+        max-width:900px;
+        margin:0 auto;
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+        gap:20px;
+      ">
+        <div class="info-card">
+          <h3>Upload Your Music</h3>
+          <p>
+            Artists can upload songs to be used in performances, build exposure, and earn from licensing.
+          </p>
+          <a class="cta" href="/pages/music-upload.html">Musician Upload</a>
+        </div>
+
+        <div class="info-card">
+          <h3>Free & Licensed Tracks</h3>
+          <p>
+            Skaters can use free tracks or pay a $10 license fee per performance—$8 to the artist, $2 platform cut.
+          </p>
+          <a class="cta" href="/pages/music-library.html">Browse Music Library</a>
+        </div>
+
+        <div class="info-card">
+          <h3>Royalties & Trademarks</h3>
+          <p>
+            Skaters can set up royalties and trademarks for their performances directly from their dashboard.
+          </p>
+          <a class="cta" href="/pages/skater-dashboard.html">Skater Dashboard</a>
+        </div>
+      </div>
     </section>
 
   </main>
