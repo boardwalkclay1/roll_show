@@ -1,5 +1,5 @@
 // CONFIG
-const API_BASE = "https://roll-worker.boardwalkclay1.workers.dev";
+const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
 
 // USER STORAGE
 function saveUser(user) {
