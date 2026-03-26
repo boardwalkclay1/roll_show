@@ -4,23 +4,56 @@
   <meta charset="UTF-8">
   <title>Your Ticket – Roll Show</title>
 
-  <!-- Correct folder path -->
-  <link rel="stylesheet" href="styles/styles.css">
+  <!-- MOBILE + PWA -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+
+  <!-- ICONS -->
+  <link rel="icon" href="/app/images/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
+
+  <!-- MANIFEST -->
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <!-- Correct CSS path -->
+  <link rel="stylesheet" href="/app/styles/styles.css">
+
+  <!-- SERVICE WORKER -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js");
+    }
+  </script>
 </head>
 
-<body>
+<body style="background:black;">
 
-<header class="header">
+  <!-- BACKGROUND IMAGE -->
+  <img 
+    src="/app/images/jammin.jpg"
+    alt="Background"
+    style="
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center 88%;
+      z-index: 0;
+    "
+  >
+
+<header class="header" style="position:relative; z-index:5;">
   <div class="logo">ROLL SHOW</div>
 
   <nav class="nav">
-    <a href="index.html">Explore</a>
-    <a href="buyer-profile.html">My Tickets</a>
+    <a href="/index.html">Explore</a>
+    <a href="/pages/buyer-profile.html">My Tickets</a>
     <button id="themeToggle">Theme</button>
   </nav>
 </header>
 
-<main class="ticket-view-page">
+<main class="ticket-view-page" style="position:relative; z-index:5;">
 
   <!-- Page Header -->
   <section class="page-header">
@@ -45,7 +78,7 @@
 </main>
 
 <!-- Correct JS path -->
-<script src="js/app.js" defer></script>
+<script src="/app/js/app.js" defer></script>
 
 </body>
 </html>
