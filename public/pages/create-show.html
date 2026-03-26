@@ -2,16 +2,35 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Create Show – Roll Show</title>
 
-  <link rel="stylesheet" href="styles/styles.css">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#000000">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/styles/styles.css">
+
+  <!-- Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js");
+    }
+  </script>
 </head>
 
 <body style="background:black;">
 
   <!-- FULL BACKGROUND IMAGE -->
   <img 
-    src="/app/images/all-eyes.jpg"
+    src="/images/all-eyes.jpg"
     alt="Background"
     style="
       position: fixed;
@@ -19,7 +38,7 @@
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      object-position: center 85%; /* ← adjust this */
+      object-position: center 85%;
       z-index: 0;
     "
   >
@@ -34,9 +53,9 @@
       gap: 30px;
       font-size: 18px;
     ">
-    <a href="skater-dashboard.html" style="color:white;">Dashboard</a>
-    <a href="video-studio.html" style="color:white;">Video Studio</a>
-    <a href="branding-studio.html" style="color:white;">Branding Studio</a>
+    <a href="/skater-dashboard.html" style="color:white;">Dashboard</a>
+    <a href="/video-studio.html" style="color:white;">Video Studio</a>
+    <a href="/branding-studio.html" style="color:white;">Branding Studio</a>
   </header>
 
   <!-- MAIN CONTENT -->
@@ -190,7 +209,7 @@
 
   </main>
 
-  <script src="js/app.js" defer></script>
+  <script src="/js/app.js" defer></script>
 
 </body>
 </html>
