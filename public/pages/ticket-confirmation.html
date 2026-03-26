@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>Roll Show – Ticket Confirmation</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+
+  <meta property="og:title" content="Roll Show – Ticket Confirmation">
+  <meta property="og:description" content="Your ticket is confirmed and added to your wallet.">
+  <meta property="og:image" content="/app/images/roll-index.jpg">
+  <meta property="og:type" content="website">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Roll Show – Ticket Confirmation">
+  <meta name="twitter:description" content="Your ticket is confirmed and added to your wallet.">
+  <meta name="twitter:image" content="/app/images/roll-index.jpg">
+
+  <link rel="icon" href="/app/images/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <link rel="stylesheet" href="/app/styles/styles.css">
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js");
+    }
+  </script>
+</head>
+
+<body style="background:black; color:white;">
+
+  <main style="max-width:600px; margin:0 auto; padding:40px; text-align:center;">
+    <h1>Ticket Confirmed</h1>
+    <p>Your ticket has been successfully issued and added to your wallet.</p>
+
+    <div id="ticketConfirmationDetails" class="ticket-confirmation">
+      <!-- JS: show title, date, QR preview -->
+    </div>
+
+    <p style="margin-top:20px;">
+      <a href="/pages/ticket-wallet.html" class="btn-primary">Go to Ticket Wallet</a>
+    </p>
+  </main>
+
+  <script src="/app/js/ticket-confirmation.js" defer></script>
+</body>
+</html>
