@@ -32,7 +32,31 @@
 
 <body style="background:black; color:white;">
 
-  <main style="max-width:800px; margin:0 auto; padding:40px;">
+  <!-- Background image for consistency -->
+  <img 
+    src="/app/images/roll-index.jpg"
+    alt="Background"
+    style="
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center 88%;
+      z-index: 0;
+    "
+  >
+
+  <!-- Optional header for navigation consistency -->
+  <header class="header" style="position:relative; z-index:5;">
+    <div class="logo">ROLL SHOW</div>
+    <nav class="nav">
+      <a href="/index.html">Explore</a>
+      <a href="/pages/buyer-profile.html">My Tickets</a>
+    </nav>
+  </header>
+
+  <main style="max-width:800px; margin:0 auto; padding:40px; position:relative; z-index:5;">
     <h1>Legal</h1>
     <ul>
       <li><a href="/pages/terms.html">Terms of Service</a></li>
