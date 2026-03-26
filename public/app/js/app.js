@@ -1,12 +1,7 @@
-// ======================================================
-// CONFIG — POINT FRONTEND TO WORKER API
-// ======================================================
+// CONFIG
 const API_BASE = "https://roll-worker.boardwalkclay1.workers.dev";
 
-
-// ======================================================
-// USER STORAGE HELPERS
-// ======================================================
+// USER STORAGE
 function saveUser(user) {
   localStorage.setItem("rollshow_user", JSON.stringify(user));
 }
@@ -36,8 +31,7 @@ function requireUser(roles = null) {
   return user;
 }
 
-
-// Attach logout to any .logout-btn
+// Attach logout
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".logout-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
@@ -47,15 +41,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
-// ======================================================
-// AUTH — LOGIN + SIGNUP
-// ======================================================
+// AUTH
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
   const signupForm = document.getElementById("signupForm");
 
-  // LOGIN
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -86,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // SIGNUP
   if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -115,10 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
-// ======================================================
-// HOMEPAGE — FEATURED + ALL SHOWS
-// ======================================================
+// HOMEPAGE SHOWS
 document.addEventListener("DOMContentLoaded", () => {
   const featured = document.getElementById("featuredShows");
   const grid = document.getElementById("showGrid");
@@ -134,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Featured = first 3
       if (featured) {
         featured.innerHTML = "";
         shows.slice(0, 3).forEach(show => {
@@ -142,14 +127,13 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="show-card">
               <img src="${show.thumbnail}" class="thumb">
               <h3>${show.title}</h3>
-              <p>${show.description?.slice(0, 80) || ""}...</p>
+              <p>${(show.description || "").slice(0, 80)}...</p>
               <button onclick="viewShow('${show.id}')">View Show</button>
             </div>
           `;
         });
       }
 
-      // All shows
       if (grid) {
         grid.innerHTML = "";
         shows.forEach(show => {
@@ -157,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="show-card">
               <img src="${show.thumbnail}" class="thumb">
               <h3>${show.title}</h3>
-              <p>${show.description?.slice(0, 80) || ""}...</p>
+              <p>${(show.description || "").slice(0, 80)}...</p>
               <button onclick="viewShow('${show.id}')">View Show</button>
             </div>
           `;
@@ -170,10 +154,7 @@ function viewShow(id) {
   window.location.href = `/pages/show.html?id=${encodeURIComponent(id)}`;
 }
 
-
-// ======================================================
-// SHOW PAGE — LOAD DETAILS + BUY TICKET
-// ======================================================
+// SHOW PAGE
 document.addEventListener("DOMContentLoaded", () => {
   const header = document.getElementById("showHeader");
   const preview = document.getElementById("showVideoPreview");
@@ -187,13 +168,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const showId = url.searchParams.get("id");
   if (!showId) return;
 
-  // Load show details
   fetch(`${API_BASE}/api/shows/${showId}`)
     .then(res => res.json())
     .then(show => {
       header.innerHTML = `
         <h1>${show.title}</h1>
-        <p>${show.description}</p>
+        <p>${show.description || ""}</p>
       `;
 
       preview.innerHTML = `
@@ -201,10 +181,9 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
       priceDisplay.textContent = `$${(show.price_cents / 100).toFixed(2)}`;
-      desc.textContent = show.description;
+      desc.textContent = show.description || "";
     });
 
-  // Buy ticket
   if (buyBtn) {
     buyBtn.addEventListener("click", async () => {
       const user = requireUser(["buyer", "skater"]);
@@ -226,16 +205,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Redirect to confirmation page
       window.location.href = `/pages/ticket-confirmation.html?ticket=${data.ticketId}`;
     });
   }
 });
 
-
-// ======================================================
 // TICKET WALLET
-// ======================================================
 document.addEventListener("DOMContentLoaded", () => {
   const wallet = document.getElementById("ticketWalletList");
   if (!wallet) return;
@@ -268,13 +243,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function viewTicket(id) {
-  window.location.href = `/pages/ticket.view.html?id=${id}`;
+  window.location.href = `/pages/ticket-view.html?id=${id}`;
 }
 
-
-// ======================================================
 // PURCHASE HISTORY
-// ======================================================
 document.addEventListener("DOMContentLoaded", () => {
   const history = document.getElementById("purchaseHistoryList");
   if (!history) return;
