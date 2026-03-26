@@ -1,50 +1,76 @@
-const CACHE_NAME = "rollshow-cache-v2";
+const CACHE_NAME = "rollshow-cache-v3";
 
 const ASSETS = [
-  "/",                         // root
-  "/index.html",               // landing page
+  "/",                         
+  "/index.html",
 
-  // AUTH
+  /* AUTH */
   "/pages/auth-login.html",
-  "/pages/auth-signup.html",
 
-  // BUYER
+  /* SIGNUP (SEPARATED ROLES) */
+  "/pages/signup-buyer.html",
+  "/pages/signup-skater.html",
+  "/pages/signup-business.html",
+
+  /* BUYER */
   "/pages/buyer-profile.html",
   "/pages/ticket-wallet.html",
   "/pages/purchase-history.html",
   "/pages/ticket-confirmation.html",
   "/pages/ticket.view.html",
 
-  // SKATER
+  /* SKATER */
   "/pages/skater-dashboard.html",
   "/pages/create-show.html",
   "/pages/video-studio.html",
   "/pages/branding-studio.html",
+  "/pages/skater-profile-edit.html",
+  "/pages/skater-royalties.html",
 
-  // PUBLIC
+  /* BUSINESS */
+  "/pages/business-dashboard.html",
+
+  /* PUBLIC */
   "/pages/show.html",
   "/pages/skaters-feed.html",
 
-  // LEGAL
+  /* CONTRACTS */
+  "/pages/contracts.html",
+
+  /* MUSIC */
+  "/pages/music-upload.html",
+  "/pages/music-library.html",
+
+  /* LEGAL */
   "/pages/terms.html",
   "/pages/privacy.html",
   "/pages/legal.html",
 
-  // STYLES + JS
+  /* STYLES + JS */
   "/app/styles/styles.css",
   "/app/js/app.js",
 
-  // IMAGES
+  /* IMAGES */
   "/app/images/roll-index.jpg",
+  "/app/images/roll-show.jpg",
+  "/app/images/roll-skater-dash.jpg",
+  "/app/images/roll-contracts.jpg",
+  "/app/images/roll-music-upload.jpg",
+  "/app/images/roll-music-library.jpg",
+  "/app/images/roll-business.jpg",
+  "/app/images/roll-business-dash.jpg",
+  "/app/images/roll-skaters-feed.jpg",
   "/app/images/jammin.jpg",
+
+  /* ICONS */
   "/app/images/icons/icon-192.png",
   "/app/images/icons/icon-512.png",
 
-  // MANIFEST
+  /* MANIFEST */
   "/manifest.webmanifest"
 ];
 
-// INSTALL
+/* INSTALL */
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
@@ -52,7 +78,7 @@ self.addEventListener("install", event => {
   self.skipWaiting();
 });
 
-// ACTIVATE
+/* ACTIVATE */
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -66,7 +92,7 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-// FETCH
+/* FETCH */
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(cached => {
