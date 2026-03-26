@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>Roll Show – Login</title>
+
+  <!-- STYLES -->
   <link rel="stylesheet" href="/app/styles/styles.css">
-  <link rel="icon" href="favicon.ico">
+
+  <!-- ICON -->
+  <link rel="icon" href="/app/images/icons/icon-192.png">
 </head>
 
 <body style="background:black;">
 
-  <!-- FULL BACKGROUND IMAGE WITH FULL CONTROL -->
+  <!-- FULL BACKGROUND IMAGE -->
   <img 
     src="/app/images/roll-show.jpg"
     alt="Background"
@@ -18,27 +22,27 @@
       inset: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: cover;          /* FULL SCREEN, NO BLACK BARS */
-      object-position: center 88%; /* ← ADJUST THIS (X/Y CONTROL) */
+      object-fit: cover;
+      object-position: center 88%;
       z-index: 0;
     "
   >
 
   <!-- LOGIN CONTAINER -->
   <main style="
-      position:relative; 
-      z-index:5; 
-      display:flex; 
-      justify-content:center; 
+      position:relative;
+      z-index:5;
+      display:flex;
+      justify-content:center;
       padding:120px 20px;
     ">
 
     <div style="
-        width:100%; 
-        max-width:420px; 
-        background:rgba(0,0,0,0.55); 
-        padding:40px; 
-        border-radius:12px; 
+        width:100%;
+        max-width:420px;
+        background:rgba(0,0,0,0.55);
+        padding:40px;
+        border-radius:12px;
         backdrop-filter:blur(6px);
         color:white;
       ">
@@ -53,7 +57,7 @@
 
       <p style="margin-top:20px; text-align:center;">
         Don’t have an account?
-        <a href="auth-signup.html" style="color:white; text-decoration:underline;">Create one</a>
+        <a href="/pages/auth-signup.html" style="color:white; text-decoration:underline;">Create one</a>
       </p>
 
     </div>
