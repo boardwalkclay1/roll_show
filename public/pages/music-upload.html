@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Roll Show – Upload Music</title>
+  <link rel="stylesheet" href="/app/styles/styles.css">
+</head>
+
+<body style="background:black;">
+
+  <img src="/app/images/roll-music-upload.jpg" class="bg-full">
+
+  <main class="auth-container">
+    <div class="auth-box">
+      <h1>Upload Your Music</h1>
+
+      <form id="musicUploadForm" class="auth-form">
+        <input type="text" id="trackTitle" placeholder="Track Title" required>
+        <input type="text" id="artistName" placeholder="Artist Name" required>
+        <input type="file" id="trackFile" accept="audio/*" required>
+
+        <button type="submit" class="btn-primary">Upload Track</button>
+      </form>
+    </div>
+  </main>
+
+  <script src="/app/js/app.js" defer></script>
+</body>
+</html>
