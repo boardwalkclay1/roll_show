@@ -2,14 +2,14 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <title>Roll Show – Signup</title>
+  <title>Roll Show – Skater Signup</title>
+
   <link rel="stylesheet" href="/app/styles/styles.css">
-  <link rel="icon" href="favicon.ico">
+  <link rel="icon" href="/app/images/icons/icon-192.png">
 </head>
 
 <body style="background:black;">
 
-  <!-- FULL BACKGROUND IMAGE -->
   <img 
     src="/app/images/roll-show.jpg"
     alt="Background"
@@ -24,7 +24,6 @@
     "
   >
 
-  <!-- SIGNUP WRAPPER -->
   <main style="
       position:relative;
       z-index:5;
@@ -43,7 +42,7 @@
         color:white;
       ">
 
-      <h1 style="margin-bottom:20px;">Create Your Account</h1>
+      <h1 style="margin-bottom:20px;">Join as a Skater</h1>
 
       <form id="signupForm" style="display:flex; flex-direction:column; gap:15px;">
 
@@ -51,17 +50,14 @@
         <input type="email" id="signupEmail" placeholder="Email" required>
         <input type="password" id="signupPassword" placeholder="Password" required>
 
-        <select id="signupRole" required>
-          <option value="buyer">Ticket Buyer</option>
-          <option value="skater">Skater</option>
-        </select>
+        <input type="hidden" id="signupRole" value="skater">
 
-        <button type="submit" class="btn-primary">Create Account</button>
+        <button type="submit" class="btn-primary">Create Skater Account</button>
       </form>
 
       <p style="margin-top:20px; text-align:center;">
         Already have an account?
-        <a href="auth-login.html" style="color:white; text-decoration:underline;">Login</a>
+        <a href="/pages/auth-login.html" style="color:white; text-decoration:underline;">Login</a>
       </p>
 
     </div>
