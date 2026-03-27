@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.user.role === "skater") {
         window.location.href = "/pages/skater-dashboard.html";
       } else if (data.user.role === "buyer") {
-        window.location.href = "/pages/buyer-profile.html";
+        window.location.href = "/pages/buyer-dashboard.html";
       } else if (data.user.role === "business") {
         window.location.href = "/pages/business-dashboard.html";
       } else if (data.user.role === "musician") {
@@ -104,16 +104,28 @@ document.addEventListener("DOMContentLoaded", () => {
       const role = document.getElementById("signupRole").value;
 
       let endpoint = "";
+      let payload = { name, email, password };
 
       if (role === "buyer") endpoint = "/api/buyer/signup";
-      if (role === "skater") endpoint = "/api/skater/signup";
-      if (role === "musician") endpoint = "/api/musician/signup";
-      if (role === "business") endpoint = "/api/business/signup";
+      if (role === "skater") {
+        endpoint = "/api/skater/signup";
+        payload.discipline = document.getElementById("signupDiscipline")?.value || null;
+        payload.bio = document.getElementById("signupBio")?.value || null;
+      }
+      if (role === "musician") {
+        endpoint = "/api/musician/signup";
+        payload.bio = document.getElementById("signupBio")?.value || null;
+      }
+      if (role === "business") {
+        endpoint = "/api/business/signup";
+        payload.company_name = document.getElementById("signupCompany")?.value || null;
+        payload.website = document.getElementById("signupWebsite")?.value || null;
+      }
 
       const res = await fetch(`${API_BASE}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
