@@ -1,4 +1,4 @@
-/* FULLSCREEN BACKGROUND */
+/* BACKGROUND */
 .bg-landing {
   position: fixed;
   inset: 0;
@@ -6,78 +6,200 @@
   height: 100vh;
   object-fit: cover;
   object-position: center 70%;
-  transform: scale(1.8); /* 2× bigger */
+  transform: scale(1.8);
+  filter: brightness(0.55);
   z-index: 0;
   pointer-events: none;
-  filter: brightness(0.55);
 }
 
-/* MAIN CONTAINER */
-.landing-container {
+/* SHELL */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Helvetica Neue", Arial, sans-serif;
+  background: #000;
+  color: #fff;
+}
+
+.landing-shell {
   position: relative;
   z-index: 5;
-  text-align: center;
-  padding-top: 120px;
-  color: white;
-}
-
-/* TITLE */
-.landing-title {
-  font-size: 64px;
-  font-weight: 800;
-  margin-bottom: 10px;
-  letter-spacing: 2px;
-}
-
-.landing-subtitle {
-  font-size: 20px;
-  opacity: 0.9;
-  margin-bottom: 60px;
-}
-
-/* ROLE GRID */
-.role-grid {
+  min-height: 100vh;
+  padding: 40px 40px 60px;
   display: flex;
-  justify-content: center;
-  gap: 40px;
-  flex-wrap: wrap;
-  padding: 20px;
+  flex-direction: column;
 }
 
-/* ROLE CARD */
-.role-card {
-  background: rgba(0, 0, 0, 0.55);
-  padding: 30px;
-  width: 260px;
-  border-radius: 14px;
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.15);
+/* HEADER */
+.landing-header {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 40px;
 }
 
-.role-card h2 {
-  margin-bottom: 10px;
+.logo-mark {
   font-size: 26px;
+  letter-spacing: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.role-card p {
-  margin-bottom: 20px;
-  opacity: 0.85;
+/* HERO LAYOUT */
+.landing-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
-/* BUTTONS */
-.role-btn {
+/* LEFT: SKATER HERO */
+.hero-copy {
+  max-width: 560px;
+}
+
+.hero-copy h1 {
+  font-size: 44px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  opacity: 0.9;
+  margin-bottom: 32px;
+}
+
+/* SKATER CTAS */
+.hero-skater-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* Cursive main skater button */
+.btn-skater-main {
+  padding: 14px 32px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000000;
+  font-size: 22px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid #ffffff;
+  font-family: "Brush Script MT", "Lucida Handwriting", cursive;
+  letter-spacing: 1px;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.btn-skater-main:hover {
+  background: #ffcc00;
+  transform: translateY(-2px);
+  box-shadow: 0 0 32px rgba(0, 0, 0, 0.9);
+}
+
+/* Secondary skater button */
+.btn-skater-ghost {
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-skater-ghost:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #ffffff;
+}
+
+/* RIGHT: SIDE ROLES */
+.hero-side-roles {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 320px;
+}
+
+/* Side cards (Buyer / Collab) */
+.side-card {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 14px;
+  padding: 20px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+}
+
+.side-card h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.side-card p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Side buttons (smaller) */
+.btn-side,
+.btn-side-ghost {
   display: block;
-  margin: 8px 0;
-  padding: 12px;
-  background: white;
-  color: black;
-  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+  padding: 9px 0;
+  border-radius: 999px;
+  font-size: 13px;
   font-weight: 600;
   text-decoration: none;
-  transition: 0.2s;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-.role-btn:hover {
+.btn-side {
+  background: #ffffff;
+  color: #000000;
+}
+
+.btn-side:hover {
   background: #ffcc00;
-  color: black;
+}
+
+.btn-side-ghost {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.btn-side-ghost:hover {
+  border-color: #ffffff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+  .landing-shell {
+    padding: 24px 16px 40px;
+  }
+
+  .hero-copy h1 {
+    font-size: 32px;
+  }
+
+  .hero-side-roles {
+    max-width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .side-card {
+    width: 220px;
+  }
 }
