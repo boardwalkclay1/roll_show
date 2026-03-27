@@ -22,7 +22,7 @@ export default {
       }
 
       /* ===========================
-         SHOWS (PUBLIC)
+         PUBLIC SHOWS
       =========================== */
 
       if (path === "/api/shows" && request.method === "GET") {
@@ -35,7 +35,7 @@ export default {
       }
 
       /* ===========================
-         BUYER ROUTES
+         BUYER
       =========================== */
 
       if (path === "/api/tickets" && request.method === "GET") {
@@ -51,7 +51,7 @@ export default {
       }
 
       /* ===========================
-         SKATER ROUTES
+         SKATER
       =========================== */
 
       if (path === "/api/skater/shows" && request.method === "GET") {
@@ -67,7 +67,7 @@ export default {
       }
 
       /* ===========================
-         BUSINESS ROUTES
+         BUSINESS / COLLAB
       =========================== */
 
       if (path === "/api/business/register" && request.method === "POST") {
@@ -150,9 +150,16 @@ async function signup(request, env) {
   const hashed = await hash(password);
 
   await env.DB.prepare(
-    `INSERT INTO users (id, name, email, password, role, verified, created_at)
+    `INSERT INTO users (id, name, email, password_hash, role, verified, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?)`
   ).bind(id, name, email, hashed, role, role === "business" ? 0 : 1, created).run();
+
+  // If skater, create skater profile row
+  if (role === "skater") {
+    await env.DB.prepare(
+      `INSERT INTO skaters (id, user_id) VALUES (?, ?)`
+    ).bind(crypto.randomUUID(), id).run();
+  }
 
   return json({
     success: true,
@@ -169,7 +176,7 @@ async function login(request, env) {
 
   if (!row) return json({ success: false, error: "Invalid credentials" }, 401);
 
-  const valid = await verify(password, row.password);
+  const valid = await verify(password, row.password_hash);
   if (!valid) return json({ success: false, error: "Invalid credentials" }, 401);
 
   return json({
@@ -189,8 +196,17 @@ async function login(request, env) {
    ROLE GUARDS
 ============================================================ */
 
+function getUserId(request) {
+  return (
+    request.headers.get("x-user-id") ||
+    request.headers.get("x-buyer-id") ||
+    request.headers.get("x-skater-id") ||
+    request.headers.get("x-business-id")
+  );
+}
+
 async function requireRole(request, env, allowedRoles, handler) {
-  const userId = request.headers.get("x-user-id");
+  const userId = getUserId(request);
   if (!userId) return json({ error: "Unauthorized" }, 401);
 
   const user = await env.DB.prepare(
@@ -205,7 +221,7 @@ async function requireRole(request, env, allowedRoles, handler) {
 }
 
 async function requireVerifiedBusiness(request, env, handler) {
-  const userId = request.headers.get("x-user-id");
+  const userId = getUserId(request);
   if (!userId) return json({ error: "Unauthorized" }, 401);
 
   const user = await env.DB.prepare(
@@ -220,12 +236,15 @@ async function requireVerifiedBusiness(request, env, handler) {
 }
 
 /* ============================================================
-   SHOWS (PUBLIC)
+   PUBLIC SHOWS
 ============================================================ */
 
 async function listShows(env) {
   const { results } = await env.DB.prepare(
-    "SELECT * FROM shows ORDER BY created_at DESC"
+    `SELECT s.*, sk.discipline, sk.bio
+     FROM shows s
+     JOIN skaters sk ON s.skater_id = sk.id
+     ORDER BY s.created_at DESC`
   ).all();
 
   return json(results);
@@ -233,7 +252,10 @@ async function listShows(env) {
 
 async function getShow(env, id) {
   const row = await env.DB.prepare(
-    "SELECT * FROM shows WHERE id = ?"
+    `SELECT s.*, sk.discipline, sk.bio
+     FROM shows s
+     JOIN skaters sk ON s.skater_id = sk.id
+     WHERE s.id = ?`
   ).bind(id).first();
 
   if (!row) return json({ error: "Show not found" }, 404);
@@ -246,25 +268,34 @@ async function getShow(env, id) {
 ============================================================ */
 
 async function listSkaterShows(request, env, user) {
+  const skater = await env.DB.prepare(
+    "SELECT id FROM skaters WHERE user_id = ?"
+  ).bind(user.id).first();
+
   const { results } = await env.DB.prepare(
     "SELECT * FROM shows WHERE skater_id = ? ORDER BY created_at DESC"
-  ).bind(user.id).all();
+  ).bind(skater.id).all();
 
   return json(results);
 }
 
 async function createShow(request, env, user) {
-  const { title, description, premiere_date } = await request.json();
+  const { title, description, premiere_date, price_cents, thumbnail, video_url } =
+    await request.json();
 
   if (!title) return json({ error: "Missing title" }, 400);
+
+  const skater = await env.DB.prepare(
+    "SELECT id FROM skaters WHERE user_id = ?"
+  ).bind(user.id).first();
 
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
   await env.DB.prepare(
-    `INSERT INTO shows (id, skater_id, title, description, premiere_date, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`
-  ).bind(id, user.id, title, description, premiere_date, now).run();
+    `INSERT INTO shows (id, skater_id, title, description, price_cents, thumbnail, video_url, premiere_date, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(id, skater.id, title, description, price_cents, thumbnail, video_url, premiere_date, now).run();
 
   return json({ success: true, showId: id });
 }
@@ -274,17 +305,22 @@ async function createShow(request, env, user) {
 ============================================================ */
 
 async function updateSkaterProfile(request, env, user) {
-  const { discipline, bio, clip_url } = await request.json();
+  const { discipline, bio, profile_image, clip_url } = await request.json();
+
+  const skater = await env.DB.prepare(
+    "SELECT id FROM skaters WHERE user_id = ?"
+  ).bind(user.id).first();
 
   await env.DB.prepare(
-    `UPDATE users SET discipline = ?, bio = ?, clip_url = ? WHERE id = ?`
-  ).bind(discipline, bio, clip_url, user.id).run();
+    `UPDATE skaters SET discipline = ?, bio = ?, profile_image = ?, clip_url = ?
+     WHERE id = ?`
+  ).bind(discipline, bio, profile_image, clip_url, skater.id).run();
 
   return json({ success: true });
 }
 
 /* ============================================================
-   BUSINESS
+   BUSINESS / COLLAB
 ============================================================ */
 
 async function registerBusiness(request, env) {
@@ -394,7 +430,7 @@ async function licenseTrack(request, env, user) {
 }
 
 /* ============================================================
-   TICKETS (BUYER)
+   BUYER TICKETS
 ============================================================ */
 
 async function listTickets(request, env, user) {
@@ -491,7 +527,7 @@ function cors() {
   return {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, x-user-id"
+    "Access-Control-Allow-Headers": "Content-Type, x-user-id, x-buyer-id, x-skater-id, x-business-id"
   };
 }
 
