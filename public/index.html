@@ -15,7 +15,7 @@
   <!-- MANIFEST -->
   <link rel="manifest" href="/manifest.webmanifest">
 
-  <!-- STYLES -->
+  <!-- LANDING CSS -->
   <link rel="stylesheet" href="/app/styles/landing.css">
 
   <!-- SERVICE WORKER -->
@@ -33,20 +33,23 @@
 
   <main class="landing-shell">
 
+    <!-- TITLE -->
     <header class="landing-header">
-      <div class="logo-mark">Roll Show</div>
+      <h1 class="landing-title-cursive">Roll Show</h1>
+      <p class="landing-subtitle">Skate Performances • Culture • Community</p>
     </header>
 
     <section class="landing-hero">
-      <div class="hero-copy">
-        <h1>Skate Performances From Every Discipline</h1>
-        <p class="hero-subtitle">
-          This is the skater’s platform. Build your shows, your brand, your deals, and your legacy.
+
+      <!-- SKATER HERO SECTION -->
+      <div class="hero-skater-block">
+        <h2 class="skater-headline">Become the Show</h2>
+        <p class="skater-subtext">
+          Skaters are the heart of this platform. Build your shows, your brand, your deals, and your legacy.
         </p>
 
-        <!-- SKATER PRIMARY CTA (cursive style) -->
-        <div class="hero-skater-cta">
-          <a href="/pages/skater-signup.html" class="btn-skater-main">
+        <div class="skater-cta-group">
+          <a href="/pages/signup-skater.html" class="btn-skater-main">
             Become a Skater
           </a>
           <a href="/pages/auth-login.html?role=skater" class="btn-skater-ghost">
@@ -55,32 +58,27 @@
         </div>
       </div>
 
-      <!-- SIDE ROLES: BUYER + COLLAB (smaller) -->
+      <!-- SIDE ROLES -->
       <div class="hero-side-roles">
 
+        <!-- BUYER -->
         <div class="side-card">
-          <h2>Ticket Buyer</h2>
+          <h3>Ticket Buyer</h3>
           <p>Buy tickets and watch shows.</p>
-          <a href="/pages/signup-buyer.html" class="btn-side">
-            Buyer Sign Up
-          </a>
-          <a href="/pages/auth-login.html?role=buyer" class="btn-side-ghost">
-            Buyer Login
-          </a>
+          <a href="/pages/signup-buyer.html" class="btn-side">Sign Up</a>
+          <a href="/pages/auth-login.html?role=buyer" class="btn-side-ghost">Login</a>
         </div>
 
+        <!-- COLLAB -->
         <div class="side-card">
-          <h2>Collab</h2>
-          <p>Brands, celebrities, music, and offers.</p>
-          <a href="/pages/signup-business.html" class="btn-side">
-            Collab Register
-          </a>
-          <a href="/pages/auth-login.html?role=business" class="btn-side-ghost">
-            Collab Login
-          </a>
+          <h3>Collab</h3>
+          <p>Brands • Celebrities • Music • Offers</p>
+          <a href="/pages/signup-business.html" class="btn-side">Register</a>
+          <a href="/pages/auth-login.html?role=business" class="btn-side-ghost">Login</a>
         </div>
 
       </div>
+
     </section>
 
   </main>
