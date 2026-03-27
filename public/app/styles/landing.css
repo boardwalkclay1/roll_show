@@ -12,160 +12,152 @@
   pointer-events: none;
 }
 
-/* SHELL */
+/* PAGE SHELL */
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Helvetica Neue", Arial, sans-serif;
   background: #000;
   color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 }
 
 .landing-shell {
   position: relative;
   z-index: 5;
-  min-height: 100vh;
-  padding: 40px 40px 60px;
-  display: flex;
-  flex-direction: column;
+  padding: 40px 40px 80px;
 }
 
-/* HEADER */
-.landing-header {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 40px;
-}
-
-.logo-mark {
-  font-size: 26px;
-  letter-spacing: 3px;
+/* TITLE */
+.landing-title-cursive {
+  font-family: "Brush Script MT", "Lucida Handwriting", cursive;
+  font-size: 120px;
   font-weight: 700;
-  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 0 22px rgba(0,0,0,0.9);
+}
+
+.landing-subtitle {
+  text-align: center;
+  font-size: 22px;
+  opacity: 0.9;
+  margin-top: -10px;
+  margin-bottom: 60px;
 }
 
 /* HERO LAYOUT */
 .landing-hero {
   display: flex;
-  flex-wrap: wrap;
-  gap: 40px;
-  align-items: flex-start;
   justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
-/* LEFT: SKATER HERO */
-.hero-copy {
-  max-width: 560px;
+/* SKATER HERO BLOCK */
+.hero-skater-block {
+  max-width: 600px;
 }
 
-.hero-copy h1 {
-  font-size: 44px;
-  line-height: 1.1;
-  margin-bottom: 16px;
+.skater-headline {
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 10px;
 }
 
-.hero-subtitle {
+.skater-subtext {
   font-size: 18px;
   opacity: 0.9;
-  margin-bottom: 32px;
+  margin-bottom: 30px;
 }
 
-/* SKATER CTAS */
-.hero-skater-cta {
+/* SKATER BUTTONS */
+.skater-cta-group {
   display: flex;
-  flex-wrap: wrap;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
-/* Cursive main skater button */
 .btn-skater-main {
-  padding: 14px 32px;
+  padding: 16px 40px;
   border-radius: 999px;
   background: #ffffff;
-  color: #000000;
-  font-size: 22px;
+  color: #000;
+  font-size: 26px;
+  font-family: "Brush Script MT", "Lucida Handwriting", cursive;
   font-weight: 700;
   text-decoration: none;
-  border: 2px solid #ffffff;
-  font-family: "Brush Script MT", "Lucida Handwriting", cursive;
-  letter-spacing: 1px;
-  box-shadow: 0 0 24px rgba(0, 0, 0, 0.6);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  border: 2px solid #fff;
+  box-shadow: 0 0 28px rgba(0,0,0,0.7);
+  transition: 0.2s ease;
 }
 
 .btn-skater-main:hover {
   background: #ffcc00;
-  transform: translateY(-2px);
-  box-shadow: 0 0 32px rgba(0, 0, 0, 0.9);
+  transform: translateY(-3px);
 }
 
-/* Secondary skater button */
 .btn-skater-ghost {
-  padding: 12px 24px;
+  padding: 12px 28px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  background: rgba(0, 0, 0, 0.4);
-  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.7);
+  background: rgba(0,0,0,0.4);
+  color: #fff;
   text-decoration: none;
-  font-weight: 500;
   font-size: 14px;
-  text-transform: uppercase;
   letter-spacing: 1px;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  text-transform: uppercase;
+  transition: 0.2s ease;
 }
 
 .btn-skater-ghost:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: #ffffff;
+  background: rgba(255,255,255,0.15);
 }
 
-/* RIGHT: SIDE ROLES */
+/* SIDE ROLES */
 .hero-side-roles {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 320px;
+  max-width: 300px;
 }
 
-/* Side cards (Buyer / Collab) */
 .side-card {
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0,0,0,0.55);
+  padding: 22px;
   border-radius: 14px;
-  padding: 20px 22px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255,255,255,0.15);
   backdrop-filter: blur(6px);
 }
 
-.side-card h2 {
+.side-card h3 {
   margin: 0 0 6px;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .side-card p {
   margin: 0 0 16px;
+  opacity: 0.85;
   font-size: 14px;
-  opacity: 0.9;
 }
 
-/* Side buttons (smaller) */
+/* SIDE BUTTONS */
 .btn-side,
 .btn-side-ghost {
   display: block;
   width: 100%;
   text-align: center;
-  padding: 9px 0;
+  padding: 10px 0;
   border-radius: 999px;
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
   margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
 }
 
 .btn-side {
-  background: #ffffff;
-  color: #000000;
+  background: #fff;
+  color: #000;
 }
 
 .btn-side:hover {
@@ -174,32 +166,18 @@ body {
 
 .btn-side-ghost {
   background: transparent;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255,255,255,0.6);
+  color: #fff;
 }
 
 .btn-side-ghost:hover {
-  border-color: #ffffff;
+  border-color: #fff;
 }
 
 /* RESPONSIVE */
-@media (max-width: 800px) {
-  .landing-shell {
-    padding: 24px 16px 40px;
-  }
-
-  .hero-copy h1 {
-    font-size: 32px;
-  }
-
-  .hero-side-roles {
-    max-width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .side-card {
-    width: 220px;
+@media (max-width: 900px) {
+  .landing-hero {
+    flex-direction: column;
+    align-items: center;
   }
 }
