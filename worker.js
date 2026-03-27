@@ -4,25 +4,41 @@ export default {
       const url = new URL(request.url);
       const path = url.pathname;
 
-      // CORS
+      // CORS preflight
       if (request.method === "OPTIONS") {
         return new Response(null, { status: 204, headers: cors() });
       }
 
       /* ===========================
-         AUTH
+         AUTH (GLOBAL)
       =========================== */
-
-      if (path === "/api/signup" && request.method === "POST") {
-        return signup(request, env);
-      }
 
       if (path === "/api/login" && request.method === "POST") {
         return login(request, env);
       }
 
       /* ===========================
-         PUBLIC SHOWS
+         SIGNUP (ROLE-SPECIFIC)
+      =========================== */
+
+      if (path === "/api/buyer/signup" && request.method === "POST") {
+        return signupBuyer(request, env);
+      }
+
+      if (path === "/api/skater/signup" && request.method === "POST") {
+        return signupSkater(request, env);
+      }
+
+      if (path === "/api/musician/signup" && request.method === "POST") {
+        return signupMusician(request, env);
+      }
+
+      if (path === "/api/business/signup" && request.method === "POST") {
+        return signupBusiness(request, env);
+      }
+
+      /* ===========================
+         PUBLIC SKATER SHOWS
       =========================== */
 
       if (path === "/api/shows" && request.method === "GET") {
@@ -35,24 +51,28 @@ export default {
       }
 
       /* ===========================
-         BUYER
+         BUYER AREA
       =========================== */
 
-      if (path === "/api/tickets" && request.method === "GET") {
+      if (path === "/api/buyer/tickets" && request.method === "GET") {
         return requireRole(request, env, ["buyer"], listTickets);
       }
 
-      if (path === "/api/purchases" && request.method === "GET") {
+      if (path === "/api/buyer/purchases" && request.method === "GET") {
         return requireRole(request, env, ["buyer"], listPurchases);
       }
 
-      if (path === "/api/tickets/create" && request.method === "POST") {
+      if (path === "/api/buyer/tickets/create" && request.method === "POST") {
         return requireRole(request, env, ["buyer"], createTicket);
       }
 
       /* ===========================
-         SKATER
+         SKATER AREA
       =========================== */
+
+      if (path === "/api/skater/dashboard" && request.method === "GET") {
+        return requireRole(request, env, ["skater"], skaterDashboard);
+      }
 
       if (path === "/api/skater/shows" && request.method === "GET") {
         return requireRole(request, env, ["skater"], listSkaterShows);
@@ -67,36 +87,28 @@ export default {
       }
 
       /* ===========================
-         BUSINESS / COLLAB
+         BUSINESS / BRAND AREA
       =========================== */
 
-      if (path === "/api/business/register" && request.method === "POST") {
-        return registerBusiness(request, env);
+      if (path === "/api/business/dashboard" && request.method === "GET") {
+        return requireRole(request, env, ["business"], businessDashboard);
       }
 
       if (path === "/api/business/offers" && request.method === "POST") {
-        return requireVerifiedBusiness(request, env, createOffer);
+        return requireRole(request, env, ["business"], createOffer);
       }
 
       if (path === "/api/business/offers" && request.method === "GET") {
-        return requireVerifiedBusiness(request, env, listBusinessOffers);
+        return requireRole(request, env, ["business"], listBusinessOffers);
       }
 
       /* ===========================
-         CONTRACTS
+         MUSIC / MUSICIANS AREA
       =========================== */
 
-      if (path === "/api/contracts" && request.method === "POST") {
-        return requireRole(request, env, ["business", "skater"], createContract);
+      if (path === "/api/musician/dashboard" && request.method === "GET") {
+        return requireRole(request, env, ["musician"], musicianDashboard);
       }
-
-      if (path === "/api/contracts" && request.method === "GET") {
-        return requireRole(request, env, ["business", "skater"], listContracts);
-      }
-
-      /* ===========================
-         MUSIC
-      =========================== */
 
       if (path === "/api/music/upload" && request.method === "POST") {
         return requireRole(request, env, ["musician"], uploadTrack);
@@ -111,7 +123,19 @@ export default {
       }
 
       /* ===========================
-         WEBHOOK
+         CONTRACTS (SKATER ↔ BUSINESS ↔ MUSIC)
+      =========================== */
+
+      if (path === "/api/contracts" && request.method === "POST") {
+        return requireRole(request, env, ["business", "skater"], createContract);
+      }
+
+      if (path === "/api/contracts" && request.method === "GET") {
+        return requireRole(request, env, ["business", "skater"], listContracts);
+      }
+
+      /* ===========================
+         WEBHOOK (PAYMENTS)
       =========================== */
 
       if (path === "/api/webhooks/partner" && request.method === "POST") {
@@ -119,7 +143,6 @@ export default {
       }
 
       return json({ error: "Not found" }, 404);
-
     } catch (err) {
       return json({ error: "Worker crashed", detail: String(err) }, 500);
     }
@@ -127,50 +150,124 @@ export default {
 };
 
 /* ============================================================
-   AUTH
+   AUTH (GLOBAL USERS)
 ============================================================ */
 
-async function signup(request, env) {
-  const { name, email, password, role } = await request.json();
-
+async function signupBase(env, { name, email, password, role }) {
   if (!name || !email || !password || !role) {
-    return json({ success: false, error: "Missing fields" }, 400);
+    return { error: "Missing fields" };
   }
 
-  const exists = await env.DB.prepare(
+  const exists = await env.DB_users.prepare(
     "SELECT id FROM users WHERE email = ?"
   ).bind(email).first();
 
   if (exists) {
-    return json({ success: false, error: "Email already registered" }, 400);
+    return { error: "Email already registered" };
   }
 
   const id = crypto.randomUUID();
   const created = new Date().toISOString();
   const hashed = await hash(password);
 
-  await env.DB.prepare(
-    `INSERT INTO users (id, name, email, password_hash, role, verified, created_at)
+  await env.DB_users.prepare(
+    `INSERT INTO users (id, name, email, password_hash, role, created_at)
+     VALUES (?, ?, ?, ?, ?, ?)`
+  ).bind(id, name, email, hashed, role, created).run();
+
+  return { id, name, email, role, created_at: created };
+}
+
+async function signupBuyer(request, env) {
+  const body = await request.json();
+  body.role = "buyer";
+
+  const base = await signupBase(env, body);
+  if (base.error) return json({ success: false, error: base.error }, 400);
+
+  await env.DB_buyers.prepare(
+    `INSERT INTO buyers (id, user_id, phone, city, state, created_at)
+     VALUES (?, ?, ?, ?, ?, ?)`
+  ).bind(
+    crypto.randomUUID(),
+    base.id,
+    body.phone || null,
+    body.city || null,
+    body.state || null,
+    base.created_at
+  ).run();
+
+  return json({ success: true, user: base });
+}
+
+async function signupSkater(request, env) {
+  const body = await request.json();
+  body.role = "skater";
+
+  const base = await signupBase(env, body);
+  if (base.error) return json({ success: false, error: base.error }, 400);
+
+  await env.DB_skaters.prepare(
+    `INSERT INTO skaters (id, user_id, bio, discipline, profile_image, clip_url, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?)`
-  ).bind(id, name, email, hashed, role, role === "business" ? 0 : 1, created).run();
+  ).bind(
+    crypto.randomUUID(),
+    base.id,
+    body.bio || null,
+    body.discipline || null,
+    body.profile_image || null,
+    body.clip_url || null,
+    base.created_at
+  ).run();
 
-  // If skater, create skater profile row
-  if (role === "skater") {
-    await env.DB.prepare(
-      `INSERT INTO skaters (id, user_id) VALUES (?, ?)`
-    ).bind(crypto.randomUUID(), id).run();
-  }
+  return json({ success: true, user: base });
+}
 
-  return json({
-    success: true,
-    user: { id, name, email, role, verified: role !== "business" }
-  });
+async function signupMusician(request, env) {
+  const body = await request.json();
+  body.role = "musician";
+
+  const base = await signupBase(env, body);
+  if (base.error) return json({ success: false, error: base.error }, 400);
+
+  await env.DB_musicians.prepare(
+    `INSERT INTO musicians (id, user_id, bio, created_at)
+     VALUES (?, ?, ?, ?)`
+  ).bind(
+    crypto.randomUUID(),
+    base.id,
+    body.bio || null,
+    base.created_at
+  ).run();
+
+  return json({ success: true, user: base });
+}
+
+async function signupBusiness(request, env) {
+  const body = await request.json();
+  body.role = "business";
+
+  const base = await signupBase(env, body);
+  if (base.error) return json({ success: false, error: base.error }, 400);
+
+  await env.DB_business.prepare(
+    `INSERT INTO businesses (id, user_id, company_name, website, verified, created_at)
+     VALUES (?, ?, ?, ?, 0, ?)`
+  ).bind(
+    crypto.randomUUID(),
+    base.id,
+    body.company_name || body.name || null,
+    body.website || null,
+    base.created_at
+  ).run();
+
+  return json({ success: true, user: base });
 }
 
 async function login(request, env) {
   const { email, password } = await request.json();
 
-  const row = await env.DB.prepare(
+  const row = await env.DB_users.prepare(
     "SELECT * FROM users WHERE email = ?"
   ).bind(email).first();
 
@@ -186,14 +283,13 @@ async function login(request, env) {
       name: row.name,
       email: row.email,
       role: row.role,
-      verified: row.verified === 1,
       created_at: row.created_at
     }
   });
 }
 
 /* ============================================================
-   ROLE GUARDS
+   ROLE GUARDS (GLOBAL USERS)
 ============================================================ */
 
 function getUserId(request) {
@@ -209,7 +305,7 @@ async function requireRole(request, env, allowedRoles, handler) {
   const userId = getUserId(request);
   if (!userId) return json({ error: "Unauthorized" }, 401);
 
-  const user = await env.DB.prepare(
+  const user = await env.DB_users.prepare(
     "SELECT * FROM users WHERE id = ?"
   ).bind(userId).first();
 
@@ -220,27 +316,12 @@ async function requireRole(request, env, allowedRoles, handler) {
   return handler(request, env, user);
 }
 
-async function requireVerifiedBusiness(request, env, handler) {
-  const userId = getUserId(request);
-  if (!userId) return json({ error: "Unauthorized" }, 401);
-
-  const user = await env.DB.prepare(
-    "SELECT * FROM users WHERE id = ?"
-  ).bind(userId).first();
-
-  if (!user || user.role !== "business" || user.verified !== 1) {
-    return json({ error: "Business not verified" }, 403);
-  }
-
-  return handler(request, env, user);
-}
-
 /* ============================================================
-   PUBLIC SHOWS
+   PUBLIC SHOWS (FROM SKATERS DB)
 ============================================================ */
 
 async function listShows(env) {
-  const { results } = await env.DB.prepare(
+  const { results } = await env.DB_skaters.prepare(
     `SELECT s.*, sk.discipline, sk.bio
      FROM shows s
      JOIN skaters sk ON s.skater_id = sk.id
@@ -251,7 +332,7 @@ async function listShows(env) {
 }
 
 async function getShow(env, id) {
-  const row = await env.DB.prepare(
+  const row = await env.DB_skaters.prepare(
     `SELECT s.*, sk.discipline, sk.bio
      FROM shows s
      JOIN skaters sk ON s.skater_id = sk.id
@@ -264,15 +345,46 @@ async function getShow(env, id) {
 }
 
 /* ============================================================
-   SKATER SHOWS
+   SKATER AREA (DB_skaters + DB_musicians + DB_business)
 ============================================================ */
 
+async function skaterDashboard(request, env, user) {
+  const skater = await env.DB_skaters.prepare(
+    "SELECT * FROM skaters WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  const shows = await env.DB_skaters.prepare(
+    "SELECT * FROM shows WHERE skater_id = ? ORDER BY created_at DESC"
+  ).bind(skater.id).all();
+
+  const offers = await env.DB_business.prepare(
+    `SELECT o.*
+     FROM business_offers o
+     WHERE o.skater_id = ? ORDER BY o.created_at DESC`
+  ).bind(skater.id).all();
+
+  const licenses = await env.DB_musicians.prepare(
+    `SELECT l.*, t.title
+     FROM track_licenses l
+     JOIN tracks t ON l.track_id = t.id
+     WHERE l.skater_id = ?
+     ORDER BY l.created_at DESC`
+  ).bind(skater.id).all();
+
+  return json({
+    skater,
+    shows: shows.results,
+    offers: offers.results,
+    licenses: licenses.results
+  });
+}
+
 async function listSkaterShows(request, env, user) {
-  const skater = await env.DB.prepare(
+  const skater = await env.DB_skaters.prepare(
     "SELECT id FROM skaters WHERE user_id = ?"
   ).bind(user.id).first();
 
-  const { results } = await env.DB.prepare(
+  const { results } = await env.DB_skaters.prepare(
     "SELECT * FROM shows WHERE skater_id = ? ORDER BY created_at DESC"
   ).bind(skater.id).all();
 
@@ -285,14 +397,14 @@ async function createShow(request, env, user) {
 
   if (!title) return json({ error: "Missing title" }, 400);
 
-  const skater = await env.DB.prepare(
+  const skater = await env.DB_skaters.prepare(
     "SELECT id FROM skaters WHERE user_id = ?"
   ).bind(user.id).first();
 
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB.prepare(
+  await env.DB_skaters.prepare(
     `INSERT INTO shows (id, skater_id, title, description, price_cents, thumbnail, video_url, premiere_date, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(id, skater.id, title, description, price_cents, thumbnail, video_url, premiere_date, now).run();
@@ -300,18 +412,14 @@ async function createShow(request, env, user) {
   return json({ success: true, showId: id });
 }
 
-/* ============================================================
-   SKATER PROFILE
-============================================================ */
-
 async function updateSkaterProfile(request, env, user) {
   const { discipline, bio, profile_image, clip_url } = await request.json();
 
-  const skater = await env.DB.prepare(
+  const skater = await env.DB_skaters.prepare(
     "SELECT id FROM skaters WHERE user_id = ?"
   ).bind(user.id).first();
 
-  await env.DB.prepare(
+  await env.DB_skaters.prepare(
     `UPDATE skaters SET discipline = ?, bio = ?, profile_image = ?, clip_url = ?
      WHERE id = ?`
   ).bind(discipline, bio, profile_image, clip_url, skater.id).run();
@@ -320,47 +428,65 @@ async function updateSkaterProfile(request, env, user) {
 }
 
 /* ============================================================
-   BUSINESS / COLLAB
+   BUSINESS / BRAND AREA (DB_business)
 ============================================================ */
 
-async function registerBusiness(request, env) {
-  const { name, email, website, description } = await request.json();
+async function businessDashboard(request, env, user) {
+  const business = await env.DB_business.prepare(
+    "SELECT * FROM businesses WHERE user_id = ?"
+  ).bind(user.id).first();
 
-  const id = crypto.randomUUID();
-  const created = new Date().toISOString();
+  const offers = await env.DB_business.prepare(
+    `SELECT * FROM business_offers WHERE business_id = ? ORDER BY created_at DESC`
+  ).bind(business.id).all();
 
-  await env.DB.prepare(
-    `INSERT INTO business_requests (id, name, email, website, description, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`
-  ).bind(id, name, email, website, description, created).run();
+  const contracts = await env.DB_business.prepare(
+    `SELECT c.*
+     FROM business_contracts c
+     JOIN business_offers o ON c.offer_id = o.id
+     WHERE o.business_id = ?
+     ORDER BY c.created_at DESC`
+  ).bind(business.id).all();
 
-  return json({ success: true, requestId: id });
+  return json({
+    business,
+    offers: offers.results,
+    contracts: contracts.results
+  });
 }
 
 async function createOffer(request, env, user) {
   const { skaterId, amount, terms } = await request.json();
 
+  const business = await env.DB_business.prepare(
+    "SELECT id FROM businesses WHERE user_id = ?"
+  ).bind(user.id).first();
+
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB.prepare(
-    `INSERT INTO offers (id, business_id, skater_id, amount, terms, status, created_at)
+  await env.DB_business.prepare(
+    `INSERT INTO business_offers (id, business_id, skater_id, amount, terms, status, created_at)
      VALUES (?, ?, ?, ?, ?, 'pending', ?)`
-  ).bind(id, user.id, skaterId, amount, terms, now).run();
+  ).bind(id, business.id, skaterId, amount, terms, now).run();
 
   return json({ success: true, offerId: id });
 }
 
 async function listBusinessOffers(request, env, user) {
-  const { results } = await env.DB.prepare(
-    "SELECT * FROM offers WHERE business_id = ? ORDER BY created_at DESC"
-  ).bind(user.id).all();
+  const business = await env.DB_business.prepare(
+    "SELECT id FROM businesses WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  const { results } = await env.DB_business.prepare(
+    "SELECT * FROM business_offers WHERE business_id = ? ORDER BY created_at DESC"
+  ).bind(business.id).all();
 
   return json(results);
 }
 
 /* ============================================================
-   CONTRACTS
+   CONTRACTS (CROSS-ROLE)
 ============================================================ */
 
 async function createContract(request, env, user) {
@@ -369,8 +495,8 @@ async function createContract(request, env, user) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB.prepare(
-    `INSERT INTO contracts (id, offer_id, details, status, created_at)
+  await env.DB_business.prepare(
+    `INSERT INTO business_contracts (id, offer_id, details, status, created_at)
      VALUES (?, ?, ?, 'pending', ?)`
   ).bind(id, offerId, details, now).run();
 
@@ -378,82 +504,134 @@ async function createContract(request, env, user) {
 }
 
 async function listContracts(request, env, user) {
-  const { results } = await env.DB.prepare(
+  const business = await env.DB_business.prepare(
+    "SELECT id FROM businesses WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  const skater = await env.DB_skaters.prepare(
+    "SELECT id FROM skaters WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  const businessId = business ? business.id : null;
+  const skaterId = skater ? skater.id : null;
+
+  const { results } = await env.DB_business.prepare(
     `SELECT c.*, o.skater_id, o.business_id
-     FROM contracts c
-     JOIN offers o ON c.offer_id = o.id
-     WHERE o.skater_id = ? OR o.business_id = ?
+     FROM business_contracts c
+     JOIN business_offers o ON c.offer_id = o.id
+     WHERE (o.skater_id = ? AND ? IS NOT NULL)
+        OR (o.business_id = ? AND ? IS NOT NULL)
      ORDER BY c.created_at DESC`
-  ).bind(user.id, user.id).all();
+  ).bind(skaterId, skaterId, businessId, businessId).all();
 
   return json(results);
 }
 
 /* ============================================================
-   MUSIC
+   MUSIC / MUSICIANS (DB_musicians + DB_skaters)
 ============================================================ */
+
+async function musicianDashboard(request, env, user) {
+  const musician = await env.DB_musicians.prepare(
+    "SELECT * FROM musicians WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  const tracks = await env.DB_musicians.prepare(
+    "SELECT * FROM tracks WHERE artist_id = ? ORDER BY created_at DESC"
+  ).bind(musician.id).all();
+
+  const licenses = await env.DB_musicians.prepare(
+    `SELECT l.*, t.title
+     FROM track_licenses l
+     JOIN tracks t ON l.track_id = t.id
+     WHERE t.artist_id = ?
+     ORDER BY l.created_at DESC`
+  ).bind(musician.id).all();
+
+  return json({
+    musician,
+    tracks: tracks.results,
+    licenses: licenses.results
+  });
+}
 
 async function uploadTrack(request, env, user) {
   const { title, url } = await request.json();
 
+  const musician = await env.DB_musicians.prepare(
+    "SELECT id FROM musicians WHERE user_id = ?"
+  ).bind(user.id).first();
+
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB.prepare(
-    `INSERT INTO music (id, artist_id, title, url, created_at)
+  await env.DB_musicians.prepare(
+    `INSERT INTO tracks (id, artist_id, title, url, created_at)
      VALUES (?, ?, ?, ?, ?)`
-  ).bind(id, user.id, title, url, now).run();
+  ).bind(id, musician.id, title, url, now).run();
 
   return json({ success: true, trackId: id });
 }
 
 async function listMusic(env) {
-  const { results } = await env.DB.prepare(
-    "SELECT * FROM music ORDER BY created_at DESC"
+  const { results } = await env.DB_musicians.prepare(
+    "SELECT * FROM tracks ORDER BY created_at DESC"
   ).all();
 
   return json(results);
 }
 
 async function licenseTrack(request, env, user) {
-  const { trackId } = await request.json();
+  const { trackId, amount_cents } = await request.json();
+
+  const skater = await env.DB_skaters.prepare(
+    "SELECT id FROM skaters WHERE user_id = ?"
+  ).bind(user.id).first();
 
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB.prepare(
-    `INSERT INTO music_licenses (id, track_id, skater_id, amount_cents, created_at)
-     VALUES (?, ?, ?, 1000, ?)`
-  ).bind(id, trackId, user.id, now).run();
+  await env.DB_musicians.prepare(
+    `INSERT INTO track_licenses (id, track_id, skater_id, amount_cents, created_at)
+     VALUES (?, ?, ?, ?, ?)`
+  ).bind(id, trackId, skater.id, amount_cents || 1000, now).run();
 
   return json({ success: true, licenseId: id });
 }
 
 /* ============================================================
-   BUYER TICKETS
+   BUYER TICKETS (DB_buyers + DB_skaters)
 ============================================================ */
 
 async function listTickets(request, env, user) {
-  const { results } = await env.DB.prepare(
+  const buyer = await env.DB_buyers.prepare(
+    "SELECT id FROM buyers WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  const { results } = await env.DB_buyers.prepare(
     `SELECT t.*, s.title, s.premiere_date
      FROM tickets t
-     JOIN shows s ON t.show_id = s.id
+     JOIN ${"shows"} s ON t.show_id = s.id
      WHERE t.buyer_id = ? AND t.status = 'paid'
      ORDER BY t.created_at DESC`
-  ).bind(user.id).all();
+  ).bind(buyer.id).all();
 
   return json(results);
 }
 
 async function listPurchases(request, env, user) {
-  const { results } = await env.DB.prepare(
+  const buyer = await env.DB_buyers.prepare(
+    "SELECT id FROM buyers WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  const { results } = await env.DB_buyers.prepare(
     `SELECT p.*, s.title
      FROM purchases p
      JOIN tickets t ON p.ticket_id = t.id
-     JOIN shows s ON t.show_id = s.id
+     JOIN ${"shows"} s ON t.show_id = s.id
      WHERE p.buyer_id = ?
      ORDER BY p.created_at DESC`
-  ).bind(user.id).all();
+  ).bind(buyer.id).all();
 
   return json(results);
 }
@@ -462,20 +640,24 @@ async function createTicket(request, env, user) {
   const { showId } = await request.json();
   if (!showId) return json({ error: "Missing showId" }, 400);
 
+  const buyer = await env.DB_buyers.prepare(
+    "SELECT id FROM buyers WHERE user_id = ?"
+  ).bind(user.id).first();
+
   const id = crypto.randomUUID();
   const qr = `ROLLSHOW-${id}`;
   const now = new Date().toISOString();
 
-  await env.DB.prepare(
+  await env.DB_buyers.prepare(
     `INSERT INTO tickets (id, show_id, buyer_id, qr_code, stamp, status, created_at)
      VALUES (?, ?, ?, ?, 'unverified', 'pending', ?)`
-  ).bind(id, showId, user.id, qr, now).run();
+  ).bind(id, showId, buyer.id, qr, now).run();
 
   return json({ ticketId: id, status: "pending" });
 }
 
 /* ============================================================
-   WEBHOOK
+   WEBHOOK (PAYMENTS → DB_buyers)
 ============================================================ */
 
 async function partnerWebhook(request, env) {
@@ -484,20 +666,20 @@ async function partnerWebhook(request, env) {
 
   if (status !== "paid") return json({ ok: true });
 
-  const ticket = await env.DB.prepare(
+  const ticket = await env.DB_buyers.prepare(
     "SELECT buyer_id FROM tickets WHERE id = ?"
   ).bind(ticketId).first();
 
   if (!ticket) return json({ error: "Ticket not found" }, 404);
 
-  await env.DB.prepare(
+  await env.DB_buyers.prepare(
     "UPDATE tickets SET status = 'paid', stamp = 'verified' WHERE id = ?"
   ).bind(ticketId).run();
 
   const purchaseId = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB.prepare(
+  await env.DB_buyers.prepare(
     `INSERT INTO purchases (id, buyer_id, ticket_id, amount_cents, partner_transaction_id, created_at)
      VALUES (?, ?, ?, ?, ?, ?)`
   ).bind(
