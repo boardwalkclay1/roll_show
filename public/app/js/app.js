@@ -84,12 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (data.user.role === "buyer") {
         window.location.href = "/pages/buyer-profile.html";
       } else if (data.user.role === "business") {
-        if (!data.user.verified) {
-          alert("Your business is pending verification.");
-          window.location.href = "/index.html";
-        } else {
-          window.location.href = "/pages/business-dashboard.html";
-        }
+        window.location.href = "/pages/business-dashboard.html";
+      } else if (data.user.role === "musician") {
+        window.location.href = "/pages/musician-dashboard.html";
       } else {
         window.location.href = "/index.html";
       }
@@ -106,10 +103,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const password = document.getElementById("signupPassword").value;
       const role = document.getElementById("signupRole").value;
 
-      const res = await fetch(`${API_BASE}/api/signup`, {
+      let endpoint = "";
+
+      if (role === "buyer") endpoint = "/api/buyer/signup";
+      if (role === "skater") endpoint = "/api/skater/signup";
+      if (role === "musician") endpoint = "/api/musician/signup";
+      if (role === "business") endpoint = "/api/business/signup";
+
+      const res = await fetch(`${API_BASE}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role })
+        body: JSON.stringify({ name, email, password })
       });
 
       const data = await res.json();
@@ -208,10 +212,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (buyBtn) {
     buyBtn.addEventListener("click", async () => {
-      const user = requireUser(["buyer", "skater"]);
+      const user = requireUser(["buyer"]);
       if (!user) return;
 
-      const res = await fetch(`${API_BASE}/api/tickets/create`, {
+      const res = await fetch(`${API_BASE}/api/buyer/tickets/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -239,10 +243,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const wallet = document.getElementById("ticketWalletList");
   if (!wallet) return;
 
-  const user = requireUser(["buyer", "skater"]);
+  const user = requireUser(["buyer"]);
   if (!user) return;
 
-  fetch(`${API_BASE}/api/tickets`, {
+  fetch(`${API_BASE}/api/buyer/tickets`, {
     headers: { "x-user-id": user.id }
   })
     .then(res => res.json())
@@ -277,10 +281,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const history = document.getElementById("purchaseHistoryList");
   if (!history) return;
 
-  const user = requireUser(["buyer", "skater"]);
+  const user = requireUser(["buyer"]);
   if (!user) return;
 
-  fetch(`${API_BASE}/api/purchases`, {
+  fetch(`${API_BASE}/api/buyer/purchases`, {
     headers: { "x-user-id": user.id }
   })
     .then(res => res.json())
