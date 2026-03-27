@@ -31,7 +31,7 @@ database_id = "<ID_BUSINESS>"
 [[d1_databases]]
 binding = "DB_musician"
 database_name = "DB_musician"
-database_id = "<ID_MUSICIANS>"
+database_id = "<ID_MUSICIAN>"
 
 # ============================
 # OBSERVABILITY
