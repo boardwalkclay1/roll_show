@@ -8,7 +8,6 @@ export async function signupBase(env, { name, email, password, role }) {
     return json({ error: "Missing fields" }, 400);
   }
 
-  // Email must be unique
   const exists = await env.DB_users.prepare(
     "SELECT id FROM users WHERE email = ?"
   ).bind(email).first();
@@ -22,15 +21,15 @@ export async function signupBase(env, { name, email, password, role }) {
   const hashed = await hash(password);
 
   await env.DB_users.prepare(
-    `INSERT INTO users (id, name, email, password_hash, role, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`
+    `INSERT INTO users (id, name, email, password_hash, role, created_at, is_owner)
+     VALUES (?, ?, ?, ?, ?, ?, 0)`
   ).bind(id, name, email, hashed, role, created).run();
 
   return json({ success: true, id, name, email, role, created_at: created });
 }
 
 /* ============================================================
-   LOGIN — SAFE + OWNER FLAG
+   LOGIN — SAFE OWNER FLAG
 ============================================================ */
 export async function login(request, env) {
   try {
@@ -49,11 +48,10 @@ export async function login(request, env) {
       return json({ success: false, error: "Invalid credentials" }, 401);
     }
 
-    // SAFE OWNER FLAG (no crash if column missing)
+    // SAFE OWNER CHECK — handles null, undefined, "1", 1, true
     const is_owner =
       row.role === "owner" ||
-      row.is_owner === 1 ||
-      row.is_owner === "1" ||
+      row.is_owner == 1 ||
       row.is_owner === true;
 
     return json({
@@ -67,18 +65,18 @@ export async function login(request, env) {
         created_at: row.created_at
       }
     });
+
   } catch (err) {
     return json({ success: false, error: "Server error", detail: String(err) }, 500);
   }
 }
 
 /* ============================================================
-   ROLE GUARD — OWNER BYPASS + SAFE
+   ROLE GUARD — OWNER BYPASS
 ============================================================ */
 export async function requireRole(request, env, allowedRoles, handler) {
   try {
     const userId = getUserId(request);
-
     if (!userId) {
       return json({ error: "Unauthorized" }, 401);
     }
@@ -91,11 +89,9 @@ export async function requireRole(request, env, allowedRoles, handler) {
       return json({ error: "Unauthorized" }, 401);
     }
 
-    // SAFE OWNER CHECK
     const is_owner =
       user.role === "owner" ||
-      user.is_owner === 1 ||
-      user.is_owner === "1" ||
+      user.is_owner == 1 ||
       user.is_owner === true;
 
     if (is_owner) {
@@ -107,6 +103,7 @@ export async function requireRole(request, env, allowedRoles, handler) {
     }
 
     return handler(request, env, user);
+
   } catch (err) {
     return json({ error: "Server error", detail: String(err) }, 500);
   }
