@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Track – Roll Show</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="icon" href="/app/images/icons/icon-192.png">
+  <link rel="stylesheet" href="/app/styles/dashboard.css">
+</head>
+
+<body style="background:url('/app/images/bg-upload-track.jpg') center/cover no-repeat;">
+
+  <main class="dash-shell">
+    <h1>Upload Track</h1>
+
+    <form id="upload-track-form" class="upload-form">
+      <input name="title" placeholder="Track Title" required>
+      <input name="track" type="file" accept="audio/*" required>
+      <button type="submit">Upload</button>
+    </form>
+  </main>
+
+  <script type="module" src="/app/js/upload-track.js"></script>
+</body>
+</html>
