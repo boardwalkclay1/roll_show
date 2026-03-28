@@ -217,11 +217,15 @@ body {
   transition: 0.3s ease;
 }
 
-/* MENU PANEL */
+/* ============================
+   MENU PANEL — HIDDEN BY DEFAULT
+============================ */
 .menu-panel {
   position: fixed;
   top: 0;
-  right: -320px;
+  right: -320px;       /* off-screen */
+  opacity: 0;          /* invisible */
+  pointer-events: none;/* unclickable */
   width: 320px;
   height: 100vh;
   background: rgba(0,0,0,0.92);
@@ -233,6 +237,8 @@ body {
 
 .menu-panel.open {
   right: 0;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .menu-panel a {
