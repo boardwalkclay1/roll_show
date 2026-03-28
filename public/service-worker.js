@@ -1,13 +1,14 @@
-const CACHE_NAME = "rollshow-cache-v3";
+const CACHE_NAME = "rollshow-cache-v5";
 
-const ASSETS = [
-  "/",                         
+/* STATIC ASSETS (HTML, CSS, JS, MANIFEST, ICONS) */
+const STATIC_ASSETS = [
+  "/",
   "/index.html",
 
   /* AUTH */
   "/pages/auth-login.html",
 
-  /* SIGNUP (SEPARATED ROLES) */
+  /* SIGNUP */
   "/pages/signup-buyer.html",
   "/pages/signup-skater.html",
   "/pages/signup-business.html",
@@ -46,21 +47,9 @@ const ASSETS = [
   "/pages/privacy.html",
   "/pages/legal.html",
 
-  /* STYLES + JS */
+  /* CORE FILES */
   "/app/styles/styles.css",
   "/app/js/app.js",
-
-  /* IMAGES */
-  "/app/images/roll-index.jpg",
-  "/app/images/roll-show.jpg",
-  "/app/images/roll-skater-dash.jpg",
-  "/app/images/roll-contracts.jpg",
-  "/app/images/roll-music-upload.jpg",
-  "/app/images/roll-music-library.jpg",
-  "/app/images/roll-business.jpg",
-  "/app/images/roll-business-dash.jpg",
-  "/app/images/roll-skaters-feed.jpg",
-  "/app/images/jammin.jpg",
 
   /* ICONS */
   "/app/images/icons/icon-192.png",
@@ -73,8 +62,29 @@ const ASSETS = [
 /* INSTALL */
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(async cache => {
+      // Cache static assets
+      await cache.addAll(STATIC_ASSETS);
+
+      // Dynamically cache ALL images in /app/images/ including subfolders
+      const imageList = await fetch("/app/images/")
+        .then(res => res.text())
+        .then(html => {
+          const matches = [...html.matchAll(/href="([^"]+\.(jpg|png|jpeg|webp|gif))"/g)];
+          return matches.map(m => "/app/images/" + m[1]);
+        })
+        .catch(() => []);
+
+      for (const img of imageList) {
+        try {
+          await cache.add(img);
+        } catch (e) {
+          // ignore missing files
+        }
+      }
+    })
   );
+
   self.skipWaiting();
 });
 
@@ -82,11 +92,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      )
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
     )
   );
   self.clients.claim();
@@ -96,10 +102,7 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(cached => {
-      return (
-        cached ||
-        fetch(event.request).catch(() => caches.match("/index.html"))
-      );
+      return cached || fetch(event.request).catch(() => caches.match("/index.html"));
     })
   );
 });
