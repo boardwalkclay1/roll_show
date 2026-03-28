@@ -1,25 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Upload Track – Roll Show</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="/app/styles/dashboard.css">
-</head>
+<form id="upload-track-form" class="upload-form">
+  <input name="title" placeholder="Track Title" required>
+  <input name="track" type="file" accept="audio/*" required>
 
-<body style="background:url('/app/images/bg-upload-track.jpg') center/cover no-repeat;">
+  <h3>Rights & Identity</h3>
+  <input name="legal_name" placeholder="Legal Name (as on ID)" required>
+  <input name="id_last4" placeholder="Last 4 of ID or Document #" required>
 
-  <main class="dash-shell">
-    <h1>Upload Track</h1>
+  <label class="agree-check">
+    <input type="checkbox" id="rights-checkbox" required>
+    I swear that I am the rights holder or have full authorization to upload and license this track, and all information provided is true.
+  </label>
 
-    <form id="upload-track-form" class="upload-form">
-      <input name="title" placeholder="Track Title" required>
-      <input name="track" type="file" accept="audio/*" required>
-      <button type="submit">Upload</button>
-    </form>
-  </main>
+  <button type="submit" id="upload-btn" disabled>Upload</button>
+</form>
 
-  <script type="module" src="/app/js/musician/upload-track.js"></script>
-</body>
-</html>
+<script type="module" src="/app/js/musician/upload-track.js"></script>
