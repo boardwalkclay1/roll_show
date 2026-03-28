@@ -1,6 +1,5 @@
-// /app/js/upload-track.js
-import API from "./api.js";
-import { getUserIdFromQuery } from "./utils.js";
+import API from "../api.js";
+import { getUserIdFromQuery } from "../utils.js";
 
 const form = document.getElementById("upload-track-form");
 const userId = getUserIdFromQuery();
@@ -12,33 +11,25 @@ form.addEventListener("submit", async (e) => {
   const file = fd.get("track");
   const title = fd.get("title");
 
-  if (!file) return alert("Select an audio file.");
+  const presign = await API.post("/api/upload/track-url", {
+    user_id: userId,
+    title,
+    filename: file.name,
+    content_type: file.type
+  });
 
-  try {
-    const presign = await API.post("/api/upload/track-url", {
-      user_id: userId,
-      title,
-      filename: file.name,
-      content_type: file.type
-    });
+  await fetch(presign.upload_url, {
+    method: "PUT",
+    headers: { "Content-Type": file.type },
+    body: file
+  });
 
-    await fetch(presign.upload_url, {
-      method: "PUT",
-      headers: { "Content-Type": file.type },
-      body: file
-    });
+  await API.post("/api/upload/track-complete", {
+    user_id: userId,
+    title,
+    r2_key: presign.r2_key
+  });
 
-    await API.post("/api/upload/track-complete", {
-      user_id: userId,
-      title,
-      r2_key: presign.r2_key
-    });
-
-    alert("Track uploaded.");
-    form.reset();
-
-  } catch (err) {
-    console.error(err);
-    alert("Upload failed.");
-  }
+  alert("Track uploaded.");
+  form.reset();
 });
