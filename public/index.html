@@ -3,66 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <title>Roll Show</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#000000">
 
+  <!-- ICONS -->
   <link rel="icon" href="/app/images/icons/icon-192.png">
   <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
   <link rel="manifest" href="/manifest.webmanifest">
 
+  <!-- LANDING CSS -->
   <link rel="stylesheet" href="/app/styles/landing.css">
 
+  <!-- DISABLE SERVICE WORKER FOR NOW -->
   <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js");
-    }
+    // if ("serviceWorker" in navigator) {
+    //   navigator.serviceWorker.register("/service-worker.js");
+    // }
   </script>
 </head>
+
 <body>
 
+  <!-- BACKGROUND -->
   <img src="/app/images/roll-index.jpg" class="bg-landing" alt="Background">
+
+  <!-- BURGER MENU -->
+  <div class="burger" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <nav class="menu-panel" id="menuPanel">
+    <a href="/index.html">Home</a>
+    <a href="/pages/skater-signup.html">Become a Skater</a>
+    <a href="/pages/musician-signup.html">Indie Artist Sign Up</a>
+    <a href="/pages/business-signup.html">Business / Collab</a>
+    <a href="/pages/buyer-signup.html">Ticket Buyer</a>
+    <a href="/legal/terms.html">Terms</a>
+    <a href="/legal/privacy.html">Privacy</a>
+  </nav>
 
   <main class="landing-shell">
 
+    <!-- TITLE -->
     <header class="landing-header">
       <h1 class="landing-title-cursive">Roll Show</h1>
       <p class="landing-subtitle">Skate • Music • Label</p>
     </header>
 
-    <section class="landing-hero landing-hero-simple">
-      <div class="role-grid">
+    <!-- HERO -->
+    <section class="landing-hero">
 
-        <div class="role-card">
-          <h2>Skater</h2>
-          <p>Build your shows and legacy.</p>
-          <a href="/pages/skater-signup.html" class="btn-main">Become a Skater</a>
-          <a href="/pages/auth-login.html?role=skater" class="btn-ghost">Login</a>
+      <div class="hero-skater-block">
+        <h2 class="skater-headline">Become the Show</h2>
+        <p class="skater-subtext">
+          Skaters are the heart of Roll Show. Build your shows, your brand, your deals, your legacy.
+        </p>
+
+        <div class="skater-cta-group">
+          <a href="/pages/skater-signup.html" class="btn-skater-main">Become a Skater</a>
+          <a href="/pages/auth-login.html?role=skater" class="btn-skater-ghost">Login</a>
         </div>
+      </div>
 
-        <div class="role-card">
-          <h2>Indie Artist</h2>
+      <div class="hero-side-roles">
+
+        <div class="side-card">
+          <h3>Indie Artist</h3>
           <p>No‑upfront label. Keep ownership, share royalties.</p>
-          <a href="/pages/musician-signup.html" class="btn-main">Artist Sign Up</a>
-          <a href="/pages/auth-login.html?role=musician" class="btn-ghost">Login</a>
+          <a href="/pages/musician-signup.html" class="btn-side">Artist Sign Up</a>
+          <a href="/pages/auth-login.html?role=musician" class="btn-side-ghost">Login</a>
         </div>
 
-        <div class="role-card">
-          <h2>Business / Collab</h2>
-          <p>Brands, events, sponsors, opportunities.</p>
-          <a href="/pages/business-signup.html" class="btn-main">Register</a>
-          <a href="/pages/auth-login.html?role=business" class="btn-ghost">Login</a>
+        <div class="side-card">
+          <h3>Business / Collab</h3>
+          <p>Brands • Events • Sponsors • Opportunities</p>
+          <a href="/pages/business-signup.html" class="btn-side">Register</a>
+          <a href="/pages/auth-login.html?role=business" class="btn-side-ghost">Login</a>
         </div>
 
-        <div class="role-card">
-          <h2>Ticket Buyer</h2>
+        <div class="side-card">
+          <h3>Ticket Buyer</h3>
           <p>Watch shows and support the culture.</p>
-          <a href="/pages/buyer-signup.html" class="btn-main">Sign Up</a>
-          <a href="/pages/auth-login.html?role=buyer" class="btn-ghost">Login</a>
+          <a href="/pages/buyer-signup.html" class="btn-side">Sign Up</a>
+          <a href="/pages/auth-login.html?role=buyer" class="btn-side-ghost">Login</a>
         </div>
 
       </div>
+
     </section>
 
+    <!-- FOOTER -->
     <footer class="landing-footer">
       <div class="footer-links">
         <a href="/legal/terms.html">Terms</a>
@@ -72,6 +105,13 @@
     </footer>
 
   </main>
+
+  <!-- BURGER MENU JS -->
+  <script>
+    function toggleMenu() {
+      document.getElementById("menuPanel").classList.toggle("open");
+    }
+  </script>
 
 </body>
 </html>
