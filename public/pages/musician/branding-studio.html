@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Branding Studio – Roll Show</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/app/styles/dashboard.css">
+</head>
+
+<body style="background:url('/app/images/bg-branding.jpg') center/cover no-repeat;">
+
+  <main class="dash-shell">
+    <h1>Branding Studio</h1>
+
+    <form id="branding-form" class="upload-form">
+      <input name="logo" type="file" accept="image/*">
+      <input name="banner" type="file" accept="image/*">
+      <textarea name="bio" placeholder="Artist Bio"></textarea>
+      <button type="submit">Save Branding</button>
+    </form>
+  </main>
+
+  <script type="module" src="/app/js/musician/branding-studio.js"></script>
+</body>
+</html>
