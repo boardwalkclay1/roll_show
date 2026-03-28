@@ -1,26 +1,28 @@
-// /app/js/business-dashboard.js
-import API from "./api.js";
-import { getUserIdFromQuery } from "./utils.js";
+import API from "../api.js";
+import { getUserIdFromQuery } from "../utils.js";
 
 const userId = getUserIdFromQuery();
 
 async function loadDashboard() {
-  try {
-    const data = await API.get(`/api/business/dashboard?user=${userId}`);
+  const data = await API.get(`/api/business/dashboard?user=${userId}`);
 
-    document.getElementById("business-name").textContent = data.name;
+  document.getElementById("business-name").textContent = data.company_name;
 
-    const offers = document.getElementById("business-offers");
-    offers.innerHTML = "";
-    data.offers.forEach(offer => {
-      const li = document.createElement("li");
-      li.textContent = offer.title;
-      offers.appendChild(li);
-    });
+  const offers = document.getElementById("business-offers");
+  offers.innerHTML = "";
+  data.offers.forEach(o => {
+    const li = document.createElement("li");
+    li.textContent = `${o.title} — ${o.status}`;
+    offers.appendChild(li);
+  });
 
-  } catch (err) {
-    console.error(err);
-  }
+  const inbox = document.getElementById("offers-inbox");
+  inbox.innerHTML = "";
+  data.inbox.forEach(i => {
+    const li = document.createElement("li");
+    li.textContent = `${i.skater_name}: ${i.message}`;
+    inbox.appendChild(li);
+  });
 }
 
 loadDashboard();
