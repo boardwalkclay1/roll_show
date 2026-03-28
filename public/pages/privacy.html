@@ -1,77 +1,59 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Roll Show – Privacy Policy</title>
-
+  <title>Privacy Policy – Roll Show</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#000000">
-
-  <meta property="og:title" content="Roll Show – Privacy Policy">
-  <meta property="og:description" content="How Roll Show collects, uses, and protects your data.">
-  <meta property="og:image" content="/app/images/roll-index.jpg">
-  <meta property="og:type" content="website">
-
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Roll Show – Privacy Policy">
-  <meta name="twitter:description" content="How Roll Show collects, uses, and protects your data.">
-  <meta name="twitter:image" content="/app/images/roll-index.jpg">
-
-  <link rel="icon" href="/app/images/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
-  <link rel="manifest" href="/manifest.webmanifest">
-
-  <link rel="stylesheet" href="/app/styles/styles.css">
-
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js");
-    }
-  </script>
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/app/styles/legal.css">
 </head>
+<body style="background:url('/app/images/bg-privacy.jpg') center/cover no-repeat;">
 
-<body style="background:black; color:white;">
-
-  <main style="max-width:900px; margin:0 auto; padding:40px;">
+  <main class="legal-shell">
     <h1>Privacy Policy</h1>
-    <p>Last updated: March 2026</p>
 
-    <h2>1. Overview</h2>
-    <p>This Privacy Policy explains how Roll Show collects, uses, and protects your information. Payments are processed by a third‑party Ticketing Partner.</p>
+    <div id="agreement-body" class="legal-box">
+      <h2>1. Overview</h2>
+      <p>This Privacy Policy explains how Roll Show collects, uses, and protects information about users of the Platform.</p>
 
-    <h2>2. Information We Collect</h2>
-    <ul>
-      <li>Account information (name, email, phone, city, state)</li>
-      <li>Ticket wallet data (tickets, QR codes, verification stamps)</li>
-      <li>Skater uploads (videos, images, descriptions)</li>
-      <li>Device and analytics data</li>
-      <li>Payment method selection (not full card numbers)</li>
-    </ul>
+      <h2>2. Information We Collect</h2>
+      <p>We may collect information you provide directly (such as name, email, role, profile details, content you upload) and information collected automatically (such as device information, log data, and usage data).</p>
 
-    <h2>3. How We Use Your Information</h2>
-    <p>We use your information to manage accounts, deliver tickets, prevent fraud, and improve the platform.</p>
+      <h2>3. How We Use Information</h2>
+      <p>We use information to operate and improve the Platform, process payments, enforce agreements, provide support, communicate with you, and comply with legal obligations.</p>
 
-    <h2>4. Sharing Information</h2>
-    <p>We may share limited information with the Ticketing Partner, skaters for verification, service providers, or law enforcement when required.</p>
+      <h2>4. Sharing of Information</h2>
+      <p>We may share information with service providers (such as payment processors, hosting providers), with other users as necessary for Platform features (e.g., displaying your profile or content), and as required by law or to protect rights and safety.</p>
 
-    <h2>5. Cookies and Tracking</h2>
-    <p>Roll Show uses cookies for login sessions, ticket wallet access, analytics, and theme settings.</p>
+      <h2>5. Data Security</h2>
+      <p>We use reasonable technical and organizational measures to protect information, but no system is completely secure.</p>
 
-    <h2>6. Data Security</h2>
-    <p>We use encryption, secure communication, and restricted access to protect your data.</p>
+      <h2>6. Data Retention</h2>
+      <p>We retain information as long as necessary to operate the Platform, comply with legal obligations, resolve disputes, and enforce agreements.</p>
 
-    <h2>7. Your Rights</h2>
-    <p>You may request access, updates, or deletion of your account by contacting us.</p>
+      <h2>7. Your Choices</h2>
+      <p>You may update certain account information through your profile. You may also request deletion of your account, subject to our need to retain certain data for legal or operational reasons.</p>
 
-    <h2>8. Children’s Privacy</h2>
-    <p>We do not knowingly collect information from children under 13.</p>
+      <h2>8. Children</h2>
+      <p>The Platform is not intended for children under the age where they can legally consent to data processing in their jurisdiction.</p>
 
-    <h2>9. Changes</h2>
-    <p>We may update this policy as the platform evolves.</p>
+      <h2>9. Changes to This Policy</h2>
+      <p>We may update this Privacy Policy from time to time. Continued use of the Platform after changes means you accept the updated Policy.</p>
+    </div>
 
-    <h2>10. Contact</h2>
-    <p>Email: privacy@rollshow.com</p>
+    <div class="sign-block"
+         data-agreement-type="privacy"
+         data-agreement-version="v1"
+         data-content-selector="#agreement-body">
+      <label>
+        <input type="checkbox" id="sign-agree-checkbox">
+        I acknowledge this Privacy Policy.
+      </label>
+      <button id="sign-agreement-btn" disabled>Acknowledge</button>
+      <p id="sign-status"></p>
+    </div>
   </main>
 
+  <script type="module" src="/app/js/legal/agreement-sign.js"></script>
 </body>
 </html>
