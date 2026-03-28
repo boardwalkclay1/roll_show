@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agreement – Roll Show</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/app/styles/legal.css">
+</head>
+
+<body style="background:url('/app/images/bg-legal.jpg') center/cover no-repeat;">
+
+  <main class="legal-shell">
+    <h1>Agreement Preview</h1>
+
+    <div id="agreement-content" class="legal-box">
+      <!-- JS loads agreement text -->
+    </div>
+  </main>
+
+  <script type="module">
+    import API from "/app/js/api.js";
+
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get("type") || "artist";
+
+    async function loadAgreement() {
+      const html = await API.getText(`/pages/legal/${type}-agreement.html`);
+      document.getElementById("agreement-content").innerHTML = html;
+    }
+
+    loadAgreement();
+  </script>
+
+</body>
+</html>
