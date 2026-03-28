@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Business Agreement – Roll Show</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/app/styles/legal.css">
+</head>
+<body style="background:url('/app/images/bg-business-agreement.jpg') center/cover no-repeat;">
+
+  <main class="legal-shell">
+    <h1>Business Agreement</h1>
+
+    <div id="agreement-body" class="legal-box">
+      <h2>1. Parties</h2>
+      <p>This Business Agreement (“Agreement”) is between the business entity or organization (“Business”) and Roll Show (“Platform”).</p>
+
+      <h2>2. Purpose</h2>
+      <p>The Platform enables Businesses to discover skaters, sponsor content, create offers, and run campaigns or collaborations.</p>
+
+      <h2>3. Use of Platform</h2>
+      <p>Business may create offers, campaigns, and collaborations with skaters and other creators. Each deal may specify deliverables, timelines, compensation, and usage rights. The Platform may record and enforce these terms.</p>
+
+      <h2>4. Payments</h2>
+      <p>Business agrees to pay agreed fees, sponsorship amounts, or campaign budgets as defined in each deal or Platform program. The Platform may charge processing or platform fees as disclosed.</p>
+
+      <h2>5. Brand and Content Use</h2>
+      <p>Business grants the Platform a limited license to use its name, logo, and campaign materials as necessary to operate the Platform and display campaigns. Skaters’ use of Business branding will be governed by specific deal terms.</p>
+
+      <h2>6. Compliance</h2>
+      <p>Business is responsible for ensuring that campaigns comply with applicable advertising, sponsorship, and disclosure laws.</p>
+
+      <h2>7. Representations and Warranties</h2>
+      <p>Business represents that it has the authority to enter into this Agreement and that its content and campaigns do not infringe third-party rights.</p>
+
+      <h2>8. Term and Termination</h2>
+      <p>This Agreement remains in effect while Business uses the Platform. Either party may terminate it, but existing campaigns and payment obligations may continue as specified in their terms.</p>
+
+      <h2>9. Limitation of Liability</h2>
+      <p>The Platform’s liability is limited as described in the Terms of Use.</p>
+    </div>
+
+    <div class="sign-block"
+         data-agreement-type="business"
+         data-agreement-version="v1"
+         data-content-selector="#agreement-body">
+      <label>
+        <input type="checkbox" id="sign-agree-checkbox">
+        I am authorized to bind this business and agree to this Business Agreement.
+      </label>
+      <button id="sign-agreement-btn" disabled>Sign Business Agreement</button>
+      <p id="sign-status"></p>
+    </div>
+  </main>
+
+  <script type="module" src="/app/js/legal/agreement-sign.js"></script>
+</body>
+</html>
