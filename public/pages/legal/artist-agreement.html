@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Artist Agreement – Roll Show</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/app/styles/legal.css">
+</head>
+<body style="background:url('/app/images/bg-artist-agreement.jpg') center/cover no-repeat;">
+
+  <main class="legal-shell">
+    <h1>Artist Agreement</h1>
+
+    <div id="agreement-body" class="legal-box">
+      <h2>1. Parties</h2>
+      <p>This Artist Agreement (“Agreement”) is between you (“Artist”) and Roll Show (“Platform”).</p>
+
+      <h2>2. Purpose</h2>
+      <p>The Platform provides tools for Artists to upload, manage, and license music for use in shows, performances, and other content.</p>
+
+      <h2>3. Grant of Rights</h2>
+      <p>Artist grants the Platform a non-exclusive, worldwide license to host, stream, transmit, and display the Artist’s audio content as necessary to operate the Platform and to enable licensed uses by approved counterparties (e.g., skaters, businesses) under separate deals.</p>
+
+      <h2>4. Ownership</h2>
+      <p>Artist retains ownership of all rights in their music, subject to the licenses granted in this Agreement and any specific deal terms agreed with counterparties.</p>
+
+      <h2>5. Licensing to Skaters and Businesses</h2>
+      <p>Artist may authorize use of specific tracks by skaters or businesses through offers, deals, or in-app licensing flows. Each such deal may specify territory, duration, media, and compensation. The Platform may record and enforce these terms.</p>
+
+      <h2>6. Royalties and Payments</h2>
+      <p>Where applicable, Artist will receive royalties or fees as defined in specific deals or Platform programs. The Platform may deduct processing or platform fees as disclosed in the Artist dashboard or deal terms.</p>
+
+      <h2>7. Representations and Warranties</h2>
+      <p>Artist represents that they own or control all rights necessary to grant the licenses in this Agreement and that their content does not infringe third-party rights.</p>
+
+      <h2>8. Content Standards</h2>
+      <p>Artist agrees not to upload content that is unlawful, abusive, or otherwise violates Platform policies.</p>
+
+      <h2>9. Term and Termination</h2>
+      <p>This Agreement remains in effect while Artist uses the Platform. Either party may terminate it, but existing licenses and deals may continue as specified in their terms.</p>
+
+      <h2>10. Limitation of Liability</h2>
+      <p>The Platform’s liability is limited as described in the Terms of Use.</p>
+    </div>
+
+    <div class="sign-block"
+         data-agreement-type="artist"
+         data-agreement-version="v1"
+         data-content-selector="#agreement-body">
+      <label>
+        <input type="checkbox" id="sign-agree-checkbox">
+        I am the rights holder or authorized representative and agree to this Artist Agreement.
+      </label>
+      <button id="sign-agreement-btn" disabled>Sign Artist Agreement</button>
+      <p id="sign-status"></p>
+    </div>
+  </main>
+
+  <script type="module" src="/app/js/legal/agreement-sign.js"></script>
+</body>
+</html>
