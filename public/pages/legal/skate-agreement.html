@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Skater Agreement – Roll Show</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/app/styles/legal.css">
+</head>
+<body style="background:url('/app/images/bg-skater-agreement.jpg') center/cover no-repeat;">
+
+  <main class="legal-shell">
+    <h1>Skater Agreement</h1>
+
+    <div id="agreement-body" class="legal-box">
+      <h2>1. Parties</h2>
+      <p>This Skater Agreement (“Agreement”) is between you (“Skater”) and Roll Show (“Platform”).</p>
+
+      <h2>2. Purpose</h2>
+      <p>The Platform enables Skaters to showcase performances, sell tickets, book lessons, and collaborate with musicians and businesses.</p>
+
+      <h2>3. Content and Rights</h2>
+      <p>Skater retains ownership of their performance content, subject to a license to the Platform to host, stream, and display it as necessary to operate the Platform and deliver purchased access to buyers.</p>
+
+      <h2>4. Use of Music</h2>
+      <p>Skater agrees to only use music in their content that is properly licensed, cleared, or provided through the Platform’s music licensing tools. Skater is responsible for unauthorized use of third-party music outside of Platform-managed deals.</p>
+
+      <h2>5. Ticketing and Sales</h2>
+      <p>Skater may sell access to shows, events, or lessons. Pricing, availability, and terms are set by Skater within Platform constraints. The Platform may charge fees as disclosed in the Skater dashboard.</p>
+
+      <h2>6. Revenue and Payouts</h2>
+      <p>Net revenue (after fees and applicable splits) will be made available for payout according to the payout schedule and methods shown in the Skater dashboard.</p>
+
+      <h2>7. Representations and Warranties</h2>
+      <p>Skater represents that their content does not infringe third-party rights and that they will comply with applicable laws and Platform policies.</p>
+
+      <h2>8. Term and Termination</h2>
+      <p>This Agreement remains in effect while Skater uses the Platform. Either party may terminate it, but existing tickets and obligations to buyers may continue as necessary to fulfill purchases.</p>
+
+      <h2>9. Limitation of Liability</h2>
+      <p>The Platform’s liability is limited as described in the Terms of Use.</p>
+    </div>
+
+    <div class="sign-block"
+         data-agreement-type="skater"
+         data-agreement-version="v1"
+         data-content-selector="#agreement-body">
+      <label>
+        <input type="checkbox" id="sign-agree-checkbox">
+        I agree to this Skater Agreement.
+      </label>
+      <button id="sign-agreement-btn" disabled>Sign Skater Agreement</button>
+      <p id="sign-status"></p>
+    </div>
+  </main>
+
+  <script type="module" src="/app/js/legal/agreement-sign.js"></script>
+</body>
+</html>
