@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Artist Dashboard – Roll Show</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/app/styles/dashboard.css">
+</head>
+
+<body style="background:url('/app/images/bg-artist-dash.jpg') center/cover no-repeat;">
+
+  <main class="dash-shell">
+    <h1 id="artist-name"></h1>
+    <h2>Earnings: <span id="artist-earnings">$0.00</span></h2>
+
+    <section>
+      <h3>Your Tracks</h3>
+      <ul id="artist-tracks"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="/app/js/musician/musician-dashboard.js"></script>
+</body>
+</html>
