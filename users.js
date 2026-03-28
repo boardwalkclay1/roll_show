@@ -5,7 +5,7 @@ import { json, getUserId, hash, verify } from "./utils.js";
 ============================================================ */
 export async function signupBase(env, { name, email, password, role }) {
   if (!name || !email || !password || !role) {
-    return { error: "Missing fields" };
+    return json({ error: "Missing fields" }, 400);
   }
 
   // Email must be unique
@@ -14,7 +14,7 @@ export async function signupBase(env, { name, email, password, role }) {
   ).bind(email).first();
 
   if (exists) {
-    return { error: "Email already registered" };
+    return json({ error: "Email already registered" }, 400);
   }
 
   const id = crypto.randomUUID();
@@ -26,70 +26,88 @@ export async function signupBase(env, { name, email, password, role }) {
      VALUES (?, ?, ?, ?, ?, ?)`
   ).bind(id, name, email, hashed, role, created).run();
 
-  return { id, name, email, role, created_at: created };
+  return json({ success: true, id, name, email, role, created_at: created });
 }
 
 /* ============================================================
-   LOGIN — RETURNS OWNER FLAG
+   LOGIN — SAFE + OWNER FLAG
 ============================================================ */
 export async function login(request, env) {
-  const { email, password } = await request.json();
+  try {
+    const { email, password } = await request.json();
 
-  const row = await env.DB_users.prepare(
-    "SELECT * FROM users WHERE email = ?"
-  ).bind(email).first();
+    const row = await env.DB_users.prepare(
+      "SELECT * FROM users WHERE email = ?"
+    ).bind(email).first();
 
-  if (!row) {
-    return json({ success: false, error: "Invalid credentials" }, 401);
-  }
-
-  const valid = await verify(password, row.password_hash);
-  if (!valid) {
-    return json({ success: false, error: "Invalid credentials" }, 401);
-  }
-
-  // OWNER FLAG
-  const is_owner = row.role === "owner" || row.is_owner === 1;
-
-  return json({
-    success: true,
-    user: {
-      id: row.id,
-      name: row.name,
-      email: row.email,
-      role: row.role,
-      is_owner,
-      created_at: row.created_at
+    if (!row) {
+      return json({ success: false, error: "Invalid credentials" }, 401);
     }
-  });
+
+    const valid = await verify(password, row.password_hash);
+    if (!valid) {
+      return json({ success: false, error: "Invalid credentials" }, 401);
+    }
+
+    // SAFE OWNER FLAG (no crash if column missing)
+    const is_owner =
+      row.role === "owner" ||
+      row.is_owner === 1 ||
+      row.is_owner === "1" ||
+      row.is_owner === true;
+
+    return json({
+      success: true,
+      user: {
+        id: row.id,
+        name: row.name,
+        email: row.email,
+        role: row.role,
+        is_owner,
+        created_at: row.created_at
+      }
+    });
+  } catch (err) {
+    return json({ success: false, error: "Server error", detail: String(err) }, 500);
+  }
 }
 
 /* ============================================================
-   ROLE GUARD — OWNER BYPASS
+   ROLE GUARD — OWNER BYPASS + SAFE
 ============================================================ */
 export async function requireRole(request, env, allowedRoles, handler) {
-  const userId = getUserId(request);
-  if (!userId) {
-    return json({ error: "Unauthorized" }, 401);
-  }
+  try {
+    const userId = getUserId(request);
 
-  const user = await env.DB_users.prepare(
-    "SELECT * FROM users WHERE id = ?"
-  ).bind(userId).first();
+    if (!userId) {
+      return json({ error: "Unauthorized" }, 401);
+    }
 
-  if (!user) {
-    return json({ error: "Unauthorized" }, 401);
-  }
+    const user = await env.DB_users.prepare(
+      "SELECT * FROM users WHERE id = ?"
+    ).bind(userId).first();
 
-  // OWNER BYPASS — FULL ACCESS
-  if (user.role === "owner" || user.is_owner === 1) {
+    if (!user) {
+      return json({ error: "Unauthorized" }, 401);
+    }
+
+    // SAFE OWNER CHECK
+    const is_owner =
+      user.role === "owner" ||
+      user.is_owner === 1 ||
+      user.is_owner === "1" ||
+      user.is_owner === true;
+
+    if (is_owner) {
+      return handler(request, env, user);
+    }
+
+    if (!allowedRoles.includes(user.role)) {
+      return json({ error: "Forbidden" }, 403);
+    }
+
     return handler(request, env, user);
+  } catch (err) {
+    return json({ error: "Server error", detail: String(err) }, 500);
   }
-
-  // Normal role check
-  if (!allowedRoles.includes(user.role)) {
-    return json({ error: "Forbidden" }, 403);
-  }
-
-  return handler(request, env, user);
 }
