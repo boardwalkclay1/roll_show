@@ -14,18 +14,34 @@ form.addEventListener("submit", async (e) => {
 
   try {
     const res = await API.post("/api/login", payload);
-    const role = res.role;
-    const userId = res.id;
+
+    // Worker returns: { success, user: {...} }
+    if (!res.success || !res.user) {
+      alert("Login failed. Check your email and password.");
+      return;
+    }
+
+    const user = res.user;
+
+    // Save user to localStorage
+    localStorage.setItem("rollshow_user", JSON.stringify(user));
 
     let target = "/";
 
-    if (role === "skater") target = "/pages/skater-dashboard.html";
-    else if (role === "musician") target = "/pages/musician-dashboard.html";
-    else if (role === "business") target = "/pages/business-dashboard.html";
-    else if (role === "buyer") target = "/pages/buyer-dashboard.html";
-    else if (role === "owner") target = "/pages/owner-dashboard.html";
+    if (user.is_owner) {
+      target = "/pages/owner-dashboard.html";
+    } else if (user.role === "skater") {
+      target = "/pages/skater-dashboard.html";
+    } else if (user.role === "musician") {
+      target = "/pages/musician-dashboard.html";
+    } else if (user.role === "business") {
+      target = "/pages/business-dashboard.html";
+    } else if (user.role === "buyer") {
+      target = "/pages/buyer-dashboard.html";
+    }
 
-    window.location.href = `${target}?user=${encodeURIComponent(userId)}`;
+    window.location.href = target;
+
   } catch (err) {
     console.error(err);
     alert("Login failed. Check your email and password.");
