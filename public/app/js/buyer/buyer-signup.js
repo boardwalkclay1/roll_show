@@ -1,3 +1,4 @@
+// app/js/buyer/buyer-signup.js
 import API from "../api.js";
 
 const form = document.getElementById("buyer-signup-form");
@@ -7,12 +8,23 @@ form.addEventListener("submit", async (e) => {
 
   const fd = new FormData(form);
 
-  const user = await API.post("/api/signup", {
-    role: "buyer",
-    name: fd.get("name"),
-    email: fd.get("email"),
-    password: fd.get("password")
-  });
+  try {
+    const res = await API.post("/api/buyer/signup", {
+      name: fd.get("name"),
+      email: fd.get("email"),
+      password: fd.get("password")
+    });
 
-  window.location.href = `/pages/buyer/buyer-dashboard.html?user=${user.id}`;
+    if (!res.success) {
+      alert("Signup failed: " + res.error);
+      return;
+    }
+
+    alert("Account created! Please log in.");
+    window.location.href = "/pages/auth-login.html";
+
+  } catch (err) {
+    console.error(err);
+    alert("Signup failed. Please try again.");
+  }
 });
