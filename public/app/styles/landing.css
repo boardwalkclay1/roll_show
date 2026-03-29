@@ -41,16 +41,43 @@ body {
   margin: 0;
   text-align: center;
   text-shadow: 0 0 28px rgba(0,0,0,0.95);
-  transform: translateY(-10px);
 }
 
 .landing-subtitle {
   text-align: center;
-  font-size: 24px;
+  font-size: 26px;
   opacity: 0.9;
-  margin-top: -12px;
-  margin-bottom: 70px;
+  margin-top: -10px;
+  margin-bottom: 40px;
   letter-spacing: 1px;
+  font-family: "Brush Script MT", cursive;
+}
+
+/* ============================
+   BUY TICKET BUTTON
+============================ */
+.header-ticket-cta {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.btn-ticket-main {
+  padding: 16px 42px;
+  border-radius: 999px;
+  background: #ffcc00;
+  color: #000;
+  font-size: 32px;
+  font-family: "Brush Script MT", cursive;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid #000;
+  box-shadow: 0 0 32px rgba(0,0,0,0.8);
+  transition: 0.25s ease;
+}
+
+.btn-ticket-main:hover {
+  background: #fff;
+  transform: translateY(-4px) scale(1.03);
 }
 
 /* ============================
@@ -71,7 +98,7 @@ body {
 }
 
 .skater-headline {
-  font-size: 56px;
+  font-size: 60px;
   font-weight: 900;
   margin-bottom: 10px;
   font-family: "Brush Script MT", cursive;
@@ -129,7 +156,7 @@ body {
 }
 
 /* ============================
-   SIDE ROLES (MUSICIANS SECOND)
+   SIDE ROLES (SECONDARY)
 ============================ */
 .hero-side-roles {
   display: flex;
@@ -149,7 +176,7 @@ body {
 
 .side-card h3 {
   margin: 0 0 8px;
-  font-size: 24px;
+  font-size: 26px;
   font-family: "Brush Script MT", cursive;
   letter-spacing: 1px;
 }
@@ -223,9 +250,9 @@ body {
 .menu-panel {
   position: fixed;
   top: 0;
-  right: -320px;       /* off-screen */
-  opacity: 0;          /* invisible */
-  pointer-events: none;/* unclickable */
+  right: -320px;
+  opacity: 0;
+  pointer-events: none;
   width: 320px;
   height: 100vh;
   background: rgba(0,0,0,0.92);
@@ -245,14 +272,48 @@ body {
   display: block;
   color: #fff;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 22px;
+  font-family: "Brush Script MT", cursive;
   margin-bottom: 22px;
-  letter-spacing: 1px;
   transition: 0.2s ease;
 }
 
 .menu-panel a:hover {
   color: #ffcc00;
+}
+
+/* ============================
+   FOOTER
+============================ */
+.landing-footer {
+  text-align: center;
+  margin-top: 100px;
+  padding-bottom: 40px;
+  opacity: 0.9;
+}
+
+.footer-links {
+  margin-bottom: 12px;
+}
+
+.footer-link {
+  font-family: "Brush Script MT", cursive;
+  font-size: 24px;
+  color: #fff;
+  text-decoration: none;
+  margin: 0 14px;
+  transition: 0.25s ease;
+}
+
+.footer-link:hover {
+  color: #ffcc00;
+  text-shadow: 0 0 12px rgba(255,204,0,0.6);
+}
+
+.footer-note {
+  font-family: "Brush Script MT", cursive;
+  font-size: 20px;
+  opacity: 0.8;
 }
 
 /* ============================
