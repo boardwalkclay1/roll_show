@@ -1,6 +1,6 @@
+// app/js/musician/musician-signup.js
 import API from "../api.js";
 import { initAgreementModal } from "../agreement-modal.js";
-import RightsEngine from "../rights-engine.js";
 
 const form = document.getElementById("musician-signup-form");
 const modal = initAgreementModal("agreement-modal");
@@ -11,30 +11,48 @@ form.addEventListener("submit", async (e) => {
 
   const fd = new FormData(form);
 
+  // Base signup payload
   const payload = {
     name: fd.get("name"),
     email: fd.get("email"),
     password: fd.get("password"),
-    extra: {}
+    bio: fd.get("bio") || ""
   };
 
+  // Load the musician agreement HTML
   const html = await API.getText("/legal/pages/artist-agreement.html");
 
+  // Open modal
   modal.open({
     title: "Artist Agreement",
     html,
     onAgreeCallback: async (agreementHtml) => {
-      const user = await RightsEngine.signupWithAgreement({
-        role: "musician",
-        signupPath: "/api/signup",
-        rightsPath: "/api/rights/artist-signup",
-        agreementType: "artist",
-        agreementVersion: AGREEMENT_VERSION,
-        agreementHtml,
-        formData: payload
+
+      // 1. Create the musician user
+      const signupRes = await API.post("/api/musician/signup", {
+        name: payload.name,
+        email: payload.email,
+        password: payload.password,
+        bio: payload.bio
       });
 
-      window.location.href = `/pages/musician/musician-dashboard.html?user=${user.id}`;
+      if (!signupRes.success) {
+        alert("Signup failed: " + signupRes.error);
+        return;
+      }
+
+      const user = signupRes;
+
+      // 2. Store agreement snapshot
+      await API.post("/api/agreements/store", {
+        user_id: user.id,
+        role: "musician",
+        version: AGREEMENT_VERSION,
+        html: agreementHtml
+      });
+
+      // 3. Redirect to dashboard
+      window.location.href = "/pages/musician-dashboard.html";
     }
   });
 });
