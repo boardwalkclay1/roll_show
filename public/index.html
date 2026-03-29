@@ -11,11 +11,13 @@
   <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
   <link rel="manifest" href="/manifest.webmanifest">
 
+  <link rel="stylesheet" href="/app/styles/global.css">
   <link rel="stylesheet" href="/app/styles/landing.css">
 </head>
 
 <body>
 
+  <!-- BACKGROUND IMAGE -->
   <img src="/app/images/roll-index.jpg" class="bg-landing" alt="Background">
 
   <!-- BURGER MENU -->
@@ -25,6 +27,7 @@
     <span></span>
   </div>
 
+  <!-- MENU PANEL -->
   <nav class="menu-panel" id="menuPanel">
     <a href="/pages/skater-signup.html">Become a Skater</a>
     <a href="/pages/musician-signup.html">Indie Artist</a>
@@ -34,68 +37,67 @@
     <a href="/legal/privacy.html">Privacy</a>
   </nav>
 
-  <main class="landing-shell">
+  <!-- PAGE CONTENT -->
+  <main class="page-shell">
 
-    <header class="landing-header">
-      <h1 class="landing-title-cursive">Roll Show</h1>
-      <p class="landing-subtitle">Skate • Music • Label</p>
+    <!-- HERO TITLE -->
+    <section class="hero">
+      <h1 class="hero-title">Roll Show</h1>
+      <p class="hero-subtitle">Skate • Music • Label</p>
 
-      <div class="header-ticket-cta">
-        <a href="/pages/shows.html" class="btn-ticket-main">Buy Tickets</a>
+      <!-- SINGLE BUY TICKET BUTTON -->
+      <a href="/pages/shows.html" class="btn-ticket">Buy Tickets</a>
+    </section>
+
+    <!-- SKATER HERO -->
+    <section class="hero">
+      <h2 class="cursive-title" style="font-size:70px;">Become the Show</h2>
+      <p class="hero-subtitle" style="font-size:26px;">
+        Build your shows, your brand, your deals, your legacy.
+      </p>
+
+      <div class="skater-cta-group">
+        <a href="/pages/skater-signup.html" class="btn-role">Become a Skater</a>
+        <a href="/pages/auth-login.html?role=skater" class="btn-role-ghost">Login</a>
       </div>
-    </header>
+    </section>
 
-    <section class="landing-hero">
+    <!-- ROLE GRID -->
+    <section class="role-grid">
 
-      <div class="hero-skater-block">
-        <h2 class="skater-headline">Become the Show</h2>
-        <p class="skater-subtext">
-          Build your shows, your brand, your deals, your legacy.
-        </p>
-
-        <div class="skater-cta-group">
-          <a href="/pages/skater-signup.html" class="btn-skater-main">Become a Skater</a>
-          <a href="/pages/auth-login.html?role=skater" class="btn-skater-ghost">Login</a>
-        </div>
+      <div class="role-card">
+        <h3>Indie Artist</h3>
+        <p>Keep ownership. Share royalties.</p>
+        <a href="/pages/musician-signup.html" class="btn-role">Artist Sign Up</a>
+        <a href="/pages/auth-login.html?role=musician" class="btn-role-ghost">Login</a>
       </div>
 
-      <div class="hero-side-roles">
+      <div class="role-card">
+        <h3>Business / Collab</h3>
+        <p>Brands • Events • Sponsors • Opportunities</p>
+        <a href="/pages/business-signup.html" class="btn-role">Register</a>
+        <a href="/pages/auth-login.html?role=business" class="btn-role-ghost">Login</a>
+      </div>
 
-        <div class="side-card">
-          <h3>Indie Artist</h3>
-          <p>Keep ownership. Share royalties.</p>
-          <a href="/pages/musician-signup.html" class="btn-side">Artist Sign Up</a>
-          <a href="/pages/auth-login.html?role=musician" class="btn-side-ghost">Login</a>
-        </div>
-
-        <div class="side-card">
-          <h3>Business / Collab</h3>
-          <p>Brands • Events • Sponsors • Opportunities</p>
-          <a href="/pages/business-signup.html" class="btn-side">Register</a>
-          <a href="/pages/auth-login.html?role=business" class="btn-side-ghost">Login</a>
-        </div>
-
-        <div class="side-card">
-          <h3>Ticket Buyer</h3>
-          <p>Watch shows and support the culture.</p>
-          <a href="/pages/buyer-signup.html" class="btn-side">Sign Up</a>
-          <a href="/pages/auth-login.html?role=buyer" class="btn-side-ghost">Login</a>
-        </div>
-
+      <div class="role-card">
+        <h3>Ticket Buyer</h3>
+        <p>Watch shows and support the culture.</p>
+        <a href="/pages/buyer-signup.html" class="btn-role">Sign Up</a>
+        <a href="/pages/auth-login.html?role=buyer" class="btn-role-ghost">Login</a>
       </div>
 
     </section>
 
-    <footer class="landing-footer">
-      <div class="footer-links">
-        <a href="/legal/terms.html" class="footer-link">Terms</a>
-        <a href="/legal/privacy.html" class="footer-link">Privacy</a>
-      </div>
+    <!-- FOOTER -->
+    <footer class="footer">
+      <a href="/legal/terms.html" class="footer-link">Terms</a>
+      <a href="/legal/privacy.html" class="footer-link">Privacy</a>
       <p class="footer-note">A no‑upfront indie label and rights platform.</p>
     </footer>
 
   </main>
 
+  <!-- MENU JS -->
   <script>
     function toggleMenu() {
       document.getElementById("menuPanel").classList.toggle("open");
