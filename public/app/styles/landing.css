@@ -1,207 +1,319 @@
-/* ============================================================
-   ROLL SHOW — GLOBAL STYLE (CLEAN + CURSIVE EVERYWHERE)
-   ============================================================ */
-
-/* FONTS */
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-
-
-/* ============================================================
-   GLOBAL RESET
-   ============================================================ */
-
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: #000;
-  color: white;
-  font-family: "Inter", sans-serif;
-  overflow-x: hidden;
+/* ============================
+   BACKGROUND
+============================ */
+.bg-landing {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  object-position: center 70%;
+  transform: scale(1.8);
+  filter: brightness(0.50) contrast(1.1);
+  z-index: 0;
+  pointer-events: none;
 }
 
-/* All content sits above background images */
-.page-shell {
+/* ============================
+   PAGE SHELL
+============================ */
+body {
+  margin: 0;
+  background: #000;
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}
+
+.landing-shell {
   position: relative;
   z-index: 5;
+  padding: 40px 40px 80px;
 }
 
-
-/* ============================================================
-   CURSIVE TITLES (GLOBAL)
-   ============================================================ */
-
-.cursive-title,
-h1, h2, h3,
-.logo,
-.footer-link {
-  font-family: "Great Vibes", cursive;
-  letter-spacing: 1px;
-  color: white;
-  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
-}
-
-
-/* ============================================================
-   LINKS + BUTTONS
-   ============================================================ */
-
-a {
-  color: white;
-  text-decoration: none;
-}
-
-button {
-  cursor: pointer;
-}
-
-
-/* ============================================================
-   HEADER
-   ============================================================ */
-
-.header {
-  width: 100%;
-  padding: 20px 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: none;
-}
-
-.logo {
-  font-size: 48px;
-  font-weight: 400;
-}
-
-.nav a {
-  margin-left: 20px;
-  font-size: 20px;
-  font-family: "Great Vibes", cursive;
-}
-
-
-/* ============================================================
-   HERO SECTION
-   ============================================================ */
-
-.hero {
-  padding: 120px 40px 80px;
-  text-align: center;
-}
-
-.hero-title {
+/* ============================
+   TITLE — SIGNATURE STYLE
+============================ */
+.landing-title-cursive {
+  font-family: "Brush Script MT", "Lucida Handwriting", cursive;
   font-size: 120px;
-  font-family: "Great Vibes", cursive;
-  margin-bottom: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 0 22px rgba(0,0,0,0.9);
 }
 
-.hero-subtitle {
-  font-size: 32px;
-  font-family: "Great Vibes", cursive;
+.landing-subtitle {
+  text-align: center;
+  font-size: 22px;
   opacity: 0.9;
-  margin-bottom: 40px;
+  margin-top: -10px;
+  margin-bottom: 30px;
 }
 
-.btn-ticket {
-  display: inline-block;
-  padding: 16px 40px;
+/* ============================
+   BUY TICKET BUTTON
+============================ */
+.header-ticket-cta {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.btn-ticket-main {
+  padding: 14px 38px;
+  border-radius: 999px;
   background: #ffcc00;
   color: #000;
-  border-radius: 999px;
-  font-size: 36px;
-  font-family: "Great Vibes", cursive;
+  font-size: 26px;
+  font-family: "Brush Script MT", "Lucida Handwriting", cursive;
+  font-weight: 700;
+  text-decoration: none;
   border: 2px solid #000;
-  box-shadow: 0 0 28px rgba(0,0,0,0.7);
+  box-shadow: 0 0 24px rgba(0,0,0,0.7);
   transition: 0.25s ease;
 }
 
-.btn-ticket:hover {
+.btn-ticket-main:hover {
   background: #fff;
-  transform: translateY(-4px) scale(1.03);
+  transform: translateY(-3px) scale(1.03);
 }
 
-
-/* ============================================================
-   ROLE GRID (SKATER, ARTIST, BUSINESS, BUYER)
-   ============================================================ */
-
-.role-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 26px;
-  padding: 20px 40px;
+/* ============================
+   HERO LAYOUT
+============================ */
+.landing-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
-.role-card {
-  background: rgba(0,0,0,0.55);
-  padding: 26px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.18);
-  text-align: center;
-  backdrop-filter: blur(8px);
+/* ============================
+   SKATER HERO BLOCK (PRIMARY)
+============================ */
+.hero-skater-block {
+  max-width: 650px;
 }
 
-.role-card h3 {
+.skater-headline {
   font-size: 48px;
+  font-weight: 800;
   margin-bottom: 10px;
+  font-family: "Brush Script MT", "Lucida Handwriting", cursive;
+  letter-spacing: 2px;
+  text-shadow: 0 0 18px rgba(0,0,0,0.8);
 }
 
-.role-card p {
+.skater-subtext {
+  font-size: 18px;
+  opacity: 0.9;
+  margin-bottom: 30px;
+}
+
+/* SKATER BUTTONS */
+.skater-cta-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-skater-main {
+  padding: 16px 40px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000;
+  font-size: 26px;
+  font-family: "Brush Script MT", "Lucida Handwriting", cursive;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid #fff;
+  box-shadow: 0 0 28px rgba(0,0,0,0.7);
+  transition: 0.2s ease;
+}
+
+.btn-skater-main:hover {
+  background: #ffcc00;
+  transform: translateY(-3px);
+}
+
+.btn-skater-ghost {
+  padding: 12px 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.7);
+  background: rgba(0,0,0,0.4);
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: 0.2s ease;
+}
+
+.btn-skater-ghost:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ============================
+   SIDE ROLES
+============================ */
+.hero-side-roles {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 300px;
+}
+
+.side-card {
+  background: rgba(0,0,0,0.55);
+  padding: 22px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
+}
+
+.side-card h3 {
+  margin: 0 0 6px;
   font-size: 22px;
-  opacity: 0.85;
-  margin-bottom: 20px;
+  font-family: "Brush Script MT", "Lucida Handwriting", cursive;
 }
 
-.btn-role,
-.btn-role-ghost {
+.side-card p {
+  margin: 0 0 16px;
+  opacity: 0.85;
+  font-size: 14px;
+}
+
+/* SIDE BUTTONS */
+.btn-side,
+.btn-side-ghost {
   display: block;
   width: 100%;
-  padding: 12px 0;
+  text-align: center;
+  padding: 10px 0;
   border-radius: 999px;
-  font-size: 24px;
-  font-family: "Great Vibes", cursive;
-  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
-.btn-role {
+.btn-side {
   background: #fff;
   color: #000;
 }
 
-.btn-role:hover {
+.btn-side:hover {
   background: #ffcc00;
 }
 
-.btn-role-ghost {
+.btn-side-ghost {
   background: transparent;
-  border: 2px solid #fff;
+  border: 1px solid rgba(255,255,255,0.6);
   color: #fff;
 }
 
-.btn-role-ghost:hover {
-  background: rgba(255,255,255,0.2);
+.btn-side-ghost:hover {
+  border-color: #fff;
 }
 
+/* ============================
+   BURGER MENU
+============================ */
+.burger {
+  position: fixed;
+  top: 28px;
+  right: 28px;
+  width: 38px;
+  height: 28px;
+  cursor: pointer;
+  z-index: 999;
+}
 
-/* ============================================================
+.burger span {
+  display: block;
+  height: 4px;
+  background: #fff;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  transition: 0.3s ease;
+}
+
+/* MENU PANEL — HIDDEN BY DEFAULT */
+.menu-panel {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  opacity: 0;
+  pointer-events: none;
+  width: 320px;
+  height: 100vh;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(10px);
+  padding: 40px 30px;
+  transition: 0.35s ease;
+  z-index: 998;
+}
+
+.menu-panel.open {
+  right: 0;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.menu-panel a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  margin-bottom: 22px;
+  letter-spacing: 1px;
+  transition: 0.2s ease;
+}
+
+.menu-panel a:hover {
+  color: #ffcc00;
+}
+
+/* ============================
    FOOTER
-   ============================================================ */
-
-.footer {
+============================ */
+.landing-footer {
   text-align: center;
-  margin-top: 100px;
+  margin-top: 80px;
   padding-bottom: 40px;
+  opacity: 0.9;
 }
 
-.footer-link {
-  font-size: 32px;
-  margin: 0 14px;
+.footer-links a {
+  font-family: "Brush Script MT", "Lucida Handwriting", cursive;
+  font-size: 20px;
+  color: #fff;
+  text-decoration: none;
+  margin: 0 12px;
+  transition: 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #ffcc00;
 }
 
 .footer-note {
-  font-size: 26px;
+  font-size: 14px;
   opacity: 0.8;
-  font-family: "Great Vibes", cursive;
+  margin-top: 10px;
+}
+
+/* ============================
+   RESPONSIVE
+============================ */
+@media (max-width: 900px) {
+  .landing-hero {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .landing-title-cursive {
+    font-size: 90px;
+  }
 }
