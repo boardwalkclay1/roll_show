@@ -1,7 +1,7 @@
 // app/js/skater/skater-signup.js
 import API from "../api.js";
 import { initAgreementModal } from "/app/js/agreement-model.js";
-import RightsEngine from "public/app/js/rights-engine.js";
+import RightsEngine from "/app/js/rights-engine.js";
 
 const form = document.getElementById("skater-signup-form");
 const modal = initAgreementModal("agreement-modal");
