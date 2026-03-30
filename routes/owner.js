@@ -1,5 +1,5 @@
-import { json } from "../utils.js";
-import { requireRole } from "../users.js";
+import { json } from "utils.js";
+import { requireRole } from "users.js";
 
 /* ============================================================
    OWNER OVERVIEW
