@@ -17,24 +17,14 @@
       <input name="name" placeholder="Artist Name" required>
       <input name="email" type="email" placeholder="Email" required>
       <input name="password" type="password" placeholder="Password" required>
-      <button type="submit">Continue</button>
+      <button type="submit">Create Account</button>
     </form>
+
+    <p class="signup-login-link">
+      Already have an account?
+      <a href="/pages/auth-login.html?role=musician">Log in</a>
+    </p>
   </main>
-
-  <!-- Agreement Modal -->
-  <div id="agreement-modal" class="agreement-modal hidden">
-    <div class="agreement-box">
-      <h2 id="agreement-title"></h2>
-      <div id="agreement-text" class="agreement-content"></div>
-
-      <label class="agree-check">
-        <input type="checkbox" id="agree-checkbox">
-        I agree to the terms above.
-      </label>
-
-      <button id="agree-button" disabled>Agree & Continue</button>
-    </div>
-  </div>
 
   <script type="module" src="/app/js/musician/musician-signup.js"></script>
 </body>
