@@ -16,7 +16,8 @@ enabled = false
 invocation_logs = true
 
 # ============================================================
-# FIX FOR BCRYPTJS — REQUIRED FOR CLOUDFLARE WORKERS
+# SERVICE BINDING TO AUTH WORKER
 # ============================================================
-[alias]
-"crypto" = "crypto-browserify"
+[[services]]
+binding = "AUTH"
+service = "rollshow-auth"
