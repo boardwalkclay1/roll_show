@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show • Owner • Skaters</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { margin:0; background:#0b0b0c; color:#fff; font-family:Inter,sans-serif; }
+    .sidebar { position:fixed; top:0; left:0; width:260px; height:100vh; background:#111; border-right:1px solid rgba(255,255,255,0.08); padding:30px 20px; box-sizing:border-box; }
+    .sidebar h1 { font-size:26px; margin-bottom:40px; font-weight:700; letter-spacing:1px; color:#ff0050; }
+    .nav-link { display:block; padding:12px 10px; margin-bottom:10px; border-radius:6px; color:#ccc; text-decoration:none; font-size:15px; transition:0.2s; }
+    .nav-link:hover { background:rgba(255,0,80,0.15); color:#fff; }
+    .main { margin-left:260px; padding:40px; }
+    .title { font-size:30px; font-weight:800; margin-bottom:10px; }
+    .subtitle { color:#aaa; margin-bottom:30px; }
+    table { width:100%; border-collapse:collapse; background:#141416; border-radius:10px; overflow:hidden; }
+    th, td { padding:12px 14px; font-size:14px; border-bottom:1px solid rgba(255,255,255,0.06); }
+    th { text-align:left; background:#18181a; color:#ff0050; }
+    tr:hover { background:#18181a; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h1>OWNER</h1>
+    <a class="nav-link" href="./owner-dashboard.html">Dashboard Overview</a>
+    <a class="nav-link" href="./users.html">Users</a>
+    <a class="nav-link" href="./skaters.html">Skaters</a>
+    <a class="nav-link" href="./businesses.html">Businesses</a>
+    <a class="nav-link" href="./musicians.html">Musicians</a>
+    <a class="nav-link" href="./shows.html">Shows</a>
+    <a class="nav-link" href="./contracts.html">Contracts</a>
+    <a class="nav-link" href="./music.html">Music Library</a>
+    <a class="nav-link" href="./settings.html">Platform Settings</a>
+  </div>
+
+  <div class="main">
+    <div class="title">Skaters</div>
+    <div class="subtitle">All skater profiles and their show activity.</div>
+
+    <table id="skaters-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Shows</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function loadSkaters() {
+      const owner = JSON.parse(localStorage.getItem("rollshow_user") || "{}");
+      const res = await fetch("/api/owner/skaters", {
+        headers: { "x-owner-id": owner.id }
+      });
+      const data = await res.json();
+      const tbody = document.querySelector("#skaters-table tbody");
+      tbody.innerHTML = "";
+      data.skaters.forEach(s => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${s.name || "-"}</td>
+          <td>${s.email || "-"}</td>
+          <td>${s.show_count || 0}</td>
+          <td>${s.created_at || "-"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    loadSkaters();
+  </script>
+</body>
+</html>
