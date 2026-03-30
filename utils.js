@@ -1,54 +1,50 @@
-/* ============================================================
-   CORS HEADERS
-============================================================ */
-export function cors() {
-  return {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers":
-      "Content-Type, x-user-id, x-buyer-id, x-skater-id, x-business-id, x-musician-id, x-owner-id"
-  };
-}
+import { json } from "../utils.js";
+import { requireRole } from "../users.js";
 
-/* ============================================================
-   JSON RESPONSE WRAPPER
-============================================================ */
-export function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json", ...cors() }
+export async function ownerOverview(request, env) {
+  return requireRole(request, env, ["owner"], async (_req, env) => {
+
+    const total_users = await env.DB_users.prepare(
+      "SELECT COUNT(*) AS c FROM users"
+    ).first();
+
+    const total_skaters = await env.DB_users.prepare(
+      "SELECT COUNT(*) AS c FROM users WHERE role='skater'"
+    ).first();
+
+    const total_businesses = await env.DB_users.prepare(
+      "SELECT COUNT(*) AS c FROM users WHERE role='business'"
+    ).first();
+
+    const total_musicians = await env.DB_users.prepare(
+      "SELECT COUNT(*) AS c FROM users WHERE role='musician'"
+    ).first();
+
+    const total_shows = await env.DB_shows.prepare(
+      "SELECT COUNT(*) AS c FROM shows"
+    ).first();
+
+    const total_tickets = await env.DB_shows.prepare(
+      "SELECT COALESCE(SUM(tickets_sold),0) AS c FROM shows"
+    ).first();
+
+    const total_purchases = await env.DB_purchases.prepare(
+      "SELECT COUNT(*) AS c FROM purchases"
+    ).first();
+
+    const total_revenue = await env.DB_purchases.prepare(
+      "SELECT COALESCE(SUM(amount),0) AS c FROM purchases"
+    ).first();
+
+    return json({
+      total_users: total_users.c,
+      total_skaters: total_skaters.c,
+      total_businesses: total_businesses.c,
+      total_musicians: total_musicians.c,
+      total_shows: total_shows.c,
+      total_tickets: total_tickets.c,
+      total_purchases: total_purchases.c,
+      total_revenue: total_revenue.c
+    });
   });
-}
-
-/* ============================================================
-   UNIFIED USER ID EXTRACTION
-============================================================ */
-export function getUserId(request) {
-  return (
-    request.headers.get("x-user-id") ||
-    request.headers.get("x-buyer-id") ||
-    request.headers.get("x-skater-id") ||
-    request.headers.get("x-business-id") ||
-    request.headers.get("x-musician-id") ||
-    request.headers.get("x-owner-id")
-  );
-}
-
-/* ============================================================
-   BCRYPTJS — WORKER SAFE
-============================================================ */
-import bcrypt from "bcryptjs";
-
-/* ============================================================
-   PASSWORD HASHING (bcrypt)
-============================================================ */
-export async function hash(str) {
-  return await bcrypt.hash(str, 10);
-}
-
-/* ============================================================
-   PASSWORD VERIFY (bcrypt)
-============================================================ */
-export async function verify(str, hashed) {
-  return await bcrypt.compare(str, hashed);
 }
