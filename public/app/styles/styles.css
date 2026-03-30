@@ -1,5 +1,5 @@
 /* ============================================================
-   ROLL SHOW — CLEAN GLOBAL STYLE (NO BACKGROUND CONTROL)
+   ROLL SHOW — GLOBAL CINEMATIC UI
    ============================================================ */
 
 /* FONTS */
@@ -8,189 +8,275 @@
 
 
 /* ============================================================
-   GLOBAL RESET
+   RESET + BASE
    ============================================================ */
 
-html, body {
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
   height: 100%;
-  background: #000; /* PURE BLACK BEHIND YOUR IMAGE */
+  background: #000;
   color: white;
   font-family: "Inter", sans-serif;
   overflow-x: hidden;
 }
 
-/* Every page’s content sits ABOVE the background image */
-.landing-page,
-.auth-container,
-.header,
-.footer {
-  position: relative;
-  z-index: 5;
+img {
+  max-width: 100%;
+  display: block;
 }
 
 
 /* ============================================================
-   HEADINGS
+   TYPOGRAPHY
    ============================================================ */
 
-h1, h2, h3, .logo, .cta {
+h1, h2, h3, h4, .title-cursive {
   font-family: "Lobster", cursive;
-  letter-spacing: 0.5px;
   color: white;
   text-shadow: 0 3px 8px rgba(0,0,0,0.6);
 }
 
-
-/* ============================================================
-   LINKS + BUTTONS
-   ============================================================ */
-
-a {
-  color: white;
-  text-decoration: underline;
-}
-
-button {
-  cursor: pointer;
+p, label, input, button, a {
+  font-family: "Inter", sans-serif;
 }
 
 
 /* ============================================================
-   HEADER
+   GLOBAL BUTTON SYSTEM
    ============================================================ */
 
-.header {
-  width: 100%;
-  padding: 20px 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: none;
-  border: none;
-}
-
-.logo {
-  font-size: 32px;
-  font-weight: 400;
-}
-
-.nav a {
-  margin-left: 20px;
-  font-weight: 600;
-}
-
-#themeToggle {
-  margin-left: 20px;
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid white;
-  background: none;
-  color: white;
-}
-
-
-/* ============================================================
-   HERO SECTION
-   ============================================================ */
-
-.hero {
-  padding: 120px 40px 80px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.hero-content {
-  max-width: 600px;
-}
-
-.hero .subtitle {
-  margin-top: 10px;
-  font-size: 22px;
-  font-weight: 300;
-  text-shadow: 0 3px 8px rgba(0,0,0,0.6);
-}
-
-.cta {
+button,
+.btn,
+.btn-primary,
+.btn-ghost {
   display: inline-block;
-  margin-top: 30px;
-  padding: 14px 24px;
-  background: rgba(255,255,255,0.2);
+  width: 100%;
+  padding: 14px 20px;
+  margin-top: 20px;
+
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+
+  color: white;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.35);
   border-radius: 10px;
-  font-size: 22px;
-  transition: 0.2s;
-  backdrop-filter: blur(3px);
+
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+
+  cursor: pointer;
+  transition: 0.25s ease;
 }
 
-.cta:hover {
-  background: rgba(255,255,255,0.35);
+button:hover,
+.btn:hover,
+.btn-primary:hover,
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.32);
+  border-color: rgba(255,255,255,0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.55);
 }
 
-
-/* ============================================================
-   SHOW GRID + CARDS
-   ============================================================ */
-
-.show-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-  padding: 20px 40px;
+/* Secondary / Ghost Buttons */
+.btn-ghost {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.25);
 }
 
-.show-card {
-  background: rgba(0,0,0,0.4);
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.2);
-  transition: 0.2s;
-}
-
-.show-card:hover {
-  transform: translateY(-4px);
+.btn-ghost:hover {
+  background: rgba(0,0,0,0.55);
+  border-color: rgba(255,255,255,0.45);
 }
 
 
 /* ============================================================
-   FORMS
+   INPUTS + FORMS
    ============================================================ */
 
-.auth-container {
-  display: flex;
-  justify-content: center;
-  padding: 100px 20px;
-}
-
-.auth-box {
+form {
   width: 100%;
   max-width: 420px;
+  margin: 0 auto;
 }
 
 form input,
 form select,
 form textarea {
   width: 100%;
-  padding: 12px;
-  margin-top: 6px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.4);
-  background: rgba(0,0,0,0.4);
+  padding: 14px;
+  margin-top: 12px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(0,0,0,0.45);
+  color: white;
+
+  backdrop-filter: blur(4px);
+  transition: 0.25s ease;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+  border-color: rgba(255,255,255,0.65);
+  background: rgba(0,0,0,0.6);
+  outline: none;
+}
+
+
+/* ============================================================
+   SIGNUP / LOGIN SHELL
+   ============================================================ */
+
+.signup-shell,
+.auth-shell {
+  width: 100%;
+  max-width: 480px;
+  margin: 120px auto 0;
+  padding: 20px;
+  text-align: center;
+}
+
+.signup-shell h1,
+.auth-shell h1 {
+  margin-bottom: 20px;
+}
+
+
+/* ============================================================
+   MODALS (AGREEMENTS, ALERTS, ETC.)
+   ============================================================ */
+
+.modal,
+.agreement-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal.hidden,
+.agreement-modal.hidden {
+  display: none;
+}
+
+.modal-box,
+.agreement-box {
+  width: 90%;
+  max-width: 600px;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 14px;
+  padding: 30px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+}
+
+.agreement-content {
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 20px 0;
+  padding-right: 10px;
+}
+
+
+/* ============================================================
+   DASHBOARD LAYOUT
+   ============================================================ */
+
+.dashboard-shell {
+  padding: 40px;
+}
+
+.dashboard-header {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 12px;
+  padding: 20px;
+  transition: 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  background: rgba(0,0,0,0.6);
+}
+
+
+/* ============================================================
+   NAV + BURGER MENU
+   ============================================================ */
+
+.burger {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 50;
+  cursor: pointer;
+}
+
+.burger span {
+  display: block;
+  width: 28px;
+  height: 3px;
+  margin: 6px 0;
+  background: white;
+  border-radius: 3px;
+}
+
+.menu-panel {
+  position: fixed;
+  top: 0;
+  right: -260px;
+  width: 260px;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(6px);
+  padding: 40px 20px;
+  transition: 0.3s ease;
+  z-index: 40;
+}
+
+.menu-panel.open {
+  right: 0;
+}
+
+.menu-panel a {
+  display: block;
+  margin: 20px 0;
+  font-size: 18px;
+  text-decoration: none;
   color: white;
 }
 
-.btn-primary {
-  margin-top: 30px;
-  padding: 14px 20px;
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 16px;
-  transition: 0.2s;
-}
 
-.btn-primary:hover {
-  background: rgba(255,255,255,0.35);
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.footer {
+  padding: 40px;
+  text-align: center;
+  opacity: 0.8;
 }
