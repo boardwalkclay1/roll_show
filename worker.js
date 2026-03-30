@@ -1,5 +1,6 @@
 import { cors, json } from "./utils.js";
 import { login, requireRole } from "./users.js";
+
 import {
   signupBuyer,
   listTickets,
@@ -7,6 +8,7 @@ import {
   createTicket,
   partnerWebhook
 } from "./buyers.js";
+
 import {
   signupSkater,
   listShows,
@@ -16,6 +18,7 @@ import {
   createShow,
   updateSkaterProfile
 } from "./skaters.js";
+
 import {
   signupBusiness,
   businessDashboard,
@@ -24,6 +27,7 @@ import {
   createContract,
   listContracts
 } from "./business.js";
+
 import {
   signupMusician,
   musicianDashboard,
@@ -32,22 +36,40 @@ import {
   licenseTrack
 } from "./musicians.js";
 
+import {
+  ownerOverview,
+  ownerUsers,
+  ownerSkaters,
+  ownerBusinesses,
+  ownerMusicians,
+  ownerShows,
+  ownerContracts,
+  ownerMusic,
+  ownerSettingsBranding,
+  ownerSettingsNotes
+} from "./routes/owner.js";
+
 export default {
   async fetch(request, env, ctx) {
     try {
       const url = new URL(request.url);
       const path = url.pathname;
 
+      // CORS
       if (request.method === "OPTIONS") {
         return new Response(null, { status: 204, headers: cors() });
       }
 
-      // AUTH
+      /* ============================================================
+         AUTH
+      ============================================================ */
       if (path === "/api/login" && request.method === "POST") {
         return login(request, env);
       }
 
-      // SIGNUP
+      /* ============================================================
+         SIGNUP ROUTES
+      ============================================================ */
       if (path === "/api/buyer/signup" && request.method === "POST") {
         return signupBuyer(request, env);
       }
@@ -61,7 +83,9 @@ export default {
         return signupBusiness(request, env);
       }
 
-      // PUBLIC SHOWS
+      /* ============================================================
+         PUBLIC SHOWS
+      ============================================================ */
       if (path === "/api/shows" && request.method === "GET") {
         return listShows(env);
       }
@@ -70,7 +94,9 @@ export default {
         return getShow(env, id);
       }
 
-      // BUYER
+      /* ============================================================
+         BUYER
+      ============================================================ */
       if (path === "/api/buyer/tickets" && request.method === "GET") {
         return requireRole(request, env, ["buyer"], listTickets);
       }
@@ -81,7 +107,9 @@ export default {
         return requireRole(request, env, ["buyer"], createTicket);
       }
 
-      // SKATER
+      /* ============================================================
+         SKATER
+      ============================================================ */
       if (path === "/api/skater/dashboard" && request.method === "GET") {
         return requireRole(request, env, ["skater"], skaterDashboard);
       }
@@ -95,7 +123,9 @@ export default {
         return requireRole(request, env, ["skater"], updateSkaterProfile);
       }
 
-      // BUSINESS
+      /* ============================================================
+         BUSINESS
+      ============================================================ */
       if (path === "/api/business/dashboard" && request.method === "GET") {
         return requireRole(request, env, ["business"], businessDashboard);
       }
@@ -112,7 +142,9 @@ export default {
         return requireRole(request, env, ["business"], listContracts);
       }
 
-      // MUSICIANS
+      /* ============================================================
+         MUSICIANS
+      ============================================================ */
       if (path === "/api/musician/dashboard" && request.method === "GET") {
         return requireRole(request, env, ["musician"], musicianDashboard);
       }
@@ -126,12 +158,32 @@ export default {
         return requireRole(request, env, ["skater"], licenseTrack);
       }
 
-      // WEBHOOK
+      /* ============================================================
+         OWNER REALM (FULLY WIRED)
+      ============================================================ */
+      if (path === "/api/owner/overview") return ownerOverview(request, env);
+      if (path === "/api/owner/users") return ownerUsers(request, env);
+      if (path === "/api/owner/skaters") return ownerSkaters(request, env);
+      if (path === "/api/owner/businesses") return ownerBusinesses(request, env);
+      if (path === "/api/owner/musicians") return ownerMusicians(request, env);
+      if (path === "/api/owner/shows") return ownerShows(request, env);
+      if (path === "/api/owner/contracts") return ownerContracts(request, env);
+      if (path === "/api/owner/music") return ownerMusic(request, env);
+      if (path === "/api/owner/settings/branding") return ownerSettingsBranding(request, env);
+      if (path === "/api/owner/settings/notes") return ownerSettingsNotes(request, env);
+
+      /* ============================================================
+         WEBHOOK
+      ============================================================ */
       if (path === "/api/webhooks/partner" && request.method === "POST") {
         return partnerWebhook(request, env);
       }
 
+      /* ============================================================
+         NOT FOUND
+      ============================================================ */
       return json({ error: "Not found" }, 404);
+
     } catch (err) {
       return json({ error: "Worker crashed", detail: String(err) }, 500);
     }
