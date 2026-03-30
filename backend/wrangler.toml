@@ -1,8 +1,0 @@
-name = "rollshow-backend"
-main = "src/worker.js"
-compatibility_date = "2024-01-01"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "rollshow-db"
-database_id = "REPLACE_WITH_D1_ID"
