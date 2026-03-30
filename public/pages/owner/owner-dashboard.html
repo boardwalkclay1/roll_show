@@ -5,14 +5,36 @@
   <title>Roll Show • Owner Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/favicon.png" />
+
   <style>
     body {
       margin: 0;
       padding: 0;
-      background: #0b0b0c;
       font-family: "Inter", sans-serif;
       color: #fff;
       overflow-x: hidden;
+
+      /* FULL SCREEN BACKGROUND */
+      background-image: url("/favicon.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    /* Dark overlay for readability */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.55);
+      pointer-events: none;
+      z-index: -1;
     }
 
     /* Cinematic Glow */
@@ -28,7 +50,8 @@
       left: 0;
       width: 260px;
       height: 100vh;
-      background: #111;
+      background: rgba(17,17,17,0.92);
+      backdrop-filter: blur(6px);
       border-right: 1px solid rgba(255,255,255,0.08);
       padding: 30px 20px;
       box-sizing: border-box;
@@ -73,7 +96,7 @@
 
     .subtitle {
       font-size: 18px;
-      color: #aaa;
+      color: #ddd;
       margin-bottom: 40px;
     }
 
@@ -85,7 +108,8 @@
     }
 
     .card {
-      background: #141416;
+      background: rgba(20,20,22,0.88);
+      backdrop-filter: blur(4px);
       padding: 25px;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.06);
@@ -134,15 +158,15 @@
   <div class="sidebar">
     <h1 class="glow">OWNER</h1>
 
-    <a class="nav-link" href="./owner-dashboard.html">Dashboard Overview</a>
-    <a class="nav-link" href="./users.html">Users</a>
-    <a class="nav-link" href="./skaters.html">Skaters</a>
-    <a class="nav-link" href="./businesses.html">Businesses</a>
-    <a class="nav-link" href="./musicians.html">Musicians</a>
-    <a class="nav-link" href="./shows.html">Shows</a>
-    <a class="nav-link" href="./contracts.html">Contracts</a>
-    <a class="nav-link" href="./music.html">Music Library</a>
-    <a class="nav-link" href="./settings.html">Platform Settings</a>
+    <a class="nav-link" href="/pages/owner/owner-dashboard.html">Dashboard Overview</a>
+    <a class="nav-link" href="/pages/owner/users.html">Users</a>
+    <a class="nav-link" href="/pages/owner/skaters.html">Skaters</a>
+    <a class="nav-link" href="/pages/owner/businesses.html">Businesses</a>
+    <a class="nav-link" href="/pages/owner/musicians.html">Musicians</a>
+    <a class="nav-link" href="/pages/owner/shows.html">Shows</a>
+    <a class="nav-link" href="/pages/owner/contracts.html">Contracts</a>
+    <a class="nav-link" href="/pages/owner/music.html">Music Library</a>
+    <a class="nav-link" href="/pages/owner/settings.html">Platform Settings</a>
   </div>
 
   <!-- MAIN CONTENT -->
@@ -152,22 +176,23 @@
 
     <!-- QUICK JUMPS -->
     <div style="margin-bottom: 40px;">
-      <a class="jump-btn" href="/pages/skater-dashboard.html">View Skater Dashboard</a>
-      <a class="jump-btn" href="/pages/business-dashboard.html">View Business Dashboard</a>
-      <a class="jump-btn" href="/pages/musician-dashboard.html">View Musician Dashboard</a>
-      <a class="jump-btn" href="/pages/buyer-dashboard.html">View Buyer Dashboard</a>
+      <a class="jump-btn" href="/pages/skater/skater-dashboard.html">View Skater Dashboard</a>
+      <a class="jump-btn" href="/pages/business/business-dashboard.html">View Business Dashboard</a>
+      <a class="jump-btn" href="/pages/musician/musician-dashboard.html">View Musician Dashboard</a>
+      <a class="jump-btn" href="/pages/buyer/buyer-dashboard.html">View Buyer Dashboard</a>
     </div>
 
     <!-- SYSTEM OVERVIEW CARDS -->
-    <div class="grid" id="overview-grid">
-      <!-- JS will fill these -->
-    </div>
+    <div class="grid" id="overview-grid"></div>
   </div>
 
   <script>
     async function loadOverview() {
+      const user = JSON.parse(localStorage.getItem("rollshow_user"));
+      if (!user) return;
+
       const res = await fetch("/api/owner/overview", {
-        headers: { "x-owner-id": JSON.parse(localStorage.getItem("rollshow_user")).id }
+        headers: { "x-owner-id": user.id }
       });
 
       const data = await res.json();
