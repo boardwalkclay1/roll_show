@@ -1,10 +1,8 @@
-import { json } from "./utils.js";
+import { json } from "./users.js";
 import { signupBase } from "./users.js";
 
 /* ============================================================
    BUSINESS SIGNUP
-   - Creates user in DB_users
-   - Creates business profile in DB_business
 ============================================================ */
 export async function signupBusiness(request, env) {
   const body = await request.json();
@@ -29,18 +27,12 @@ export async function signupBusiness(request, env) {
 
 /* ============================================================
    BUSINESS DASHBOARD
-   - Businesses ONLY see:
-       • their profile
-       • their offers (sent or received)
-       • their contracts
-       • skater profiles
 ============================================================ */
 export async function businessDashboard(request, env, user) {
   const business = await env.DB_business.prepare(
     "SELECT * FROM businesses WHERE user_id = ?"
   ).bind(user.id).first();
 
-  // Offers where business is sender OR receiver (but always involving a skater)
   const { results: offers } = await env.DB_business.prepare(
     `SELECT o.*, u.name AS skater_name
      FROM offers o
@@ -50,7 +42,6 @@ export async function businessDashboard(request, env, user) {
      ORDER BY o.created_at DESC`
   ).bind(user.id, user.id).all();
 
-  // Contracts involving this business
   const { results: contracts } = await env.DB_business.prepare(
     `SELECT c.*, o.type, o.terms
      FROM contracts c
@@ -67,12 +58,11 @@ export async function businessDashboard(request, env, user) {
 }
 
 /* ============================================================
-   CREATE OFFER (BUSINESS → SKATER ONLY)
+   CREATE OFFER (BUSINESS → SKATER)
 ============================================================ */
 export async function createOffer(request, env, user) {
   const { skaterId, type, amount_cents, terms } = await request.json();
 
-  // Validate: businesses can ONLY send offers to skaters
   const target = await env.DB_users.prepare(
     "SELECT role FROM users WHERE id = ?"
   ).bind(skaterId).first();
@@ -109,12 +99,11 @@ export async function listBusinessOffers(request, env, user) {
 }
 
 /* ============================================================
-   CREATE CONTRACT (BUSINESS CAN ONLY CREATE IF SKATER ACCEPTS)
+   CREATE CONTRACT
 ============================================================ */
 export async function createContract(request, env, user) {
   const { offerId, details } = await request.json();
 
-  // Validate offer exists and involves this business
   const offer = await env.DB_business.prepare(
     `SELECT * FROM offers WHERE id = ? AND (from_user_id = ? OR to_user_id = ?)`
   ).bind(offerId, user.id, user.id).first();
@@ -123,7 +112,6 @@ export async function createContract(request, env, user) {
     return json({ error: "Offer not found or not associated with this business." }, 404);
   }
 
-  // Validate skater accepted the offer
   if (offer.status !== "accepted") {
     return json({ error: "Skater must accept the offer before creating a contract." }, 400);
   }
@@ -136,7 +124,6 @@ export async function createContract(request, env, user) {
      VALUES (?, ?, ?, 'pending', ?)`
   ).bind(id, offerId, details, now).run();
 
-  // Add business as participant
   await env.DB_business.prepare(
     `INSERT INTO contract_participants (id, contract_id, user_id, role_in_contract, percentage, signed)
      VALUES (?, ?, ?, 'business', NULL, 0)`
@@ -146,7 +133,7 @@ export async function createContract(request, env, user) {
 }
 
 /* ============================================================
-   LIST CONTRACTS (BUSINESS ONLY SEES THEIR OWN)
+   LIST CONTRACTS
 ============================================================ */
 export async function listContracts(request, env, user) {
   const { results } = await env.DB_business.prepare(
