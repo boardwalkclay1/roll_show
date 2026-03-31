@@ -21,7 +21,7 @@
   <meta property="og:image" content="/app/images/roll-index.jpg">
   <meta property="og:type" content="website">
 
-  <!-- STYLES -->
+  <!-- CORRECT GLOBAL STYLES -->
   <link rel="stylesheet" href="/app/styles/styles.css">
 
   <!-- SERVICE WORKER -->
@@ -38,62 +38,28 @@
   <img src="/app/images/2nd-rd/roll-board-jump.jpg" class="bg-landing" alt="Background">
 
   <main class="rs-auth-shell">
-
     <section class="rs-card">
       <h1 class="rs-title">Business Application</h1>
-      <p class="rs-subtitle">
-        Apply to join Roll Show as a verified business partner.
-      </p>
+      <p class="rs-subtitle">Apply to join Roll Show as a verified business partner.</p>
 
       <form id="business-apply-form" class="rs-form">
-        <label>
-          Company Name
-          <input type="text" name="company_name" required />
-        </label>
-
-        <label>
-          Website
-          <input type="url" name="website" placeholder="https://example.com" />
-        </label>
-
-        <label>
-          Phone
-          <input type="tel" name="phone" />
-        </label>
-
-        <label>
-          Address
-          <textarea name="address" rows="2"></textarea>
-        </label>
-
-        <label>
-          EIN / Tax ID
-          <input type="text" name="ein" placeholder="XX-XXXXXXX" />
-        </label>
-
-        <label>
-          Your Name
-          <input type="text" name="name" required />
-        </label>
-
-        <label>
-          Email
-          <input type="email" name="email" required />
-        </label>
-
-        <label>
-          Password
-          <input type="password" name="password" required />
-        </label>
+        <label>Company Name <input type="text" name="company_name" required /></label>
+        <label>Website <input type="url" name="website" placeholder="https://example.com" /></label>
+        <label>Phone <input type="tel" name="phone" /></label>
+        <label>Address <textarea name="address" rows="2"></textarea></label>
+        <label>EIN / Tax ID <input type="text" name="ein" placeholder="XX-XXXXXXX" /></label>
+        <label>Your Name <input type="text" name="name" required /></label>
+        <label>Email <input type="email" name="email" required /></label>
+        <label>Password <input type="password" name="password" required /></label>
 
         <button type="submit" class="rs-btn-primary">Submit Application</button>
       </form>
 
       <div id="business-apply-message" class="rs-message"></div>
     </section>
-
   </main>
 
+  <!-- CORRECT JS FILE -->
   <script src="/app/js/business/business-signup.js" type="module"></script>
 </body>
 </html>
