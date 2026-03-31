@@ -233,3 +233,84 @@ export async function respondLessonRequest(request, env, user) {
 
   return json({ success: true });
 }
+import { json } from "./users.js";
+
+/* ============================================================
+   SKATER: LIST BUSINESSES (SIGNED ONLY)
+============================================================ */
+export async function skaterBusinesses(request, env, user) {
+  const skater = await env.DB_skaters.prepare(
+    "SELECT id, signed_to_label FROM skaters WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  if (!skater || !skater.signed_to_label) {
+    return json({ error: "You must be signed to the label to access businesses." }, 403);
+  }
+
+  const { results: businesses } = await env.DB_business.prepare(
+    `SELECT b.id, b.company_name, b.website, b.verified
+     FROM businesses b
+     WHERE b.verified = 1
+     ORDER BY b.company_name ASC`
+  ).all();
+
+  const { results: sponsorships } = await env.DB_business.prepare(
+    `SELECT s.*, b.company_name
+     FROM sponsorships s
+     JOIN businesses b ON s.business_id = b.id
+     WHERE s.skater_id = ?`
+  ).bind(skater.id).all();
+
+  return json({
+    businesses,
+    sponsorships
+  });
+}
+
+/* ============================================================
+   SKATER: CONTACT BUSINESS (MESSAGE THREAD)
+============================================================ */
+export async function skaterContactBusiness(request, env, user) {
+  const body = await request.json();
+  const { businessId, message } = body;
+
+  const skater = await env.DB_skaters.prepare(
+    "SELECT id, signed_to_label FROM skaters WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  if (!skater || !skater.signed_to_label) {
+    return json({ error: "You must be signed to the label to contact businesses." }, 403);
+  }
+
+  const business = await env.DB_business.prepare(
+    "SELECT id FROM businesses WHERE id = ? AND verified = 1"
+  ).bind(businessId).first();
+
+  if (!business) return json({ error: "Business not found." }, 404);
+
+  let thread = await env.DB_business.prepare(
+    `SELECT * FROM message_threads
+     WHERE skater_id = ? AND business_id = ?`
+  ).bind(skater.id, business.id).first();
+
+  const now = new Date().toISOString();
+
+  if (!thread) {
+    const threadId = crypto.randomUUID();
+    await env.DB_business.prepare(
+      `INSERT INTO message_threads (id, skater_id, business_id, sponsorship_id, created_at)
+       VALUES (?, ?, ?, NULL, ?)`
+    ).bind(threadId, skater.id, business.id, now).run();
+
+    thread = { id: threadId };
+  }
+
+  const msgId = crypto.randomUUID();
+
+  await env.DB_business.prepare(
+    `INSERT INTO messages (id, thread_id, from_user_id, to_user_id, body, created_at)
+     VALUES (?, ?, ?, ?, ?, ?)`
+  ).bind(msgId, thread.id, user.id, null, message || "Let's talk branding.", now).run();
+
+  return json({ success: true, threadId: thread.id, messageId: msgId });
+}
