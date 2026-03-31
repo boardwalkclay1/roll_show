@@ -5,6 +5,12 @@
   <title>Roll Show — Buyer Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- Favicon + manifest -->
+  <link rel="icon" type="image/png" href="/app/images/favicon.png">
+  <link rel="apple-touch-icon" href="/app/images/favicon.png">
+  <link rel="manifest" href="/app/manifest.json">
+
+  <!-- Styles -->
   <link rel="stylesheet" href="/app/styles/styles.css">
   <link rel="stylesheet" href="/app/styles/dashboard.css">
 </head>
@@ -13,25 +19,60 @@
   <img src="/app/images/bg-buyer-dash.jpg" class="bg-landing" alt="Background">
 
   <main class="rs-dash-shell rs-dash-buyer">
+
     <header class="rs-dash-header">
       <div>
         <h1 class="rs-dash-title" id="buyer-name">Buyer</h1>
-        <p class="rs-dash-sub">Your tickets and recent purchases.</p>
+        <p class="rs-dash-sub">Your tickets, purchases, and tools.</p>
       </div>
     </header>
 
     <nav class="rs-dash-nav" id="buyer-nav"></nav>
 
     <section class="rs-dash-grid">
+
+      <!-- TICKETS PREVIEW -->
       <article class="rs-dash-card">
         <h3>Recent Tickets</h3>
         <ul class="rs-dash-list" id="buyer-tickets"></ul>
+        <a class="rs-dash-pill" id="tickets-link">View All Tickets</a>
       </article>
 
+      <!-- PURCHASES PREVIEW -->
       <article class="rs-dash-card">
         <h3>Recent Purchases</h3>
         <ul class="rs-dash-list" id="buyer-purchases"></ul>
+        <a class="rs-dash-pill" id="purchases-link">View Purchase History</a>
       </article>
+
+      <!-- FEED -->
+      <article class="rs-dash-card">
+        <h3>Buyer Feed</h3>
+        <p>Updates and recommended shows.</p>
+        <a class="rs-dash-pill" id="feed-link">Open Feed</a>
+      </article>
+
+      <!-- TICKET WALLET -->
+      <article class="rs-dash-card">
+        <h3>Ticket Wallet</h3>
+        <p>Your full ticket collection.</p>
+        <a class="rs-dash-pill" id="wallet-link">Open Wallet</a>
+      </article>
+
+      <!-- CONFIRMATION -->
+      <article class="rs-dash-card">
+        <h3>Confirmations</h3>
+        <p>View your latest ticket confirmations.</p>
+        <a class="rs-dash-pill" id="confirmation-link">View Confirmations</a>
+      </article>
+
+      <!-- TICKET VIEW -->
+      <article class="rs-dash-card">
+        <h3>Ticket Viewer</h3>
+        <p>Scan or display your ticket QR.</p>
+        <a class="rs-dash-pill" id="ticketview-link">Open Ticket Viewer</a>
+      </article>
+
     </section>
 
     <p class="rs-dash-status" id="buyer-status"></p>
