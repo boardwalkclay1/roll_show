@@ -1,36 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Owner — Business Applications</title>
-  <link rel="stylesheet" href="/assets/css/owner.css" />
-</head>
-<body class="owner-body">
-  <main class="owner-shell">
-    <header class="owner-header">
-      <h1>Business Applications</h1>
-      <p>Review and approve businesses before they access the platform.</p>
-    </header>
+const form = document.getElementById("business-apply-form");
+const messageEl = document.getElementById("business-apply-message");
 
-    <section class="owner-card">
-      <table class="owner-table" id="applications-table">
-        <thead>
-          <tr>
-            <th>Company</th>
-            <th>Owner</th>
-            <th>Website</th>
-            <th>Phone</th>
-            <th>Submitted</th>
-            <th>Status</th>
-            <th>Notes</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-  </main>
+function showMessage(text, type = "info") {
+  messageEl.textContent = text;
+  messageEl.className = "rs-message " + type;
+}
 
-  <script src="/app/js/owner/business-applications.js" type="module"></script>
-</body>
-</html>
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  showMessage("Submitting application...", "info");
+
+  const formData = new FormData(form);
+  const payload = Object.fromEntries(formData.entries());
+
+  try {
+    const res = await fetch("/api/business/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      showMessage(data.error || "Application failed.", "error");
+      return;
+    }
+
+    showMessage(
+      "Application submitted. Your business will be reviewed before access is granted.",
+      "success"
+    );
+
+    form.reset();
+  } catch (err) {
+    showMessage("Network error. Please try again.", "error");
+  }
+});
