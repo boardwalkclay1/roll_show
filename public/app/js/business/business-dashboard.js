@@ -1,6 +1,5 @@
 import API from "../api.js";
 
-// INLINE REPLACEMENT FOR utils.js
 function getUserIdFromQuery() {
   const params = new URLSearchParams(window.location.search);
   return params.get("user");
@@ -9,46 +8,60 @@ function getUserIdFromQuery() {
 const userId = getUserIdFromQuery();
 
 async function loadDashboard() {
+  const nameEl = document.getElementById("business-name");
+  const revenueEl = document.getElementById("business-revenue");
+  const offersEl = document.getElementById("business-offers");
+  const contractsEl = document.getElementById("business-contracts");
+  const statusEl = document.getElementById("business-status");
+
   if (!userId) {
-    console.error("No user ID in URL");
-    document.getElementById("business-name").textContent = "Unknown Business";
-    document.getElementById("business-revenue").textContent = "$0.00";
-    document.getElementById("business-offers").innerHTML =
-      "<li>Missing user ID in URL.</li>";
+    statusEl.textContent = "Missing business ID in URL.";
     return;
   }
 
   try {
-    const data = await API.get(`/api/business/dashboard?user=${encodeURIComponent(userId)}`);
+    statusEl.textContent = "Loading…";
 
-    document.getElementById("business-name").textContent = data.name;
-    document.getElementById("business-revenue").textContent =
-      `$${((data.revenue_cents || 0) / 100).toFixed(2)}`;
-
-    const offers = document.getElementById("business-offers");
-    offers.innerHTML = "";
-
-    if (Array.isArray(data.offers) && data.offers.length > 0) {
-      data.offers.forEach(offer => {
-        const li = document.createElement("li");
-        li.textContent = `${offer.title} — $${(offer.price_cents / 100).toFixed(2)}`;
-        offers.appendChild(li);
-      });
-    } else {
-      offers.innerHTML = "<li>No offers yet.</li>";
-    }
-
-  } catch (err) {
-    console.error("Dashboard error:", err);
-
-    if (err.message?.includes("<!DOCTYPE")) {
-      document.getElementById("business-offers").innerHTML =
-        "<li>Worker returned HTML instead of JSON — routing issue.</li>";
+    const res = await API.get(`/api/business/dashboard?user=${encodeURIComponent(userId)}`);
+    if (!res.success) {
+      statusEl.textContent = res.error?.message || "Failed to load dashboard.";
       return;
     }
 
-    document.getElementById("business-offers").innerHTML =
-      "<li>Failed to load dashboard.</li>";
+    const data = res.data || {};
+
+    nameEl.textContent = data.name || "Business";
+    revenueEl.textContent = `$${((data.revenue_cents || 0) / 100).toFixed(2)}`;
+
+    offersEl.innerHTML = "";
+    const offers = Array.isArray(data.offers) ? data.offers : [];
+    if (offers.length === 0) {
+      offersEl.innerHTML = "<li>No active offers.</li>";
+    } else {
+      offers.forEach(offer => {
+        const li = document.createElement("li");
+        li.textContent = `${offer.title} — $${(offer.price_cents / 100).toFixed(2)}`;
+        offersEl.appendChild(li);
+      });
+    }
+
+    contractsEl.innerHTML = "";
+    const contracts = Array.isArray(data.contracts) ? data.contracts : [];
+    if (contracts.length === 0) {
+      contractsEl.innerHTML = "<li>No contracts yet.</li>";
+    } else {
+      contracts.forEach(contract => {
+        const li = document.createElement("li");
+        li.textContent = `${contract.skater_name} — ${contract.status}`;
+        contractsEl.appendChild(li);
+      });
+    }
+
+    statusEl.textContent = "";
+
+  } catch (err) {
+    console.error("Business dashboard error:", err);
+    statusEl.textContent = "Server error loading dashboard.";
   }
 }
 
