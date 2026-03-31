@@ -1,4 +1,4 @@
-import { json } from "./utils.js";
+import { json } from "./users.js";
 import { signupBase } from "./users.js";
 
 /* ============================================================
@@ -59,15 +59,6 @@ export async function getShow(env, id) {
 
 /* ============================================================
    SKATER DASHBOARD
-   Skaters see EVERYTHING related to THEM:
-     • profile
-     • shows
-     • lessons
-     • lesson requests
-     • offers (from musicians + businesses + skaters)
-     • contracts
-     • contract participants
-     • music licenses
 ============================================================ */
 export async function skaterDashboard(request, env, user) {
   const skater = await env.DB_skaters.prepare(
@@ -224,7 +215,6 @@ export async function respondLessonRequest(request, env, user) {
     return json({ error: "Invalid status" }, 400);
   }
 
-  // Validate skater owns the lesson
   const row = await env.DB_skaters.prepare(
     `SELECT lr.id
      FROM lesson_requests lr
