@@ -4,22 +4,36 @@
   <meta charset="UTF-8">
   <title>Skater Dashboard – Roll Show</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
   <link rel="icon" href="/favicon.png">
+
+  <!-- Dashboard Styles -->
   <link rel="stylesheet" href="/app/styles/dashboard.css">
 </head>
 
 <body style="background:url('/app/images/bg-skater-dash.jpg') center/cover no-repeat;">
 
   <main class="dash-shell">
-    <h1 id="skater-name"></h1>
-    <h2>Earnings: <span id="skater-earnings">$0.00</span></h2>
 
-    <section>
+    <!-- SKATER NAME -->
+    <h1 id="skater-name" class="skater-title"></h1>
+
+    <!-- EARNINGS -->
+    <h2 class="earnings-line">
+      Earnings: <span id="skater-earnings">$0.00</span>
+    </h2>
+
+    <!-- SHOWS LIST -->
+    <section class="shows-section">
       <h3>Your Shows</h3>
-      <ul id="skater-shows"></ul>
+      <ul id="skater-shows" class="shows-list"></ul>
     </section>
+
   </main>
 
+  <!-- Dashboard Logic -->
   <script type="module" src="/app/js/skater/skater-dashboard.js"></script>
+
 </body>
 </html>
