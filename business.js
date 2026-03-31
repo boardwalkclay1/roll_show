@@ -192,3 +192,138 @@ export async function listContracts(request, env, user) {
 
   return json(results);
 }
+import { json } from "./users.js";
+
+/* ============================================================
+   BUSINESS DASHBOARD (EXTENDED)
+============================================================ */
+export async function businessDashboard(request, env, user) {
+  const business = await env.DB_business.prepare(
+    "SELECT * FROM businesses WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  if (!business) {
+    return json({ success: false, error: "Business profile not found." }, 404);
+  }
+
+  if (!business.verified) {
+    return json({
+      success: false,
+      error: "Your business is not verified yet.",
+      review_status: business.review_status,
+      review_notes: business.review_notes
+    }, 403);
+  }
+
+  const { results: offers } = await env.DB_business.prepare(
+    `SELECT o.*, u.name AS skater_name
+     FROM offers o
+     JOIN users u ON o.to_user_id = u.id OR o.from_user_id = u.id
+     WHERE (o.from_user_id = ? OR o.to_user_id = ?)
+       AND (u.role = 'skater')
+     ORDER BY o.created_at DESC`
+  ).bind(user.id, user.id).all();
+
+  const { results: contracts } = await env.DB_business.prepare(
+    `SELECT c.*, o.type, o.terms
+     FROM contracts c
+     JOIN offers o ON c.offer_id = o.id
+     WHERE o.from_user_id = ? OR o.to_user_id = ?
+     ORDER BY c.created_at DESC`
+  ).bind(user.id, user.id).all();
+
+  const { results: ads } = await env.DB_business.prepare(
+    `SELECT * FROM business_ads WHERE business_id = ? ORDER BY created_at DESC`
+  ).bind(business.id).all();
+
+  const { results: sponsorships } = await env.DB_business.prepare(
+    `SELECT s.*, sk.discipline, sk.bio
+     FROM sponsorships s
+     JOIN skaters sk ON s.skater_id = sk.id
+     WHERE s.business_id = ?
+     ORDER BY s.created_at DESC`
+  ).bind(business.id).all();
+
+  const { results: threads } = await env.DB_business.prepare(
+    `SELECT mt.*, s.discipline, b.company_name
+     FROM message_threads mt
+     LEFT JOIN skaters s ON mt.skater_id = s.id
+     LEFT JOIN businesses b ON mt.business_id = b.id
+     WHERE mt.business_id = ?`
+  ).bind(business.id).all();
+
+  const { results: events } = await env.DB_business.prepare(
+    `SELECT * FROM events
+     WHERE created_by_business_id = ?
+     ORDER BY start_at DESC`
+  ).bind(business.id).all();
+
+  // signed skaters (label only) as opportunities
+  const { results: skater_opportunities } = await env.DB_skaters.prepare(
+    `SELECT s.id, s.bio, s.discipline, u.name
+     FROM skaters s
+     JOIN users u ON s.user_id = u.id
+     WHERE s.signed_to_label = 1`
+  ).all();
+
+  return json({
+    business,
+    offers,
+    contracts,
+    ads,
+    sponsorships,
+    threads,
+    events,
+    skater_opportunities
+  });
+}
+
+/* ============================================================
+   BUSINESS: CREATE AD
+============================================================ */
+export async function businessCreateAd(request, env, user) {
+  const body = await request.json();
+  const { title, image_r2_key, target_url, start_at, end_at } = body;
+
+  const business = await env.DB_business.prepare(
+    "SELECT id FROM businesses WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  if (!business) return json({ error: "Business not found." }, 404);
+
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+
+  await env.DB_business.prepare(
+    `INSERT INTO business_ads
+     (id, business_id, title, image_r2_key, target_url, start_at, end_at, status, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)`
+  ).bind(id, business.id, title, image_r2_key || null, target_url || null, start_at || null, end_at || null, now).run();
+
+  return json({ success: true, adId: id });
+}
+
+/* ============================================================
+   BUSINESS: CREATE EVENT
+============================================================ */
+export async function businessCreateEvent(request, env, user) {
+  const body = await request.json();
+  const { title, description, location, lat, lng, start_at, end_at } = body;
+
+  const business = await env.DB_business.prepare(
+    "SELECT id FROM businesses WHERE user_id = ?"
+  ).bind(user.id).first();
+
+  if (!business) return json({ error: "Business not found." }, 404);
+
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+
+  await env.DB_business.prepare(
+    `INSERT INTO events
+     (id, type, title, description, location, lat, lng, start_at, end_at, created_by_business_id, created_at)
+     VALUES (?, 'business', ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(id, title, description || null, location || null, lat || null, lng || null, start_at || null, end_at || null, business.id, now).run();
+
+  return json({ success: true, eventId: id });
+}
