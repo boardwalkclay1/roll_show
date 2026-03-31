@@ -5,17 +5,13 @@
   <title>Roll Show — Business Application</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- THEME + BRAND COLORS -->
+  <!-- BRAND -->
   <meta name="theme-color" content="#000000">
-
-  <!-- FAVICONS -->
   <link rel="icon" href="/app/images/icons/icon-192.png">
   <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
-
-  <!-- MANIFEST -->
   <link rel="manifest" href="/manifest.webmanifest">
 
-  <!-- SOCIAL PREVIEW -->
+  <!-- SOCIAL -->
   <meta property="og:title" content="Roll Show — Business Application">
   <meta property="og:description" content="Apply to join Roll Show as a verified business partner.">
   <meta property="og:image" content="/app/images/roll-index.jpg">
@@ -32,18 +28,19 @@
   </script>
 
   <style>
-    /* FULL SCREEN BACKGROUND — EXACTLY LIKE BEFORE */
+    /* FULL SCREEN BACKGROUND — SHOW ENTIRE IMAGE + PIXEL CONTROL */
     .bg-landing {
       position: fixed;
       inset: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: cover;
-      object-position: center 85%;
+      object-fit: contain;          /* show entire picture */
+      object-position: center -40px; /* move image up/down */
       z-index: 0;
+      pointer-events: none;
     }
 
-    /* ENSURE CONTENT FLOATS ABOVE BACKGROUND */
+    /* CONTENT ABOVE BACKGROUND */
     .rs-auth-shell,
     .rs-card {
       position: relative;
