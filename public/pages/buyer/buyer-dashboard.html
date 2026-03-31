@@ -1,112 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Buyer Dashboard – Roll Show</title>
+  <meta charset="UTF-8" />
+  <title>Roll Show — Buyer Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="/app/styles/styles.css"> <!-- FIXED -->
+  <link rel="icon" href="/app/images/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta property="og:image" content="/app/images/roll-index.jpg">
+
+  <link rel="stylesheet" href="/app/styles/styles.css">
+  <link rel="stylesheet" href="/app/styles/dashboard.css">
 </head>
 
-<body style="background:url('/app/images/bg-buyer-dash.jpg') center/cover no-repeat;">
+<body class="rs-body">
+  <img src="/app/images/bg-buyer-dash.jpg" class="bg-landing" alt="Background">
 
-  <main class="dash-shell">
-    <h1 id="buyer-name">Buyer</h1>
+  <main class="rs-dash-shell rs-dash-buyer">
+    <header class="rs-dash-header">
+      <div>
+        <h1 class="rs-dash-title" id="buyer-name">Buyer</h1>
+        <p class="rs-dash-sub">Your tickets and skater recommendations.</p>
+      </div>
+    </header>
 
-    <section>
-      <h3>Your Tickets</h3>
-      <ul id="buyer-tickets"></ul>
+    <section class="rs-dash-grid">
+      <article class="rs-dash-card">
+        <h3>Your Tickets</h3>
+        <ul class="rs-dash-list" id="buyer-tickets"></ul>
+      </article>
+
+      <article class="rs-dash-card">
+        <h3>Recommended Skaters</h3>
+        <ul class="rs-dash-list" id="recommended-skaters"></ul>
+      </article>
     </section>
 
-    <section>
-      <h3>Recommended Skaters</h3>
-      <ul id="recommended-skaters"></ul>
-    </section>
-
-    <p id="buyer-status" class="status-text"></p>
+    <p class="rs-dash-status" id="buyer-status"></p>
   </main>
 
-  <script type="module">
-    import API from "/app/js/api.js";
-
-    // INLINE REPLACEMENT FOR utils.js
-    function getUserIdFromQuery() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get("user");
-    }
-
-    const userId = getUserIdFromQuery();
-    const statusEl = document.getElementById("buyer-status");
-
-    if (!userId) {
-      statusEl.textContent = "Missing buyer ID in URL.";
-    } else {
-      loadDashboard();
-    }
-
-    async function loadDashboard() {
-      try {
-        statusEl.textContent = "Loading…";
-
-        const data = await API.get(`/api/buyer/dashboard?user=${encodeURIComponent(userId)}`);
-
-        // BUYER NAME
-        document.getElementById("buyer-name").textContent = data.name || "Buyer";
-
-        // TICKETS
-        const tickets = document.getElementById("buyer-tickets");
-        tickets.innerHTML = "";
-
-        if (Array.isArray(data.tickets) && data.tickets.length > 0) {
-          data.tickets.forEach(ticket => {
-            const li = document.createElement("li");
-            li.textContent = `${ticket.show_title} — ${ticket.date}`;
-            tickets.appendChild(li);
-          });
-        } else {
-          tickets.innerHTML = "<li>No tickets yet.</li>";
-        }
-
-        // RECOMMENDED SKATERS
-        const rec = document.getElementById("recommended-skaters");
-        rec.innerHTML = "";
-
-        if (Array.isArray(data.recommended) && data.recommended.length > 0) {
-          data.recommended.forEach(skater => {
-            const li = document.createElement("li");
-            li.textContent = skater.name;
-            rec.appendChild(li);
-          });
-        } else {
-          rec.innerHTML = "<li>No recommendations yet.</li>";
-        }
-
-        statusEl.textContent = "";
-
-      } catch (err) {
-        console.error("Buyer dashboard error:", err);
-
-        const tickets = document.getElementById("buyer-tickets");
-        const rec = document.getElementById("recommended-skaters");
-
-        // Worker returned HTML instead of JSON
-        if (err.message?.includes("<!DOCTYPE")) {
-          tickets.innerHTML = "<li>Worker returned HTML instead of JSON — routing issue.</li>";
-          rec.innerHTML = "<li>Worker returned HTML instead of JSON — routing issue.</li>";
-          return;
-        }
-
-        if (err?.error === "Unauthorized") {
-          tickets.innerHTML = "<li>Unauthorized — please sign in again.</li>";
-          rec.innerHTML = "<li>Unauthorized — please sign in again.</li>";
-          return;
-        }
-
-        tickets.innerHTML = "<li>Failed to load dashboard.</li>";
-        rec.innerHTML = "<li>Failed to load dashboard.</li>";
-      }
-    }
-  </script>
+  <script type="module" src="/app/js/buyer/buyer-dashboard.js"></script>
 </body>
 </html>
