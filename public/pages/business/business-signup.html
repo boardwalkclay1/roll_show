@@ -1,31 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Business Signup – Roll Show</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="/app/styles/styles.css">
+  <meta charset="UTF-8" />
+  <title>Roll Show — Business Application</title>
+  <link rel="stylesheet" href="/assets/css/main.css" />
 </head>
+<body class="rs-body">
+  <main class="rs-auth-shell">
+    <section class="rs-card">
+      <h1 class="rs-title">Business Application</h1>
+      <p class="rs-subtitle">
+        Apply to join Roll Show as a verified business partner.
+      </p>
 
-<body style="background:url('/app/images/2nd-rd/roll-board-jump.jpg') center/cover no-repeat;">
+      <form id="business-apply-form" class="rs-form">
+        <label>
+          Company Name
+          <input type="text" name="company_name" required />
+        </label>
 
-  <main class="signup-shell">
-    <h1>Register Your Business</h1>
+        <label>
+          Website
+          <input type="url" name="website" placeholder="https://example.com" />
+        </label>
 
-    <form id="business-signup-form" class="signup-form">
-      <input name="name" placeholder="Your Name" required>
-      <input name="email" type="email" placeholder="Business Email" required>
-      <input name="password" type="password" placeholder="Password" required>
-      <button type="submit">Create Account</button>
-    </form>
+        <label>
+          Phone
+          <input type="tel" name="phone" />
+        </label>
 
-    <p class="signup-login-link">
-      Already have an account?
-      <a href="/pages/auth-login.html?role=business">Log in</a>
-    </p>
+        <label>
+          Address
+          <textarea name="address" rows="2"></textarea>
+        </label>
+
+        <label>
+          EIN / Tax ID
+          <input type="text" name="ein" placeholder="XX-XXXXXXX" />
+        </label>
+
+        <label>
+          Your Name
+          <input type="text" name="name" required />
+        </label>
+
+        <label>
+          Email
+          <input type="email" name="email" required />
+        </label>
+
+        <label>
+          Password
+          <input type="password" name="password" required />
+        </label>
+
+        <button type="submit" class="rs-btn-primary">Submit Application</button>
+      </form>
+
+      <div id="business-apply-message" class="rs-message"></div>
+    </section>
   </main>
 
-  <script type="module" src="/app/js/business/business-signup.js"></script>
+  <script src="/app/js/business/signup.js" type="module"></script>
 </body>
 </html>
