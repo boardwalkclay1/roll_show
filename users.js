@@ -11,13 +11,37 @@ export function cors() {
 }
 
 /* ============================================================
-   JSON RESPONSE WRAPPER
+   LOGGING
 ============================================================ */
-export function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json", ...cors() }
-  });
+export function logRequest(request, extra = {}) {
+  const url = new URL(request.url);
+  console.log(
+    JSON.stringify({
+      path: url.pathname,
+      method: request.method,
+      ...extra
+    })
+  );
+}
+
+/* ============================================================
+   UNIFIED JSON RESPONSE WRAPPER
+============================================================ */
+export function apiJson(body, status = 200) {
+  const success = status >= 200 && status < 300;
+
+  return new Response(
+    JSON.stringify({
+      success,
+      status,
+      data: success ? body : null,
+      error: success ? null : body
+    }),
+    {
+      status,
+      headers: { "Content-Type": "application/json", ...cors() }
+    }
+  );
 }
 
 /* ============================================================
@@ -78,7 +102,6 @@ export async function signupBase(env, { name, email, password, role }) {
 
   const id = crypto.randomUUID();
   const created = new Date().toISOString();
-
   const hashed = await hash(password, env);
 
   await env.DB_users.prepare(
@@ -107,13 +130,12 @@ export async function login(request, env) {
     ).bind(email).first();
 
     if (!row) {
-      return json({ success: false, error: "Invalid credentials" }, 401);
+      return apiJson({ message: "Invalid credentials" }, 401);
     }
 
     const valid = await verify(password, row.password_hash, env);
-
     if (!valid) {
-      return json({ success: false, error: "Invalid credentials" }, 401);
+      return apiJson({ message: "Invalid credentials" }, 401);
     }
 
     const is_owner =
@@ -121,8 +143,7 @@ export async function login(request, env) {
       row["owner-1"] == 1 ||
       row["owner-1"] === true;
 
-    return json({
-      success: true,
+    return apiJson({
       user: {
         id: row.id,
         name: row.name,
@@ -134,21 +155,23 @@ export async function login(request, env) {
     });
 
   } catch (err) {
-    return json(
-      { success: false, error: "Server error", detail: String(err) },
+    return apiJson(
+      { message: "Server error", detail: String(err) },
       500
     );
   }
 }
 
 /* ============================================================
-   ROLE GUARD
+   ROLE GUARD (WITH OWNER OVERRIDE)
 ============================================================ */
 export async function requireRole(request, env, allowedRoles, handler) {
   try {
+    logRequest(request);
+
     const userId = getUserId(request);
     if (!userId) {
-      return json({ error: "Unauthorized" }, 401);
+      return apiJson({ message: "Unauthorized" }, 401);
     }
 
     const user = await env.DB_users.prepare(
@@ -156,7 +179,7 @@ export async function requireRole(request, env, allowedRoles, handler) {
     ).bind(userId).first();
 
     if (!user) {
-      return json({ error: "Unauthorized" }, 401);
+      return apiJson({ message: "Unauthorized" }, 401);
     }
 
     const is_owner =
@@ -164,19 +187,22 @@ export async function requireRole(request, env, allowedRoles, handler) {
       user["owner-1"] == 1 ||
       user["owner-1"] === true;
 
-    // OWNER BYPASS
+    // OWNER OVERRIDE
     if (is_owner) {
       return handler(request, env, user);
     }
 
     // NORMAL ROLE CHECK
     if (!allowedRoles.includes(user.role)) {
-      return json({ error: "Forbidden" }, 403);
+      return apiJson({ message: "Forbidden" }, 403);
     }
 
     return handler(request, env, user);
 
   } catch (err) {
-    return json({ error: "Server error", detail: String(err) }, 500);
+    return apiJson(
+      { message: "Server error", detail: String(err) },
+      500
+    );
   }
 }
