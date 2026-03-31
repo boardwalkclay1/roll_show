@@ -12,13 +12,15 @@ function logRequest(request, extra = {}) {
   );
 }
 
-/* OWNER OVERRIDE WRAPPER */
+/* OWNER OVERRIDE WRAPPER — FIXED (CLONES REQUEST FOR POST) */
 async function withOwnerOverride(request, env, allowedRoles, handler) {
   const url = new URL(request.url);
   const ownerOverride = url.searchParams.get("owner");
   const userId = url.searchParams.get("user");
 
-  // If owner=1 and user is provided → treat that user as the acting user, bypass normal role check
+  // Clone request so POST bodies can be read again
+  const cloned = request.clone();
+
   if (ownerOverride === "1" && userId) {
     logRequest(request, { ownerOverride: true, userId });
 
@@ -30,14 +32,12 @@ async function withOwnerOverride(request, env, allowedRoles, handler) {
       return apiJson({ message: "User not found for owner override" }, 404);
     }
 
-    // Force owner semantics for bypass
     const ownerUser = { ...user, role: "owner" };
 
-    return handler(request, env, ownerUser);
+    return handler(cloned, env, ownerUser);
   }
 
-  // Normal role guard
-  return requireRole(request, env, allowedRoles, handler);
+  return requireRole(cloned, env, allowedRoles, handler);
 }
 
 /* BUYER */
@@ -122,7 +122,7 @@ export default {
          AUTH
       ============================================================ */
       if (path === "/api/login" && method === "POST")
-        return login(request, env);
+        return login(request.clone(), env);
 
       /* ============================================================
          SIGNUP
@@ -135,7 +135,7 @@ export default {
       };
 
       if (signupRoutes[path] && method === "POST")
-        return signupRoutes[path](request, env);
+        return signupRoutes[path](request.clone(), env);
 
       /* ============================================================
          PUBLIC SHOWS
@@ -206,7 +206,7 @@ export default {
       }
 
       /* ============================================================
-         OWNER
+         OWNER — FIXED TO USE OVERRIDE
       ============================================================ */
       const ownerRoutes = {
         "/api/owner/overview": ownerOverview,
@@ -227,13 +227,13 @@ export default {
       };
 
       if (ownerRoutes[path] && (method === "GET" || method === "POST"))
-        return ownerRoutes[path](request, env);
+        return withOwnerOverride(request, env, ["owner"], ownerRoutes[path]);
 
       /* ============================================================
          WEBHOOK
       ============================================================ */
       if (path === "/api/webhooks/partner" && method === "POST")
-        return partnerWebhook(request, env);
+        return partnerWebhook(request.clone(), env);
 
       /* ============================================================
          NOT FOUND
