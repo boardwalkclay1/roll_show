@@ -87,3 +87,26 @@
 .rs-dash-business h3 { color: #ffd36b; }
 .rs-dash-musician h3 { color: #ff8cf5; }
 .rs-dash-buyer h3 { color: #9dff8c; }
+.rs-dash-nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.rs-dash-nav a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.rs-dash-nav a:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.rs-dash-nav a.rs-dash-nav-active {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+}
