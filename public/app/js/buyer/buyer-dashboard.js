@@ -9,10 +9,12 @@ function buildNav(userId) {
   const base = "/app/pages/buyer";
   const links = [
     { href: `${base}/dashboard.html?user=${userId}`, label: "Dashboard" },
-    { href: `${base}/profile.html?user=${userId}`, label: "Profile" },
     { href: `${base}/tickets.html?user=${userId}`, label: "Tickets" },
-    { href: `${base}/purchases.html?user=${userId}`, label: "Purchases" },
-    { href: `${base}/recommended.html?user=${userId}`, label: "Recommended" }
+    { href: `${base}/purchase-history.html?user=${userId}`, label: "Purchases" },
+    { href: `${base}/buyer-feed.html?user=${userId}`, label: "Feed" },
+    { href: `${base}/ticket-wallet.html?user=${userId}`, label: "Wallet" },
+    { href: `${base}/ticket-confirmation.html?user=${userId}`, label: "Confirmations" },
+    { href: `${base}/ticket-view.html?user=${userId}`, label: "Ticket Viewer" }
   ];
 
   const nav = document.getElementById("buyer-nav");
@@ -23,11 +25,31 @@ function buildNav(userId) {
     const a = document.createElement("a");
     a.href = link.href;
     a.textContent = link.label;
-    if (currentPath.endsWith("dashboard.html") && link.href.includes("dashboard.html")) {
+    if (currentPath.includes(link.href.split("/").pop())) {
       a.classList.add("rs-dash-nav-active");
     }
     nav.appendChild(a);
   });
+}
+
+function wirePageLinks(userId) {
+  document.getElementById("tickets-link").href =
+    `/app/pages/buyer/tickets.html?user=${userId}`;
+
+  document.getElementById("purchases-link").href =
+    `/app/pages/buyer/purchase-history.html?user=${userId}`;
+
+  document.getElementById("feed-link").href =
+    `/app/pages/buyer/buyer-feed.html?user=${userId}`;
+
+  document.getElementById("wallet-link").href =
+    `/app/pages/buyer/ticket-wallet.html?user=${userId}`;
+
+  document.getElementById("confirmation-link").href =
+    `/app/pages/buyer/ticket-confirmation.html?user=${userId}`;
+
+  document.getElementById("ticketview-link").href =
+    `/app/pages/buyer/ticket-view.html?user=${userId}`;
 }
 
 const userId = getUserIdFromQuery();
@@ -44,49 +66,28 @@ async function loadDashboard() {
   }
 
   buildNav(userId);
-  statusEl.textContent = "Loading…";
+  wirePageLinks(userId);
 
-  // You can set buyer name from login or another endpoint; placeholder for now
-  nameEl.textContent = "Buyer";
+  statusEl.textContent = "Loading…";
 
   const [ticketsRes, purchasesRes] = await Promise.all([
     API.get(`/api/buyer/tickets?user=${encodeURIComponent(userId)}`),
     API.get(`/api/buyer/purchases?user=${encodeURIComponent(userId)}`)
   ]);
 
-  ticketsEl.innerHTML = "";
-  if (!ticketsRes.success) {
-    ticketsEl.innerHTML = "<li>Failed to load tickets.</li>";
-  } else {
-    const tData = ticketsRes.data || {};
-    const tickets = Array.isArray(tData.tickets) ? tData.tickets : [];
-    if (!tickets.length) {
-      ticketsEl.innerHTML = "<li>No tickets yet.</li>";
-    } else {
-      tickets.slice(0, 5).forEach(t => {
-        const li = document.createElement("li");
-        li.textContent = `${t.show_title} — ${t.date}`;
-        ticketsEl.appendChild(li);
-      });
-    }
-  }
+  nameEl.textContent = "Buyer";
 
-  purchasesEl.innerHTML = "";
-  if (!purchasesRes.success) {
-    purchasesEl.innerHTML = "<li>Failed to load purchases.</li>";
-  } else {
-    const pData = purchasesRes.data || {};
-    const purchases = Array.isArray(pData.purchases) ? pData.purchases : [];
-    if (!purchases.length) {
-      purchasesEl.innerHTML = "<li>No purchases yet.</li>";
-    } else {
-      purchases.slice(0, 5).forEach(p => {
-        const li = document.createElement("li");
-        li.textContent = `${p.show_title} — $${(p.amount_cents / 100).toFixed(2)}`;
-        purchasesEl.appendChild(li);
-      });
-    }
-  }
+  ticketsEl.innerHTML = ticketsRes.success
+    ? (ticketsRes.data.tickets.length
+        ? ticketsRes.data.tickets.slice(0, 5).map(t => `<li>${t.show_title}</li>`).join("")
+        : "<li>No tickets yet.</li>")
+    : "<li>Error loading tickets.</li>";
+
+  purchasesEl.innerHTML = purchasesRes.success
+    ? (purchasesRes.data.purchases.length
+        ? purchasesRes.data.purchases.slice(0, 5).map(p => `<li>${p.show_title}</li>`).join("")
+        : "<li>No purchases yet.</li>")
+    : "<li>Error loading purchases.</li>";
 
   statusEl.textContent = "";
 }
