@@ -21,7 +21,7 @@
   <meta property="og:image" content="/app/images/roll-index.jpg">
   <meta property="og:type" content="website">
 
-  <!-- CORRECT GLOBAL STYLES -->
+  <!-- GLOBAL STYLES -->
   <link rel="stylesheet" href="/app/styles/styles.css">
 
   <!-- SERVICE WORKER -->
@@ -30,11 +30,31 @@
       navigator.serviceWorker.register("/service-worker.js");
     }
   </script>
+
+  <style>
+    /* FULL SCREEN BACKGROUND — EXACTLY LIKE BEFORE */
+    .bg-landing {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center 85%;
+      z-index: 0;
+    }
+
+    /* ENSURE CONTENT FLOATS ABOVE BACKGROUND */
+    .rs-auth-shell,
+    .rs-card {
+      position: relative;
+      z-index: 5;
+    }
+  </style>
 </head>
 
 <body class="rs-body">
 
-  <!-- BACKGROUND IMAGE -->
+  <!-- FULL SCREEN BACKGROUND -->
   <img src="/app/images/2nd-rd/roll-board-jump.jpg" class="bg-landing" alt="Background">
 
   <main class="rs-auth-shell">
@@ -59,7 +79,7 @@
     </section>
   </main>
 
-  <!-- CORRECT JS FILE -->
+  <!-- BUSINESS SIGNUP JS -->
   <script src="/app/js/business/business-signup.js" type="module"></script>
 </body>
 </html>
