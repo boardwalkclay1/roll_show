@@ -59,11 +59,12 @@ export function getUserId(request) {
 }
 
 /* ============================================================
-   PASSWORD HASHING (AUTH WORKER)
+   PASSWORD HASHING (AUTH WORKER) — FIXED
 ============================================================ */
 export async function hash(str, env) {
   const res = await env.AUTH.fetch("https://auth/hash", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ password: str })
   });
 
@@ -72,11 +73,12 @@ export async function hash(str, env) {
 }
 
 /* ============================================================
-   PASSWORD VERIFY (AUTH WORKER)
+   PASSWORD VERIFY (AUTH WORKER) — FIXED
 ============================================================ */
 export async function verify(str, hashed, env) {
   const res = await env.AUTH.fetch("https://auth/verify", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ password: str, hash: hashed })
   });
 
