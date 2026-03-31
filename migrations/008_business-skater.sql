@@ -1,12 +1,10 @@
 -- SKATERS: label signing
-ALTER TABLE skaters
-  ADD COLUMN signed_to_label INTEGER DEFAULT 0,
-  ADD COLUMN label_contract_id TEXT;
+ALTER TABLE skaters ADD COLUMN signed_to_label INTEGER DEFAULT 0;
+ALTER TABLE skaters ADD COLUMN label_contract_id TEXT;
 
 -- BUSINESSES: ads + balance
-ALTER TABLE businesses
-  ADD COLUMN can_advertise INTEGER DEFAULT 0,
-  ADD COLUMN ad_balance_cents INTEGER DEFAULT 0;
+ALTER TABLE businesses ADD COLUMN can_advertise INTEGER DEFAULT 0;
+ALTER TABLE businesses ADD COLUMN ad_balance_cents INTEGER DEFAULT 0;
 
 -- BUSINESS ADS
 CREATE TABLE IF NOT EXISTS business_ads (
