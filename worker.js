@@ -17,7 +17,9 @@ import {
   skaterDashboard,
   listSkaterShows,
   createShow,
-  updateSkaterProfile
+  updateSkaterProfile,
+  skaterBusinesses,
+  skaterContactBusiness
 } from "./skaters.js";
 
 /* BUSINESS */
@@ -27,7 +29,9 @@ import {
   createOffer,
   listBusinessOffers,
   createContract,
-  listContracts
+  listContracts,
+  businessCreateAd,
+  businessCreateEvent
 } from "./business.js";
 
 /* MUSICIAN */
@@ -52,7 +56,10 @@ import {
   ownerSettingsBranding,
   ownerSettingsNotes,
   ownerBusinessApplications,
-  ownerBusinessUpdateStatus
+  ownerBusinessUpdateStatus,
+  ownerAds,
+  ownerUpdateAdStatus,
+  ownerSponsorships
 } from "./routes/owner.js";
 
 export default {
@@ -60,43 +67,41 @@ export default {
     try {
       const url = new URL(request.url);
       const path = url.pathname;
+      const method = request.method;
 
       /* ============================================================
          CORS
       ============================================================ */
-      if (request.method === "OPTIONS") {
+      if (method === "OPTIONS") {
         return new Response(null, { status: 204, headers: cors() });
       }
 
       /* ============================================================
          AUTH
       ============================================================ */
-      if (path === "/api/login" && request.method === "POST") {
+      if (path === "/api/login" && method === "POST")
         return login(request, env);
-      }
 
       /* ============================================================
-         SIGNUP ROUTES
+         SIGNUP
       ============================================================ */
-      if (path === "/api/buyer/signup" && request.method === "POST")
-        return signupBuyer(request, env);
+      const signupRoutes = {
+        "/api/buyer/signup": signupBuyer,
+        "/api/skater/signup": signupSkater,
+        "/api/musician/signup": signupMusician,
+        "/api/business/signup": signupBusiness
+      };
 
-      if (path === "/api/skater/signup" && request.method === "POST")
-        return signupSkater(request, env);
-
-      if (path === "/api/musician/signup" && request.method === "POST")
-        return signupMusician(request, env);
-
-      if (path === "/api/business/signup" && request.method === "POST")
-        return signupBusiness(request, env);
+      if (signupRoutes[path] && method === "POST")
+        return signupRoutes[path](request, env);
 
       /* ============================================================
          PUBLIC SHOWS
       ============================================================ */
-      if (path === "/api/shows" && request.method === "GET")
+      if (path === "/api/shows" && method === "GET")
         return listShows(env);
 
-      if (path.startsWith("/api/shows/") && request.method === "GET") {
+      if (path.startsWith("/api/shows/") && method === "GET") {
         const id = path.split("/").pop();
         return getShow(env, id);
       }
@@ -104,109 +109,88 @@ export default {
       /* ============================================================
          BUYER
       ============================================================ */
-      if (path === "/api/buyer/tickets" && request.method === "GET")
-        return requireRole(request, env, ["buyer"], listTickets);
+      const buyerRoutes = {
+        "/api/buyer/tickets": { GET: listTickets },
+        "/api/buyer/purchases": { GET: listPurchases },
+        "/api/buyer/tickets/create": { POST: createTicket }
+      };
 
-      if (path === "/api/buyer/purchases" && request.method === "GET")
-        return requireRole(request, env, ["buyer"], listPurchases);
-
-      if (path === "/api/buyer/tickets/create" && request.method === "POST")
-        return requireRole(request, env, ["buyer"], createTicket);
+      if (buyerRoutes[path] && buyerRoutes[path][method])
+        return requireRole(request, env, ["buyer"], buyerRoutes[path][method]);
 
       /* ============================================================
          SKATER
       ============================================================ */
-      if (path === "/api/skater/dashboard" && request.method === "GET")
-        return requireRole(request, env, ["skater"], skaterDashboard);
+      const skaterRoutes = {
+        "/api/skater/dashboard": { GET: skaterDashboard },
+        "/api/skater/shows": { GET: listSkaterShows },
+        "/api/skater/show/create": { POST: createShow },
+        "/api/skater/profile": { POST: updateSkaterProfile },
+        "/api/skater/businesses": { GET: skaterBusinesses },
+        "/api/skater/contact-business": { POST: skaterContactBusiness }
+      };
 
-      if (path === "/api/skater/shows" && request.method === "GET")
-        return requireRole(request, env, ["skater"], listSkaterShows);
-
-      if (path === "/api/skater/show/create" && request.method === "POST")
-        return requireRole(request, env, ["skater"], createShow);
-
-      if (path === "/api/skater/profile" && request.method === "POST")
-        return requireRole(request, env, ["skater"], updateSkaterProfile);
+      if (skaterRoutes[path] && skaterRoutes[path][method])
+        return requireRole(request, env, ["skater"], skaterRoutes[path][method]);
 
       /* ============================================================
          BUSINESS
       ============================================================ */
-      if (path === "/api/business/dashboard" && request.method === "GET")
-        return requireRole(request, env, ["business"], businessDashboard);
+      const businessRoutes = {
+        "/api/business/dashboard": { GET: businessDashboard },
+        "/api/business/offers": { GET: listBusinessOffers, POST: createOffer },
+        "/api/contracts": { GET: listContracts, POST: createContract },
+        "/api/business/ads": { POST: businessCreateAd },
+        "/api/business/events": { POST: businessCreateEvent }
+      };
 
-      if (path === "/api/business/offers" && request.method === "POST")
-        return requireRole(request, env, ["business"], createOffer);
-
-      if (path === "/api/business/offers" && request.method === "GET")
-        return requireRole(request, env, ["business"], listBusinessOffers);
-
-      if (path === "/api/contracts" && request.method === "POST")
-        return requireRole(request, env, ["business", "skater"], createContract);
-
-      if (path === "/api/contracts" && request.method === "GET")
-        return requireRole(request, env, ["business"], listContracts);
+      if (businessRoutes[path] && businessRoutes[path][method])
+        return requireRole(request, env, ["business"], businessRoutes[path][method]);
 
       /* ============================================================
-         MUSICIANS
+         MUSICIAN
       ============================================================ */
-      if (path === "/api/musician/dashboard" && request.method === "GET")
-        return requireRole(request, env, ["musician"], musicianDashboard);
+      const musicianRoutes = {
+        "/api/musician/dashboard": { GET: musicianDashboard },
+        "/api/music/upload": { POST: uploadTrack },
+        "/api/music/library": { GET: listMusic },
+        "/api/music/license": { POST: licenseTrack }
+      };
 
-      if (path === "/api/music/upload" && request.method === "POST")
-        return requireRole(request, env, ["musician"], uploadTrack);
-
-      if (path === "/api/music/library" && request.method === "GET")
-        return listMusic(env);
-
-      if (path === "/api/music/license" && request.method === "POST")
-        return requireRole(request, env, ["skater"], licenseTrack);
+      if (musicianRoutes[path] && musicianRoutes[path][method])
+        return requireRole(request, env, ["musician", "skater"], musicianRoutes[path][method]);
 
       /* ============================================================
-         OWNER REALM
+         OWNER
       ============================================================ */
-      if (path === "/api/owner/overview" && request.method === "GET")
-        return ownerOverview(request, env);
+      const ownerRoutes = {
+        "/api/owner/overview": ownerOverview,
+        "/api/owner/users": ownerUsers,
+        "/api/owner/skaters": ownerSkaters,
+        "/api/owner/businesses": ownerBusinesses,
+        "/api/owner/musicians": ownerMusicians,
+        "/api/owner/shows": ownerShows,
+        "/api/owner/contracts": ownerContracts,
+        "/api/owner/music": ownerMusic,
+        "/api/owner/settings/branding": ownerSettingsBranding,
+        "/api/owner/settings/notes": ownerSettingsNotes,
+        "/api/owner/business/applications": ownerBusinessApplications,
+        "/api/owner/business/applications/status": ownerBusinessUpdateStatus,
+        "/api/owner/ads": ownerAds,
+        "/api/owner/ads/status": ownerUpdateAdStatus,
+        "/api/owner/sponsorships": ownerSponsorships
+      };
 
-      if (path === "/api/owner/users" && request.method === "GET")
-        return ownerUsers(request, env);
+      if (ownerRoutes[path] && method === "GET")
+        return ownerRoutes[path](request, env);
 
-      if (path === "/api/owner/skaters" && request.method === "GET")
-        return ownerSkaters(request, env);
-
-      if (path === "/api/owner/businesses" && request.method === "GET")
-        return ownerBusinesses(request, env);
-
-      if (path === "/api/owner/musicians" && request.method === "GET")
-        return ownerMusicians(request, env);
-
-      if (path === "/api/owner/shows" && request.method === "GET")
-        return ownerShows(request, env);
-
-      if (path === "/api/owner/contracts" && request.method === "GET")
-        return ownerContracts(request, env);
-
-      if (path === "/api/owner/music" && request.method === "GET")
-        return ownerMusic(request, env);
-
-      if (path === "/api/owner/settings/branding" && request.method === "POST")
-        return ownerSettingsBranding(request, env);
-
-      if (path === "/api/owner/settings/notes" && request.method === "POST")
-        return ownerSettingsNotes(request, env);
-
-      /* ============================================================
-         OWNER — BUSINESS APPLICATION REVIEW
-      ============================================================ */
-      if (path === "/api/owner/business/applications" && request.method === "GET")
-        return ownerBusinessApplications(request, env);
-
-      if (path === "/api/owner/business/applications/status" && request.method === "POST")
-        return ownerBusinessUpdateStatus(request, env);
+      if (ownerRoutes[path] && method === "POST")
+        return ownerRoutes[path](request, env);
 
       /* ============================================================
          WEBHOOK
       ============================================================ */
-      if (path === "/api/webhooks/partner" && request.method === "POST")
+      if (path === "/api/webhooks/partner" && method === "POST")
         return partnerWebhook(request, env);
 
       /* ============================================================
@@ -219,18 +203,3 @@ export default {
     }
   }
 };
-import {
-  skaterBusinesses,
-  skaterContactBusiness
-} from "./skaters.js";
-
-import {
-  businessCreateAd,
-  businessCreateEvent
-} from "./business.js";
-
-import {
-  ownerAds,
-  ownerUpdateAdStatus,
-  ownerSponsorships
-} from "./routes/owner.js";
