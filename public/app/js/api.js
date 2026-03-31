@@ -1,17 +1,17 @@
-// api.js — FINAL VERSION FOR UNIFIED API
+// api.js — FIXED UNIFIED API
 
 const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
 
 async function safeJson(res) {
   const text = await res.text();
 
-  // Worker fallback HTML → JSON parse error → detect it
-  if (text.startsWith("<!DOCTYPE") || text.startsWith("<html")) {
+  // Worker fallback HTML → detect immediately
+  if (!res.headers.get("content-type")?.includes("application/json")) {
     return {
       success: false,
       status: res.status,
       data: null,
-      error: { message: "Worker returned HTML instead of JSON" }
+      error: { message: "Invalid response from server" }
     };
   }
 
@@ -22,44 +22,47 @@ async function safeJson(res) {
       success: false,
       status: res.status,
       data: null,
-      error: { message: "Invalid JSON response" }
+      error: { message: "Invalid JSON" }
     };
   }
 }
 
+async function request(method, path, payload) {
+  const options = {
+    method,
+    headers: { "Content-Type": "application/json" }
+  };
+
+  if (payload) options.body = JSON.stringify(payload);
+
+  let res;
+  try {
+    res = await fetch(API_BASE + path, options);
+  } catch (err) {
+    return {
+      success: false,
+      status: 0,
+      data: null,
+      error: { message: "Network error" }
+    };
+  }
+
+  const body = await safeJson(res);
+
+  return {
+    success: body.success ?? res.ok,
+    status: body.status ?? res.status,
+    data: body.data ?? null,
+    error: body.error ?? (res.ok ? null : { message: "Request failed" })
+  };
+}
+
 const API = {
-  async get(path) {
-    const res = await fetch(API_BASE + path, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" }
-    });
-
-    const body = await safeJson(res);
-
-    // Always return unified shape
-    return {
-      success: body.success ?? res.ok,
-      status: body.status ?? res.status,
-      data: body.data ?? null,
-      error: body.error ?? (res.ok ? null : { message: "Request failed" })
-    };
+  get(path) {
+    return request("GET", path);
   },
-
-  async post(path, payload) {
-    const res = await fetch(API_BASE + path, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const body = await safeJson(res);
-
-    return {
-      success: body.success ?? res.ok,
-      status: body.status ?? res.status,
-      data: body.data ?? null,
-      error: body.error ?? (res.ok ? null : { message: "Request failed" })
-    };
+  post(path, payload) {
+    return request("POST", path, payload);
   }
 };
 
