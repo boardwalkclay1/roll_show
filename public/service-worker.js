@@ -3,30 +3,38 @@
    No HTML caching. No stale CSS/JS. No manual version bumps.
 ============================================================ */
 
-const CACHE_NAME = "rollshow-static";
+const CACHE_NAME = "rollshow-static-v1";
 
 /* ============================================================
-   STATIC ASSETS TO CACHE
-============================================================ */
-const STATIC_ASSETS = [
-  "/",
-  "/app/styles/styles.css",
-  "/app/js/app.js",
-
-  /* ICONS */
-  "/app/images/icons/icon-192.png",
-  "/app/images/icons/icon-512.png",
-
-  /* MANIFEST */
-  "/manifest.webmanifest"
-];
-
-/* ============================================================
-   INSTALL — Cache static assets only
+   INSTALL — Cache ALL static assets under /app/
 ============================================================ */
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
+    caches.open(CACHE_NAME).then(async cache => {
+      const base = "/app/";
+      const assets = [
+        // Core
+        "/",
+        "/manifest.webmanifest",
+
+        // Styles
+        "/app/styles/styles.css",
+        "/app/styles/dashboard.css",
+
+        // Global JS
+        "/app/js/app.js",
+
+        // Images (backgrounds, icons, etc.)
+        "/app/images/bg-artist-dash.jpg",
+        "/app/images/bg-buyer-dash.jpg",
+        "/app/images/bg-skater-dash.jpg",
+        "/app/images/bg-business-dash.jpg",
+        "/app/images/icons/icon-192.png",
+        "/app/images/icons/icon-512.png"
+      ];
+
+      await cache.addAll(assets);
+    })
   );
   self.skipWaiting();
 });
@@ -59,14 +67,15 @@ self.addEventListener("fetch", event => {
 
   // Static assets → cache-first
   if (
-    req.url.endsWith(".css") ||
-    req.url.endsWith(".js") ||
-    req.url.endsWith(".png") ||
-    req.url.endsWith(".jpg") ||
-    req.url.endsWith(".jpeg") ||
-    req.url.endsWith(".webp") ||
-    req.url.endsWith(".gif") ||
-    req.url.endsWith(".svg")
+    req.url.includes("/app/") &&
+    (req.url.endsWith(".css") ||
+     req.url.endsWith(".js") ||
+     req.url.endsWith(".png") ||
+     req.url.endsWith(".jpg") ||
+     req.url.endsWith(".jpeg") ||
+     req.url.endsWith(".webp") ||
+     req.url.endsWith(".gif") ||
+     req.url.endsWith(".svg"))
   ) {
     event.respondWith(
       caches.match(req).then(cached => {
