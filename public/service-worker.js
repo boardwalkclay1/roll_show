@@ -1,53 +1,19 @@
-const CACHE_NAME = "rollshow-cache-v5";
+/* ============================================================
+   ROLL SHOW — SERVICE WORKER v1
+   Clean, modern, no stale CSS, no stale HTML
+============================================================ */
 
-/* STATIC ASSETS (HTML, CSS, JS, MANIFEST, ICONS) */
+const CACHE_VERSION = "rollshow-v1";
+const STATIC_CACHE = `${CACHE_VERSION}-static`;
+
+/* ============================================================
+   STATIC ASSETS TO CACHE
+============================================================ */
 const STATIC_ASSETS = [
-  "/",
+  "/", 
   "/index.html",
 
-  /* AUTH */
-  "/pages/auth-login.html",
-
-  /* SIGNUP */
-  "/pages/signup-buyer.html",
-  "/pages/signup-skater.html",
-  "/pages/signup-business.html",
-
-  /* BUYER */
-  "/pages/buyer-profile.html",
-  "/pages/ticket-wallet.html",
-  "/pages/purchase-history.html",
-  "/pages/ticket-confirmation.html",
-  "/pages/ticket.view.html",
-
-  /* SKATER */
-  "/pages/skater-dashboard.html",
-  "/pages/create-show.html",
-  "/pages/video-studio.html",
-  "/pages/branding-studio.html",
-  "/pages/skater-profile-edit.html",
-  "/pages/skater-royalties.html",
-
-  /* BUSINESS */
-  "/pages/business-dashboard.html",
-
-  /* PUBLIC */
-  "/pages/show.html",
-  "/pages/skaters-feed.html",
-
-  /* CONTRACTS */
-  "/pages/contracts.html",
-
-  /* MUSIC */
-  "/pages/music-upload.html",
-  "/pages/music-library.html",
-
-  /* LEGAL */
-  "/pages/terms.html",
-  "/pages/privacy.html",
-  "/pages/legal.html",
-
-  /* CORE FILES */
+  /* GLOBAL */
   "/app/styles/styles.css",
   "/app/js/app.js",
 
@@ -59,50 +25,83 @@ const STATIC_ASSETS = [
   "/manifest.webmanifest"
 ];
 
-/* INSTALL */
+/* ============================================================
+   INSTALL — Cache static assets
+============================================================ */
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
-      // Cache static assets
-      await cache.addAll(STATIC_ASSETS);
-
-      // Dynamically cache ALL images in /app/images/ including subfolders
-      const imageList = await fetch("/app/images/")
-        .then(res => res.text())
-        .then(html => {
-          const matches = [...html.matchAll(/href="([^"]+\.(jpg|png|jpeg|webp|gif))"/g)];
-          return matches.map(m => "/app/images/" + m[1]);
-        })
-        .catch(() => []);
-
-      for (const img of imageList) {
-        try {
-          await cache.add(img);
-        } catch (e) {
-          // ignore missing files
-        }
-      }
-    })
+    caches.open(STATIC_CACHE).then(cache => cache.addAll(STATIC_ASSETS))
   );
-
   self.skipWaiting();
 });
 
-/* ACTIVATE */
+/* ============================================================
+   ACTIVATE — Remove old caches
+============================================================ */
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+      Promise.all(
+        keys
+          .filter(key => key !== STATIC_CACHE)
+          .map(key => caches.delete(key))
+      )
     )
   );
   self.clients.claim();
 });
 
-/* FETCH */
+/* ============================================================
+   FETCH STRATEGY
+   - HTML → network-first (so updates always load)
+   - CSS/JS/Images → cache-first
+============================================================ */
 self.addEventListener("fetch", event => {
+  const req = event.request;
+  const url = new URL(req.url);
+
+  // HTML → always try network first
+  if (req.mode === "navigate" || req.headers.get("accept")?.includes("text/html")) {
+    event.respondWith(
+      fetch(req)
+        .then(res => {
+          const clone = res.clone();
+          caches.open(STATIC_CACHE).then(cache => cache.put(req, clone));
+          return res;
+        })
+        .catch(() => caches.match(req).then(cached => cached || caches.match("/index.html")))
+    );
+    return;
+  }
+
+  // Static assets → cache-first
+  if (
+    req.url.endsWith(".css") ||
+    req.url.endsWith(".js") ||
+    req.url.endsWith(".png") ||
+    req.url.endsWith(".jpg") ||
+    req.url.endsWith(".jpeg") ||
+    req.url.endsWith(".webp") ||
+    req.url.endsWith(".gif") ||
+    req.url.endsWith(".svg")
+  ) {
+    event.respondWith(
+      caches.match(req).then(cached => {
+        return (
+          cached ||
+          fetch(req).then(res => {
+            const clone = res.clone();
+            caches.open(STATIC_CACHE).then(cache => cache.put(req, clone));
+            return res;
+          })
+        );
+      })
+    );
+    return;
+  }
+
+  // Default → network fallback to cache
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      return cached || fetch(event.request).catch(() => caches.match("/index.html"));
-    })
+    fetch(req).catch(() => caches.match(req))
   );
 });
