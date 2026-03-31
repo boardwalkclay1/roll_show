@@ -5,6 +5,31 @@ function getUserIdFromQuery() {
   return params.get("user");
 }
 
+function buildNav(userId) {
+  const base = "/app/pages/musician";
+  const links = [
+    { href: `${base}/dashboard.html?user=${userId}`, label: "Dashboard" },
+    { href: `${base}/profile.html?user=${userId}`, label: "Profile" },
+    { href: `${base}/tracks.html?user=${userId}`, label: "Tracks" },
+    { href: `${base}/licenses.html?user=${userId}`, label: "Licenses" },
+    { href: `${base}/upload.html?user=${userId}`, label: "Upload" }
+  ];
+
+  const nav = document.getElementById("artist-nav");
+  nav.innerHTML = "";
+  const currentPath = window.location.pathname;
+
+  links.forEach(link => {
+    const a = document.createElement("a");
+    a.href = link.href;
+    a.textContent = link.label;
+    if (currentPath.endsWith("dashboard.html") && link.href.includes("dashboard.html")) {
+      a.classList.add("rs-dash-nav-active");
+    }
+    nav.appendChild(a);
+  });
+}
+
 const userId = getUserIdFromQuery();
 
 async function loadDashboard() {
@@ -19,50 +44,44 @@ async function loadDashboard() {
     return;
   }
 
-  try {
-    statusEl.textContent = "Loading…";
+  buildNav(userId);
+  statusEl.textContent = "Loading…";
 
-    const res = await API.get(`/api/musician/dashboard?user=${encodeURIComponent(userId)}`);
-    if (!res.success) {
-      statusEl.textContent = res.error?.message || "Failed to load dashboard.";
-      return;
-    }
-
-    const data = res.data || {};
-
-    nameEl.textContent = data.name || "Artist";
-    earningsEl.textContent = `$${((data.earnings_cents || 0) / 100).toFixed(2)}`;
-
-    tracksEl.innerHTML = "";
-    const tracks = Array.isArray(data.tracks) ? data.tracks : [];
-    if (tracks.length === 0) {
-      tracksEl.innerHTML = "<li>No tracks uploaded yet.</li>";
-    } else {
-      tracks.forEach(track => {
-        const li = document.createElement("li");
-        li.textContent = `${track.title} — $${(track.price_cents / 100).toFixed(2)}`;
-        tracksEl.appendChild(li);
-      });
-    }
-
-    licensesEl.innerHTML = "";
-    const licenses = Array.isArray(data.licenses) ? data.licenses : [];
-    if (licenses.length === 0) {
-      licensesEl.innerHTML = "<li>No licenses yet.</li>";
-    } else {
-      licenses.forEach(lic => {
-        const li = document.createElement("li");
-        li.textContent = `${lic.skater_name} — ${lic.show_title}`;
-        licensesEl.appendChild(li);
-      });
-    }
-
-    statusEl.textContent = "";
-
-  } catch (err) {
-    console.error("Musician dashboard error:", err);
-    statusEl.textContent = "Server error loading dashboard.";
+  const res = await API.get(`/api/musician/dashboard?user=${encodeURIComponent(userId)}`);
+  if (!res.success) {
+    statusEl.textContent = res.error?.message || "Failed to load dashboard.";
+    return;
   }
+
+  const data = res.data || {};
+  nameEl.textContent = data.name || "Artist";
+  earningsEl.textContent = `$${((data.earnings_cents || 0) / 100).toFixed(2)}`;
+
+  const tracks = Array.isArray(data.tracks) ? data.tracks : [];
+  tracksEl.innerHTML = "";
+  if (!tracks.length) {
+    tracksEl.innerHTML = "<li>No tracks yet.</li>";
+  } else {
+    tracks.slice(0, 5).forEach(t => {
+      const li = document.createElement("li");
+      li.textContent = `${t.title} — $${(t.price_cents / 100).toFixed(2)}`;
+      tracksEl.appendChild(li);
+    });
+  }
+
+  const licenses = Array.isArray(data.licenses) ? data.licenses : [];
+  licensesEl.innerHTML = "";
+  if (!licenses.length) {
+    licensesEl.innerHTML = "<li>No licenses yet.</li>";
+  } else {
+    licenses.slice(0, 5).forEach(l => {
+      const li = document.createElement("li");
+      li.textContent = `${l.skater_name} — ${l.show_title}`;
+      licensesEl.appendChild(li);
+    });
+  }
+
+  statusEl.textContent = "";
 }
 
 loadDashboard();
