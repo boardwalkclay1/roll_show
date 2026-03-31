@@ -1,6 +1,5 @@
 import API from "../api.js";
 
-// INLINE REPLACEMENT FOR utils.js
 function getUserIdFromQuery() {
   const params = new URLSearchParams(window.location.search);
   return params.get("user");
@@ -9,53 +8,60 @@ function getUserIdFromQuery() {
 const userId = getUserIdFromQuery();
 
 async function loadDashboard() {
+  const nameEl = document.getElementById("artist-name");
+  const earningsEl = document.getElementById("artist-earnings");
+  const tracksEl = document.getElementById("artist-tracks");
+  const licensesEl = document.getElementById("artist-licenses");
+  const statusEl = document.getElementById("artist-status");
+
   if (!userId) {
-    console.error("No user ID found in URL.");
-    document.getElementById("artist-name").textContent = "Unknown Artist";
-    document.getElementById("artist-earnings").textContent = "$0.00";
-    document.getElementById("artist-tracks").innerHTML =
-      "<li>Missing user ID in URL.</li>";
+    statusEl.textContent = "Missing musician ID in URL.";
     return;
   }
 
   try {
-    const data = await API.get(`/api/musician/dashboard?user=${encodeURIComponent(userId)}`);
+    statusEl.textContent = "Loading…";
 
-    document.getElementById("artist-name").textContent = data.name;
-    document.getElementById("artist-earnings").textContent =
-      `$${(data.earnings_cents / 100).toFixed(2)}`;
-
-    const tracks = document.getElementById("artist-tracks");
-    tracks.innerHTML = "";
-
-    if (Array.isArray(data.tracks) && data.tracks.length > 0) {
-      data.tracks.forEach(track => {
-        const li = document.createElement("li");
-        li.textContent = track.title;
-        tracks.appendChild(li);
-      });
-    } else {
-      tracks.innerHTML = "<li>No tracks uploaded yet.</li>";
+    const res = await API.get(`/api/musician/dashboard?user=${encodeURIComponent(userId)}`);
+    if (!res.success) {
+      statusEl.textContent = res.error?.message || "Failed to load dashboard.";
+      return;
     }
+
+    const data = res.data || {};
+
+    nameEl.textContent = data.name || "Artist";
+    earningsEl.textContent = `$${((data.earnings_cents || 0) / 100).toFixed(2)}`;
+
+    tracksEl.innerHTML = "";
+    const tracks = Array.isArray(data.tracks) ? data.tracks : [];
+    if (tracks.length === 0) {
+      tracksEl.innerHTML = "<li>No tracks uploaded yet.</li>";
+    } else {
+      tracks.forEach(track => {
+        const li = document.createElement("li");
+        li.textContent = `${track.title} — $${(track.price_cents / 100).toFixed(2)}`;
+        tracksEl.appendChild(li);
+      });
+    }
+
+    licensesEl.innerHTML = "";
+    const licenses = Array.isArray(data.licenses) ? data.licenses : [];
+    if (licenses.length === 0) {
+      licensesEl.innerHTML = "<li>No licenses yet.</li>";
+    } else {
+      licenses.forEach(lic => {
+        const li = document.createElement("li");
+        li.textContent = `${lic.skater_name} — ${lic.show_title}`;
+        licensesEl.appendChild(li);
+      });
+    }
+
+    statusEl.textContent = "";
 
   } catch (err) {
-    console.error("Dashboard error:", err);
-
-    const tracks = document.getElementById("artist-tracks");
-
-    // Worker returned HTML instead of JSON
-    if (err.message?.includes("<!DOCTYPE")) {
-      tracks.innerHTML = "<li>Worker returned HTML instead of JSON — routing issue.</li>";
-      return;
-    }
-
-    // Unauthorized
-    if (err?.error === "Unauthorized") {
-      tracks.innerHTML = "<li>Unauthorized — please sign in again.</li>";
-      return;
-    }
-
-    tracks.innerHTML = "<li>Failed to load dashboard.</li>";
+    console.error("Musician dashboard error:", err);
+    statusEl.textContent = "Server error loading dashboard.";
   }
 }
 
