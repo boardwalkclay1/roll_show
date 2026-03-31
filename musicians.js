@@ -1,4 +1,4 @@
-import { json } from "./utils.js";
+import { json } from "./users.js";
 import { signupBase } from "./users.js";
 
 /* ============================================================
@@ -26,11 +26,6 @@ export async function signupMusician(request, env) {
 
 /* ============================================================
    MUSICIAN DASHBOARD
-   Musicians ONLY see:
-     • their profile
-     • their tracks
-     • their licenses
-     • skater profiles (for offers)
 ============================================================ */
 export async function musicianDashboard(request, env, user) {
   const musician = await env.DB_musician.prepare(
@@ -58,8 +53,6 @@ export async function musicianDashboard(request, env, user) {
 
 /* ============================================================
    UPLOAD TRACK (R2 STORAGE)
-   - Musicians upload audio to R2
-   - DB stores metadata + R2 key
 ============================================================ */
 export async function uploadTrack(request, env, user) {
   const { title, r2_key, artwork_r2_key } = await request.json();
@@ -84,7 +77,7 @@ export async function uploadTrack(request, env, user) {
 }
 
 /* ============================================================
-   PUBLIC MUSIC LIBRARY (SKATERS ONLY)
+   PUBLIC MUSIC LIBRARY
 ============================================================ */
 export async function listMusic(env) {
   const { results } = await env.DB_musician.prepare(
@@ -96,13 +89,10 @@ export async function listMusic(env) {
 
 /* ============================================================
    LICENSE TRACK (SKATER → MUSICIAN)
-   - Skater licenses a track
-   - Creates track_licenses row
 ============================================================ */
 export async function licenseTrack(request, env, user) {
   const { trackId, amount_cents } = await request.json();
 
-  // Validate skater
   const skater = await env.DB_skaters.prepare(
     "SELECT id FROM skaters WHERE user_id = ?"
   ).bind(user.id).first();
@@ -111,7 +101,6 @@ export async function licenseTrack(request, env, user) {
     return json({ error: "Only skaters can license music." }, 403);
   }
 
-  // Validate track exists
   const track = await env.DB_musician.prepare(
     "SELECT * FROM tracks WHERE id = ?"
   ).bind(trackId).first();
@@ -132,12 +121,11 @@ export async function licenseTrack(request, env, user) {
 }
 
 /* ============================================================
-   CREATE OFFER (MUSICIAN → SKATER ONLY)
+   CREATE OFFER (MUSICIAN → SKATER)
 ============================================================ */
 export async function musicianCreateOffer(request, env, user) {
   const { skaterId, type, terms, amount_cents } = await request.json();
 
-  // Validate target is skater
   const target = await env.DB_users.prepare(
     "SELECT role FROM users WHERE id = ?"
   ).bind(skaterId).first();
