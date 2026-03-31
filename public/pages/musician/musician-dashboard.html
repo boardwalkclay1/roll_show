@@ -5,19 +5,19 @@
   <title>Roll Show — Musician Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Favicon + manifest -->
-  <link rel="icon" type="image/png" href="/app/images/favicon.png">
+  <link rel="icon" href="/app/images/favicon.png">
   <link rel="apple-touch-icon" href="/app/images/favicon.png">
   <link rel="manifest" href="/app/manifest.json">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="/app/styles/styles.css">
   <link rel="stylesheet" href="/app/styles/dashboard.css">
 </head>
 
 <body class="rs-body">
+
+  <!-- FULLSCREEN BACKGROUND -->
   <img src="/app/images/backs/Roll-music.jpg" class="bg-landing" alt="Background">
 
+  <!-- DASHBOARD SHELL -->
   <main class="rs-dash-shell rs-dash-musician">
 
     <header class="rs-dash-header">
@@ -32,42 +32,36 @@
 
     <section class="rs-dash-grid">
 
-      <!-- TRACKS PREVIEW -->
       <article class="rs-dash-card">
         <h3>Tracks</h3>
         <ul class="rs-dash-list" id="artist-tracks"></ul>
         <a class="rs-dash-pill" id="tracks-link">View All Tracks</a>
       </article>
 
-      <!-- LICENSES PREVIEW -->
       <article class="rs-dash-card">
         <h3>Licenses</h3>
         <ul class="rs-dash-list" id="artist-licenses"></ul>
         <a class="rs-dash-pill" id="licenses-link">View All Licenses</a>
       </article>
 
-      <!-- FEED -->
       <article class="rs-dash-card">
         <h3>Feed</h3>
         <p>Quick access to your musician feed.</p>
         <a class="rs-dash-pill" id="feed-link">Open Feed</a>
       </article>
 
-      <!-- UPLOAD -->
       <article class="rs-dash-card">
         <h3>Upload Track</h3>
         <p>Upload new music directly from here.</p>
         <a class="rs-dash-pill" id="upload-link">Upload Track</a>
       </article>
 
-      <!-- BRANDING -->
       <article class="rs-dash-card">
         <h3>Branding Studio</h3>
         <p>Edit your musician brand assets.</p>
         <a class="rs-dash-pill" id="branding-link">Branding Studio</a>
       </article>
 
-      <!-- LIBRARY -->
       <article class="rs-dash-card">
         <h3>Music Library</h3>
         <p>Your full public music library.</p>
