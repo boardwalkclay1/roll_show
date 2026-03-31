@@ -1,17 +1,4 @@
-import { cors, json as baseJson, login, requireRole } from "./users.js";
-
-/* UNIFIED JSON WRAPPER */
-function apiJson(body, status = 200) {
-  return baseJson(
-    {
-      success: status >= 200 && status < 300,
-      status,
-      data: status >= 200 && status < 300 ? body : null,
-      error: status >= 400 ? body : null
-    },
-    status
-  );
-}
+import { cors, apiJson, login, requireRole } from "./users.js";
 
 /* SIMPLE REQUEST LOGGER */
 function logRequest(request, extra = {}) {
@@ -29,13 +16,27 @@ function logRequest(request, extra = {}) {
 async function withOwnerOverride(request, env, allowedRoles, handler) {
   const url = new URL(request.url);
   const ownerOverride = url.searchParams.get("owner");
+  const userId = url.searchParams.get("user");
 
-  // If owner=1 → treat as owner, bypass role check
-  if (ownerOverride === "1") {
-    logRequest(request, { ownerOverride: true });
-    return handler(request, env);
+  // If owner=1 and user is provided → treat that user as the acting user, bypass normal role check
+  if (ownerOverride === "1" && userId) {
+    logRequest(request, { ownerOverride: true, userId });
+
+    const user = await env.DB_users.prepare(
+      "SELECT * FROM users WHERE id = ?"
+    ).bind(userId).first();
+
+    if (!user) {
+      return apiJson({ message: "User not found for owner override" }, 404);
+    }
+
+    // Force owner semantics for bypass
+    const ownerUser = { ...user, role: "owner" };
+
+    return handler(request, env, ownerUser);
   }
 
+  // Normal role guard
   return requireRole(request, env, allowedRoles, handler);
 }
 
@@ -199,7 +200,6 @@ export default {
       };
 
       if (musicianRoutes[path] && musicianRoutes[path][method]) {
-        // licenseTrack is for skaters, others for musicians
         const roles =
           path === "/api/music/license" ? ["skater"] : ["musician"];
         return withOwnerOverride(request, env, roles, musicianRoutes[path][method]);
