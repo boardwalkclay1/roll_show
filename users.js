@@ -1,7 +1,65 @@
-import { json, getUserId, hash, verify } from "./utils.js";
+/* ============================================================
+   CORS HEADERS
+============================================================ */
+export function cors() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers":
+      "Content-Type, x-user-id, x-buyer-id, x-skater-id, x-business-id, x-musician-id, x-owner-id"
+  };
+}
 
 /* ============================================================
-   BASE SIGNUP (ALL ROLES) — BCRYPT VERSION
+   JSON RESPONSE WRAPPER
+============================================================ */
+export function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", ...cors() }
+  });
+}
+
+/* ============================================================
+   UNIFIED USER ID EXTRACTION
+============================================================ */
+export function getUserId(request) {
+  return (
+    request.headers.get("x-user-id") ||
+    request.headers.get("x-buyer-id") ||
+    request.headers.get("x-skater-id") ||
+    request.headers.get("x-business-id") ||
+    request.headers.get("x-musician-id") ||
+    request.headers.get("x-owner-id")
+  );
+}
+
+/* ============================================================
+   PASSWORD HASHING (AUTH WORKER)
+============================================================ */
+export async function hash(str, env) {
+  const res = await env.AUTH.fetch("https://auth/hash", {
+    method: "POST",
+    body: JSON.stringify({ password: str })
+  });
+  const data = await res.json();
+  return data.hashed;
+}
+
+/* ============================================================
+   PASSWORD VERIFY (AUTH WORKER)
+============================================================ */
+export async function verify(str, hashed, env) {
+  const res = await env.AUTH.fetch("https://auth/verify", {
+    method: "POST",
+    body: JSON.stringify({ password: str, hash: hashed })
+  });
+  const data = await res.json();
+  return data.ok;
+}
+
+/* ============================================================
+   BASE SIGNUP (ALL ROLES)
 ============================================================ */
 export async function signupBase(env, { name, email, password, role }) {
   if (!name || !email || !password || !role) {
@@ -19,8 +77,8 @@ export async function signupBase(env, { name, email, password, role }) {
   const id = crypto.randomUUID();
   const created = new Date().toISOString();
 
-  // bcrypt hash
-  const hashed = await hash(password);
+  // FIXED: pass env
+  const hashed = await hash(password, env);
 
   await env.DB_users.prepare(
     `INSERT INTO users (id, name, email, password_hash, role, created_at, "owner-1")
@@ -31,7 +89,7 @@ export async function signupBase(env, { name, email, password, role }) {
 }
 
 /* ============================================================
-   LOGIN — BCRYPT VERSION
+   LOGIN
 ============================================================ */
 export async function login(request, env) {
   try {
@@ -45,8 +103,9 @@ export async function login(request, env) {
       return json({ success: false, error: "Invalid credentials" }, 401);
     }
 
-    // bcrypt verify
-    const valid = await verify(password, row.password_hash);
+    // FIXED: pass env
+    const valid = await verify(password, row.password_hash, env);
+
     if (!valid) {
       return json({ success: false, error: "Invalid credentials" }, 401);
     }
@@ -74,7 +133,7 @@ export async function login(request, env) {
 }
 
 /* ============================================================
-   ROLE GUARD — OWNER BYPASS
+   ROLE GUARD
 ============================================================ */
 export async function requireRole(request, env, allowedRoles, handler) {
   try {
