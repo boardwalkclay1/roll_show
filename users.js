@@ -6,7 +6,7 @@ export function cors() {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers":
-      "Content-Type, x-user-id, x-user-role, x-buyer-id, x-skater-id, x-business-id, x-musician-id, x-owner-id"
+      "Content-Type, x-user-id, x-user-role"
   };
 }
 
@@ -48,18 +48,11 @@ export function apiJson(body, status = 200) {
 }
 
 /* ============================================================
-   USER ID EXTRACTION
+   USER ID EXTRACTION (FIXED)
 ============================================================ */
 export function getUserId(request) {
-  return (
-    request.headers.get("x-user-id") ||
-    request.headers.get("x-user-role") ||
-    request.headers.get("x-buyer-id") ||
-    request.headers.get("x-skater-id") ||
-    request.headers.get("x-business-id") ||
-    request.headers.get("x-musician-id") ||
-    request.headers.get("x-owner-id")
-  );
+  // Only return the actual user ID header
+  return request.headers.get("x-user-id");
 }
 
 /* ============================================================
@@ -142,7 +135,7 @@ export async function signupBase(env, { name, email, password, role }) {
 }
 
 /* ============================================================
-   LOGIN
+   LOGIN (MATCHES FRONTEND EXPECTATIONS)
 ============================================================ */
 export async function login(request, env) {
   try {
