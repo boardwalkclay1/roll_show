@@ -58,7 +58,7 @@ export async function getShow(env, id) {
 }
 
 /* ============================================================
-   SKATER DASHBOARD
+   SKATER DASHBOARD (UPDATED TO MATCH BUSINESS.JS)
 ============================================================ */
 export async function skaterDashboard(request, env, user) {
   const skater = await env.DB_skaters.prepare(
@@ -84,6 +84,9 @@ export async function skaterDashboard(request, env, user) {
      ORDER BY lr.created_at DESC`
   ).bind(skater.id).all();
 
+  /* ------------------------------------------------------------
+     OFFERS (MATCH BUSINESS.JS)
+  ------------------------------------------------------------ */
   const { results: offers } = await env.DB_business.prepare(
     `SELECT o.*, u.name AS sender_name
      FROM offers o
@@ -92,6 +95,9 @@ export async function skaterDashboard(request, env, user) {
      ORDER BY o.created_at DESC`
   ).bind(user.id, user.id).all();
 
+  /* ------------------------------------------------------------
+     CONTRACTS (MATCH BUSINESS.JS)
+  ------------------------------------------------------------ */
   const { results: contracts } = await env.DB_business.prepare(
     `SELECT c.*, o.type, o.terms
      FROM contracts c
