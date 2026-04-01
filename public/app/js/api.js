@@ -1,4 +1,4 @@
-// api.js — FINAL UNIFIED API CLIENT
+// js/api.js — FINAL UNIFIED API CLIENT WITH REAL-TIME POLLING
 
 const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
 
@@ -9,7 +9,6 @@ async function safeJson(res) {
   const text = await res.text();
   const type = res.headers.get("content-type") || "";
 
-  // Worker returned HTML → fallback page or crash
   if (!type.includes("application/json")) {
     return {
       success: false,
@@ -35,21 +34,15 @@ async function safeJson(res) {
    INTERNAL REQUEST HANDLER
 ------------------------------------------------------------ */
 async function request(method, path, payload, extraHeaders = {}) {
-  const headers = {
-    ...extraHeaders
-  };
-
+  const headers = { ...extraHeaders };
   const options = { method, headers };
 
-  // JSON body
   if (payload && !(payload instanceof FormData)) {
     headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(payload);
   }
 
-  // FormData upload
   if (payload instanceof FormData) {
-    // Let browser set multipart boundary
     options.body = payload;
   }
 
@@ -100,10 +93,37 @@ const API = {
   },
 
   withUser(user) {
-    if (!user) return {};
+    if (!user || !user.id || !user.role) return {};
     return {
       "x-user-id": user.id,
       "x-user-role": user.role
+    };
+  },
+
+  /**
+   * REAL-TIME POLLING
+   * Usage:
+   *   const stop = API.poll("/api/notifications", {
+   *     interval: 5000,
+   *     headers: API.withUser(user),
+   *     onData: (res) => { ... }
+   *   });
+   *   // later: stop();
+   */
+  poll(path, { interval = 5000, headers = {}, onData } = {}) {
+    let stopped = false;
+
+    async function tick() {
+      if (stopped) return;
+      const res = await request("GET", path, null, headers);
+      if (onData) onData(res);
+      setTimeout(tick, interval);
+    }
+
+    tick();
+
+    return () => {
+      stopped = true;
     };
   }
 };
