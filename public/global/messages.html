@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Messages • Roll Show</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/system.css" />
+</head>
+
+<body class="bg-system">
+
+  <div class="system-shell">
+
+    <header class="page-header">
+      <h1>Messages</h1>
+    </header>
+
+    <main class="system-main grid-2">
+
+      <aside class="messages-sidebar">
+        <div id="conversations-list"></div>
+      </aside>
+
+      <section class="messages-chat">
+        <div id="chat-window"></div>
+        <div class="chat-input">
+          <input id="chat-text" placeholder="Type a message..." />
+          <button id="chat-send" class="btn-primary">Send</button>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <script type="module" src="/js/system/messages.js"></script>
+</body>
+</html>
