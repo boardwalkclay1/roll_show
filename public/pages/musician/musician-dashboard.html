@@ -12,25 +12,33 @@
   <link rel="stylesheet" href="/app/styles/styles.css">
   <link rel="stylesheet" href="/app/styles/dashboard.css">
 
-  <!-- INLINE FIX: Transparent dashboard shell -->
+  <!-- TRANSPARENT DASHBOARD + CARD SYSTEM -->
   <style>
+    /* Dashboard shell transparency */
     .rs-dash-shell {
-      background: rgba(0, 0, 0, 0.55);   /* semi‑transparent */
-      backdrop-filter: blur(6px);        /* cinematic blur */
+      background: rgba(0, 0, 0, 0.40);   /* clean see-through */
+      backdrop-filter: blur(10px);       /* cinematic blur */
       border-radius: 18px;
       padding: 2rem;
       max-width: 960px;
       margin: 4rem auto;
-      z-index: 10;
       position: relative;
+      z-index: 10;
     }
 
+    /* Card transparency */
     .rs-dash-card {
-      background: rgba(10, 10, 10, 0.55); /* more see‑through */
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.32);   /* even more transparent */
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 14px;
       padding: 1.25rem 1.5rem;
+    }
+
+    /* Pills slightly transparent */
+    .rs-dash-pill {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.25);
     }
   </style>
 </head>
