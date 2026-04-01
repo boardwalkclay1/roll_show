@@ -1,81 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Roll Show — Business Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<div class="business-dashboard-page">
 
-  <link rel="icon" href="/app/images/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
-  <link rel="manifest" href="/manifest.webmanifest">
+  <section class="dashboard-header">
+    <h1>Business Dashboard</h1>
+  </section>
 
-  <link rel="stylesheet" href="/app/styles/styles.css">
-  <link rel="stylesheet" href="/app/styles/dashboard.css">
-</head>
+  <section class="dashboard-grid">
 
-<body class="rs-body">
+    <a data-page="business-profile" class="dashboard-card">Business Profile</a>
+    <a data-page="business-campaigns" class="dashboard-card">Campaigns</a>
+    <a data-page="business-sponsorships" class="dashboard-card">Sponsorships</a>
+    <a data-page="business-bookings" class="dashboard-card">Bookings</a>
+    <a data-page="business-analytics" class="dashboard-card">Analytics</a>
 
-  <!-- FULLSCREEN BACKGROUND IMAGE -->
-  <img src="/app/images/backs/Roll-business.jpg" class="bg-landing" alt="Background">
+  </section>
 
-  <!-- DASHBOARD SHELL -->
-  <main class="rs-dash-shell rs-dash-business">
-
-    <header class="rs-dash-header">
-      <div>
-        <h1 class="rs-dash-title" id="business-name">Business</h1>
-        <p class="rs-dash-sub">Your offers, contracts, ads, and brand performance.</p>
-      </div>
-      <div class="rs-dash-stat" id="business-revenue">$0.00</div>
-    </header>
-
-    <nav class="rs-dash-nav" id="business-nav"></nav>
-
-    <section class="rs-dash-grid">
-
-      <article class="rs-dash-card">
-        <h3>Active Offers</h3>
-        <ul class="rs-dash-list" id="business-offers"></ul>
-        <a class="rs-dash-pill" id="offers-link">View All Offers</a>
-        <a class="rs-dash-pill" id="create-offer-link">Create Offer</a>
-        <a class="rs-dash-pill" id="offers-inbox-link">Offers Inbox</a>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Contracts</h3>
-        <ul class="rs-dash-list" id="business-contracts"></ul>
-        <a class="rs-dash-pill" id="contracts-link">View All Contracts</a>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Branding Studio</h3>
-        <p>Manage your brand assets, logos, and identity.</p>
-        <a class="rs-dash-pill" id="branding-link">Open Branding Studio</a>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Business Feed</h3>
-        <p>Your activity feed and updates.</p>
-        <a class="rs-dash-pill" id="feed-link">Open Feed</a>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Ads</h3>
-        <p>Create and manage your business ads.</p>
-        <a class="rs-dash-pill" id="ads-link">Create Ad</a>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Business Application</h3>
-        <p>Review your verification status.</p>
-        <a class="rs-dash-pill" id="apply-link">View Application</a>
-      </article>
-
-    </section>
-
-    <p class="rs-dash-status" id="business-status"></p>
-  </main>
-
-  <script type="module" src="/app/js/business/business-dashboard.js"></script>
-</body>
-</html>
+</div>
