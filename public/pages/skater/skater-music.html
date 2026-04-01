@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Music Library • Roll Show</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/skater.css" />
+</head>
+<body class="bg-skater">
+
+  <div class="skater-shell">
+    <header class="page-header">
+      <h1>Music Library</h1>
+      <div class="music-filters">
+        <button data-filter="all" class="chip active">All</button>
+        <button data-filter="licensed" class="chip">Licensed</button>
+        <button data-filter="favorites" class="chip">Favorites</button>
+      </div>
+    </header>
+
+    <main class="skater-main">
+      <section class="skater-section">
+        <div id="music-list" class="list-tracks"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="/js/skater/skater-music.js"></script>
+</body>
+</html>
