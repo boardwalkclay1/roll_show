@@ -4,9 +4,9 @@
 export function cors() {
   return {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers":
-      "Content-Type, x-user-id, x-buyer-id, x-skater-id, x-business-id, x-musician-id, x-owner-id"
+      "Content-Type, x-user-id, x-user-role, x-buyer-id, x-skater-id, x-business-id, x-musician-id, x-owner-id"
   };
 }
 
@@ -25,7 +25,7 @@ export function logRequest(request, extra = {}) {
 }
 
 /* ============================================================
-   UNIFIED JSON RESPONSE WRAPPER
+   JSON RESPONSE WRAPPER
 ============================================================ */
 export function apiJson(body, status = 200) {
   const success = status >= 200 && status < 300;
@@ -39,17 +39,21 @@ export function apiJson(body, status = 200) {
     }),
     {
       status,
-      headers: { "Content-Type": "application/json", ...cors() }
+      headers: {
+        "Content-Type": "application/json",
+        ...cors()
+      }
     }
   );
 }
 
 /* ============================================================
-   UNIFIED USER ID EXTRACTION
+   USER ID EXTRACTION
 ============================================================ */
 export function getUserId(request) {
   return (
     request.headers.get("x-user-id") ||
+    request.headers.get("x-user-role") ||
     request.headers.get("x-buyer-id") ||
     request.headers.get("x-skater-id") ||
     request.headers.get("x-business-id") ||
@@ -59,7 +63,24 @@ export function getUserId(request) {
 }
 
 /* ============================================================
-   PASSWORD HASHING (AUTH WORKER) — FIXED
+   SAFE JSON FOR AUTH WORKER
+============================================================ */
+async function safeAuthJson(res) {
+  const text = await res.text();
+
+  if (!res.headers.get("content-type")?.includes("application/json")) {
+    throw new Error("AUTH worker returned non‑JSON");
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error("AUTH worker returned invalid JSON");
+  }
+}
+
+/* ============================================================
+   PASSWORD HASHING
 ============================================================ */
 export async function hash(str, env) {
   const res = await env.AUTH.fetch("https://auth/hash", {
@@ -68,12 +89,12 @@ export async function hash(str, env) {
     body: JSON.stringify({ password: str })
   });
 
-  const data = await res.json();
+  const data = await safeAuthJson(res);
   return data.hashed;
 }
 
 /* ============================================================
-   PASSWORD VERIFY (AUTH WORKER) — FIXED
+   PASSWORD VERIFY
 ============================================================ */
 export async function verify(str, hashed, env) {
   const res = await env.AUTH.fetch("https://auth/verify", {
@@ -82,7 +103,7 @@ export async function verify(str, hashed, env) {
     body: JSON.stringify({ password: str, hash: hashed })
   });
 
-  const data = await res.json();
+  const data = await safeAuthJson(res);
   return data.ok;
 }
 
@@ -165,7 +186,7 @@ export async function login(request, env) {
 }
 
 /* ============================================================
-   ROLE GUARD (WITH OWNER OVERRIDE)
+   ROLE GUARD (OWNER OVERRIDE)
 ============================================================ */
 export async function requireRole(request, env, allowedRoles, handler) {
   try {
