@@ -70,24 +70,35 @@ async function loadDashboard() {
 
   statusEl.textContent = "Loading…";
 
+  // ⭐ REQUIRED HEADERS
+  const headers = API.withUser({ id: userId, role: "buyer" });
+
   const [ticketsRes, purchasesRes] = await Promise.all([
-    API.get(`/api/buyer/tickets?user=${encodeURIComponent(userId)}`),
-    API.get(`/api/buyer/purchases?user=${encodeURIComponent(userId)}`)
+    API.get(`/api/buyer/tickets?user=${encodeURIComponent(userId)}`, headers),
+    API.get(`/api/buyer/purchases?user=${encodeURIComponent(userId)}`, headers)
   ]);
 
   nameEl.textContent = "Buyer";
 
-  ticketsEl.innerHTML = ticketsRes.success
-    ? (ticketsRes.data.tickets.length
-        ? ticketsRes.data.tickets.slice(0, 5).map(t => `<li>${t.show_title}</li>`).join("")
-        : "<li>No tickets yet.</li>")
-    : "<li>Error loading tickets.</li>";
+  /* TICKETS */
+  if (ticketsRes.success && ticketsRes.data?.tickets?.length) {
+    ticketsEl.innerHTML = ticketsRes.data.tickets
+      .slice(0, 5)
+      .map(t => `<li>${t.show_title}</li>`)
+      .join("");
+  } else {
+    ticketsEl.innerHTML = "<li>No tickets yet.</li>";
+  }
 
-  purchasesEl.innerHTML = purchasesRes.success
-    ? (purchasesRes.data.purchases.length
-        ? purchasesRes.data.purchases.slice(0, 5).map(p => `<li>${p.show_title}</li>`).join("")
-        : "<li>No purchases yet.</li>")
-    : "<li>Error loading purchases.</li>";
+  /* PURCHASES */
+  if (purchasesRes.success && purchasesRes.data?.purchases?.length) {
+    purchasesEl.innerHTML = purchasesRes.data.purchases
+      .slice(0, 5)
+      .map(p => `<li>${p.show_title}</li>`)
+      .join("");
+  } else {
+    purchasesEl.innerHTML = "<li>No purchases yet.</li>";
+  }
 
   statusEl.textContent = "";
 }
