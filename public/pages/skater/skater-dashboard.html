@@ -11,12 +11,42 @@
 
   <link rel="stylesheet" href="/app/styles/styles.css">
   <link rel="stylesheet" href="/app/styles/dashboard.css">
+
+  <!-- TRANSPARENT DASHBOARD + CARD SYSTEM -->
+  <style>
+    /* Dashboard shell transparency */
+    .rs-dash-shell {
+      background: rgba(0, 0, 0, 0.40);   /* see-through */
+      backdrop-filter: blur(10px);       /* cinematic blur */
+      border-radius: 18px;
+      padding: 2rem;
+      max-width: 960px;
+      margin: 4rem auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Card transparency */
+    .rs-dash-card {
+      background: rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    /* Pills slightly transparent */
+    .rs-dash-pill {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+  </style>
 </head>
 
 <body class="rs-body">
 
-  <!-- BACKGROUND IMAGE (you choose the skater art) -->
-  <img src="/app/images/backs/Roll-skater.jpg" class="bg-landing" alt="Background">
+  <!-- FULLSCREEN LOCKED BACKGROUND -->
+  <img src="/app/images/backs/roll-show-gold.jpg" class="bg-landing" alt="Background">
 
   <main class="rs-dash-shell rs-dash-skater">
 
