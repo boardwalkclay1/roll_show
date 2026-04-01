@@ -1,116 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Roll Show — Buyer Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<div class="buyer-dashboard-page">
 
-  <!-- Favicon + manifest -->
-  <link rel="icon" type="image/png" href="/app/images/favicon.png">
-  <link rel="apple-touch-icon" href="/app/images/favicon.png">
-  <link rel="manifest" href="/manifest.webmanifest">
+  <section class="dashboard-header">
+    <h1>Buyer Dashboard</h1>
+  </section>
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="/app/styles/styles.css">
-  <link rel="stylesheet" href="/app/styles/dashboard.css">
+  <section class="dashboard-grid">
 
-  <!-- TRANSPARENT DASHBOARD + CARD SYSTEM -->
-  <style>
-    /* Dashboard shell transparency */
-    .rs-dash-shell {
-      background: rgba(0, 0, 0, 0.40);   /* see-through */
-      backdrop-filter: blur(10px);       /* cinematic blur */
-      border-radius: 18px;
-      padding: 2rem;
-      max-width: 960px;
-      margin: 4rem auto;
-      position: relative;
-      z-index: 10;
-    }
+    <a data-page="buyer-profile" class="dashboard-card">My Profile</a>
+    <a data-page="buyer-tickets" class="dashboard-card">My Tickets</a>
+    <a data-page="buyer-cards" class="dashboard-card">My Skate Cards</a>
+    <a data-page="buyer-music-library" class="dashboard-card">Music Library</a>
+    <a data-page="buyer-calendar" class="dashboard-card">My Calendar</a>
 
-    /* Card transparency */
-    .rs-dash-card {
-      background: rgba(0, 0, 0, 0.32);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 14px;
-      padding: 1.25rem 1.5rem;
-    }
+  </section>
 
-    /* Pills slightly transparent */
-    .rs-dash-pill {
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-    }
-  </style>
-</head>
-
-<body class="rs-body">
-
-  <!-- FULLSCREEN LOCKED BACKGROUND -->
-  <img src="/app/images/backs/roll-show-stage.jpg" class="bg-landing" alt="Background">
-
-  <!-- DASHBOARD SHELL -->
-  <main class="rs-dash-shell rs-dash-buyer">
-
-    <header class="rs-dash-header">
-      <div>
-        <h1 class="rs-dash-title" id="buyer-name">Buyer</h1>
-        <p class="rs-dash-sub">Your tickets, purchases, and tools.</p>
-      </div>
-    </header>
-
-    <nav class="rs-dash-nav" id="buyer-nav"></nav>
-
-    <section class="rs-dash-grid">
-
-      <!-- TICKETS PREVIEW -->
-      <article class="rs-dash-card">
-        <h3>Recent Tickets</h3>
-        <ul class="rs-dash-list" id="buyer-tickets"></ul>
-        <a class="rs-dash-pill" id="tickets-link">View All Tickets</a>
-      </article>
-
-      <!-- PURCHASES PREVIEW -->
-      <article class="rs-dash-card">
-        <h3>Recent Purchases</h3>
-        <ul class="rs-dash-list" id="buyer-purchases"></ul>
-        <a class="rs-dash-pill" id="purchases-link">View Purchase History</a>
-      </article>
-
-      <!-- FEED -->
-      <article class="rs-dash-card">
-        <h3>Buyer Feed</h3>
-        <p>Updates and recommended shows.</p>
-        <a class="rs-dash-pill" id="feed-link">Open Feed</a>
-      </article>
-
-      <!-- TICKET WALLET -->
-      <article class="rs-dash-card">
-        <h3>Ticket Wallet</h3>
-        <p>Your full ticket collection.</p>
-        <a class="rs-dash-pill" id="wallet-link">Open Wallet</a>
-      </article>
-
-      <!-- CONFIRMATION -->
-      <article class="rs-dash-card">
-        <h3>Confirmations</h3>
-        <p>View your latest ticket confirmations.</p>
-        <a class="rs-dash-pill" id="confirmation-link">View Confirmations</a>
-      </article>
-
-      <!-- TICKET VIEW -->
-      <article class="rs-dash-card">
-        <h3>Ticket Viewer</h3>
-        <p>Scan or display your ticket QR.</p>
-        <a class="rs-dash-pill" id="ticketview-link">Open Ticket Viewer</a>
-      </article>
-
-    </section>
-
-    <p class="rs-dash-status" id="buyer-status"></p>
-  </main>
-
-  <script type="module" src="/app/js/buyer/buyer-dashboard.js"></script>
-</body>
-</html>
+</div>
