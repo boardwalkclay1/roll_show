@@ -280,3 +280,14 @@ form textarea:focus {
   text-align: center;
   opacity: 0.8;
 }
+.bg-landing {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  object-position: center;
+  z-index: -1;
+  pointer-events: none;
+}
