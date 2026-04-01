@@ -1,120 +1,280 @@
-import API from "../api.js";
+// public/app/js/skater/skater-dashboard.js
 
-function getUserIdFromQuery() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("user");
+const state = {
+  skater: null,
+  shows: [],
+  merch: [],
+  gifts: [],
+  contracts: [],
+  secondaryTalent: null,
+  badges: [],
+  earnings: 0,
+};
+
+async function initSkaterDashboard() {
+  await loadSkaterProfile();
+  await Promise.all([
+    loadShows(),
+    loadMerch(),
+    loadContracts(),
+    loadBadges(),
+  ]);
+
+  renderHeader();
+  renderShows();
+  renderMerch();
+  renderContractsSection();
+  renderSecondaryTalent();
+  renderStatus();
+  setupNav();
+  setupActions();
 }
 
-function buildNav(userId) {
-  const base = "/app/pages/skater";
-  const links = [
-    { href: `${base}/skater-dashboard.html?user=${userId}`, label: "Dashboard" },
-    { href: `${base}/skater-feed.html?user=${userId}`, label: "Feed" },
-    { href: `${base}/skater-shows.html?user=${userId}`, label: "Shows" },
-    { href: `${base}/create-show.html?user=${userId}`, label: "Create Show" },
-    { href: `${base}/skater-intent.html?user=${userId}`, label: "Lessons" },
-    { href: `${base}/upload-video.html?user=${userId}`, label: "Upload" },
-    { href: `${base}/video-studio.html?user=${userId}`, label: "Studio" },
-    { href: `${base}/welcome_skater.html?user=${userId}`, label: "Welcome" }
-  ];
+/* ========== DATA LOADERS (API HOOKS) ========== */
 
-  const nav = document.getElementById("skater-nav");
-  nav.innerHTML = "";
-  const current = window.location.pathname;
+async function loadSkaterProfile() {
+  // TODO: replace with real auth/user lookup
+  const res = await fetch("/api/skater/me");
+  if (!res.ok) return;
+  const data = await res.json();
+  state.skater = data.skater;
+  state.secondaryTalent = data.secondary_talent || null;
+  state.earnings = data.earnings || 0;
+}
 
-  links.forEach(link => {
-    const a = document.createElement("a");
-    a.href = link.href;
-    a.textContent = link.label;
-    if (current.includes(link.href.split("/").pop().split("?")[0])) {
-      a.classList.add("rs-dash-nav-active");
-    }
-    nav.appendChild(a);
+async function loadShows() {
+  const res = await fetch("/api/skater/shows");
+  if (!res.ok) return;
+  const data = await res.json();
+  state.shows = data.shows || [];
+}
+
+async function loadMerch() {
+  const res = await fetch("/api/skater/merch");
+  if (!res.ok) return;
+  const data = await res.json();
+  state.merch = data.merch || [];
+  state.gifts = data.gifts || []; // roses, skates, boards, etc.
+}
+
+async function loadContracts() {
+  const res = await fetch("/api/skater/contracts");
+  if (!res.ok) return;
+  const data = await res.json();
+  state.contracts = data.contracts || [];
+}
+
+async function loadBadges() {
+  const res = await fetch("/api/skater/badges");
+  if (!res.ok) return;
+  const data = await res.json();
+  state.badges = data.badges || [];
+}
+
+/* ========== RENDERERS ========== */
+
+function renderHeader() {
+  const nameEl = document.getElementById("skater-name");
+  const earningsEl = document.getElementById("skater-earnings");
+
+  if (state.skater && nameEl) {
+    nameEl.textContent = state.skater.display_name || "Skater";
+  }
+  if (earningsEl) {
+    earningsEl.textContent = `$${(state.earnings || 0).toFixed(2)}`;
+  }
+}
+
+function renderShows() {
+  const list = document.getElementById("skater-shows");
+  if (!list) return;
+  list.innerHTML = "";
+
+  if (!state.shows.length) {
+    list.innerHTML = `<li>No shows yet. Create your first show.</li>`;
+    return;
+  }
+
+  state.shows.forEach(show => {
+    const li = document.createElement("li");
+    const typeLabel = show.type || "show"; // premiere, private, short, live, golden
+    li.textContent = `${show.title} — ${typeLabel} — ${show.duration_seconds || 0}s`;
+    list.appendChild(li);
   });
 }
 
-function wirePageLinks(userId) {
-  const base = "/app/pages/skater";
+function renderMerch() {
+  const merchList = document.getElementById("skater-merch");
+  if (!merchList) return;
+  merchList.innerHTML = "";
 
-  document.getElementById("shows-link").href =
-    `${base}/skater-shows.html?user=${userId}`;
+  const allItems = [
+    ...state.merch.map(m => ({ ...m, kind: "merch" })),
+    ...state.gifts.map(g => ({ ...g, kind: "gift" })),
+  ];
 
-  document.getElementById("create-show-link").href =
-    `${base}/create-show.html?user=${userId}`;
+  if (!allItems.length) {
+    merchList.innerHTML = `<li>No merch or gifts configured yet.</li>`;
+    return;
+  }
 
-  document.getElementById("feed-link").href =
-    `${base}/skater-feed.html?user=${userId}`;
-
-  document.getElementById("intent-link").href =
-    `${base}/skater-intent.html?user=${userId}`;
-
-  document.getElementById("upload-video-link").href =
-    `${base}/upload-video.html?user=${userId}`;
-
-  document.getElementById("video-studio-link").href =
-    `${base}/video-studio.html?user=${userId}`;
-
-  document.getElementById("welcome-link").href =
-    `${base}/welcome_skater.html?user=${userId}`;
+  allItems.forEach(item => {
+    const li = document.createElement("li");
+    const kindLabel = item.kind === "gift" ? "Gift" : "Merch";
+    li.textContent = `${kindLabel}: ${item.name} — $${(item.price || 0).toFixed(2)}`;
+    merchList.appendChild(li);
+  });
 }
 
-const userId = getUserIdFromQuery();
+function renderContractsSection() {
+  const statusEl = document.getElementById("skater-contract-status");
+  if (!statusEl) return;
 
-async function loadDashboard() {
-  const nameEl = document.getElementById("skater-name");
-  const earningsEl = document.getElementById("skater-earnings");
-  const showsEl = document.getElementById("skater-shows");
-  const lessonsEl = document.getElementById("skater-lessons");
+  const required = state.contracts.filter(c => c.required);
+  const unsignedRequired = required.filter(c => !c.signed_at);
+
+  if (!required.length) {
+    statusEl.textContent = "No contracts required yet.";
+    return;
+  }
+
+  if (unsignedRequired.length) {
+    statusEl.textContent = `You have ${unsignedRequired.length} required contract(s) to sign before unlocking royalties and Pro features.`;
+  } else {
+    statusEl.textContent = "All required contracts signed. Royalties and Pro features unlocked.";
+  }
+}
+
+function renderSecondaryTalent() {
+  const textEl = document.getElementById("secondary-talent-text");
+  if (!textEl) return;
+
+  if (!state.secondaryTalent) {
+    textEl.textContent = "Showcase your other talents (music, art, books, etc.).";
+    return;
+  }
+
+  textEl.textContent = `Secondary talent: ${state.secondaryTalent.label || state.secondaryTalent.type}`;
+}
+
+function renderStatus() {
   const statusEl = document.getElementById("skater-status");
+  if (!statusEl) return;
 
-  if (!userId) {
-    statusEl.textContent = "Missing skater ID in URL.";
-    return;
-  }
+  const proContract = state.contracts.find(c => c.slug === "pro-skater");
+  const videoRights = state.contracts.find(c => c.slug === "video-rights");
 
-  buildNav(userId);
-  wirePageLinks(userId);
+  const parts = [];
 
-  statusEl.textContent = "Loading…";
-
-  const res = await API.get(`/api/skater/dashboard?user=${encodeURIComponent(userId)}`);
-  if (!res.success) {
-    statusEl.textContent = res.error?.message || "Failed to load dashboard.";
-    return;
-  }
-
-  const data = res.data || {};
-
-  nameEl.textContent = data.skater?.name || "Skater";
-  earningsEl.textContent = `$${((data.earnings_cents || 0) / 100).toFixed(2)}`;
-
-  /* SHOWS */
-  const shows = Array.isArray(data.shows) ? data.shows : [];
-  showsEl.innerHTML = "";
-  if (!shows.length) {
-    showsEl.innerHTML = "<li>No shows yet.</li>";
+  if (proContract && proContract.signed_at) {
+    parts.push("Pro Skater active.");
   } else {
-    shows.slice(0, 5).forEach(show => {
-      const li = document.createElement("li");
-      li.textContent = `${show.title} — ${show.premiere_date}`;
-      showsEl.appendChild(li);
-    });
+    parts.push("Pro Skater not active.");
   }
 
-  /* LESSONS */
-  const lessons = Array.isArray(data.lessons) ? data.lessons : [];
-  lessonsEl.innerHTML = "";
-  if (!lessons.length) {
-    lessonsEl.innerHTML = "<li>No lessons yet.</li>";
+  if (videoRights && videoRights.signed_at) {
+    parts.push("Video rights contract signed (royalties enabled).");
   } else {
-    lessons.slice(0, 5).forEach(lesson => {
-      const li = document.createElement("li");
-      li.textContent = `${lesson.title} — $${(lesson.price_cents / 100).toFixed(2)}`;
-      lessonsEl.appendChild(li);
-    });
+    parts.push("Video rights contract not signed (royalties limited).");
   }
 
-  statusEl.textContent = "";
+  statusEl.textContent = parts.join(" ");
 }
 
-loadDashboard();
+/* ========== NAV & ACTIONS ========== */
+
+function setupNav() {
+  const nav = document.getElementById("skater-nav");
+  if (!nav) return;
+
+  nav.innerHTML = `
+    <a href="#" data-tab="shows" class="rs-dash-nav-active">Shows</a>
+    <a href="#" data-tab="merch">Merch & Gifts</a>
+    <a href="#" data-tab="contracts">Contracts</a>
+    <a href="#" data-tab="profile">Profile</a>
+    <a href="#" data-tab="social">Social</a>
+  `;
+
+  nav.addEventListener("click", (e) => {
+    const link = e.target.closest("a[data-tab]");
+    if (!link) return;
+    e.preventDefault();
+
+    nav.querySelectorAll("a").forEach(a => a.classList.remove("rs-dash-nav-active"));
+    link.classList.add("rs-dash-nav-active");
+
+    // You can later wire tab-specific UI changes here if needed.
+  });
+}
+
+function setupActions() {
+  bindClick("create-show-link", () => {
+    // open show creation modal / route
+    console.log("Create show clicked");
+  });
+
+  bindClick("tickets-link", () => {
+    console.log("Manage tickets clicked");
+  });
+
+  bindClick("golden-ticket-link", () => {
+    console.log("Golden tickets clicked");
+  });
+
+  bindClick("view-contracts-link", () => {
+    console.log("View contracts clicked");
+  });
+
+  bindClick("pro-tier-link", () => {
+    console.log("Upgrade to Pro Skater clicked");
+  });
+
+  bindClick("add-merch-link", () => {
+    console.log("Add merch clicked");
+  });
+
+  bindClick("gifts-link", () => {
+    console.log("Gifts options clicked");
+  });
+
+  bindClick("edit-secondary-talent-link", () => {
+    console.log("Edit secondary talent clicked");
+  });
+
+  bindClick("art-store-link", () => {
+    console.log("Art / books store clicked");
+  });
+
+  bindClick("edit-profile-link", () => {
+    console.log("Edit profile clicked");
+  });
+
+  bindClick("ticket-branding-link", () => {
+    console.log("Ticket branding studio clicked");
+  });
+
+  bindClick("feed-link", () => {
+    console.log("Open skater feed clicked");
+  });
+
+  bindClick("followers-link", () => {
+    console.log("Followers & fans clicked");
+  });
+}
+
+function bindClick(id, handler) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener("click", (e) => {
+    e.preventDefault();
+    handler();
+  });
+}
+
+/* ========== BOOTSTRAP ========== */
+
+document.addEventListener("DOMContentLoaded", () => {
+  initSkaterDashboard().catch(err => {
+    console.error("Skater dashboard init failed", err);
+  });
+});
