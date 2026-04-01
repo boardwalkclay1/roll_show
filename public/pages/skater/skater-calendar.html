@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calendar • Roll Show</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/skater.css" />
+</head>
+<body class="bg-skater">
+
+  <div class="skater-shell">
+    <header class="page-header">
+      <h1>Calendar</h1>
+      <div class="calendar-filters">
+        <button data-filter="all" class="chip active">All</button>
+        <button data-filter="shows" class="chip">Shows</button>
+        <button data-filter="bookings" class="chip">Bookings</button>
+        <button data-filter="campaigns" class="chip">Campaigns</button>
+      </div>
+    </header>
+
+    <main class="skater-main">
+      <section class="skater-section">
+        <div id="calendar-grid" class="calendar-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="/js/skater/skater-calendar.js"></script>
+</body>
+</html>
