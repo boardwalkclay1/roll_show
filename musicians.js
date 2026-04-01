@@ -11,7 +11,7 @@ export async function signupMusician(request, env) {
   const base = await signupBase(env, body);
   if (base.error) return apiJson({ message: base.error }, 400);
 
-  await env.DB_musician.prepare(
+  await env.DB_musicians.prepare(
     `INSERT INTO musicians (id, user_id, bio, created_at)
      VALUES (?, ?, ?, ?)`
   ).bind(
@@ -28,17 +28,17 @@ export async function signupMusician(request, env) {
    MUSICIAN DASHBOARD
 ============================================================ */
 export async function musicianDashboard(request, env, user) {
-  const musician = await env.DB_musician.prepare(
+  const musician = await env.DB_musicians.prepare(
     "SELECT * FROM musicians WHERE user_id = ?"
   ).bind(user.id).first();
 
   if (!musician) return apiJson({ message: "Musician profile not found" }, 404);
 
-  const { results: tracks } = await env.DB_musician.prepare(
+  const { results: tracks } = await env.DB_musicians.prepare(
     "SELECT * FROM tracks WHERE artist_id = ? ORDER BY created_at DESC"
   ).bind(musician.id).all();
 
-  const { results: licenses } = await env.DB_musician.prepare(
+  const { results: licenses } = await env.DB_musicians.prepare(
     `SELECT l.*, t.title
      FROM track_licenses l
      JOIN tracks t ON l.track_id = t.id
@@ -63,7 +63,7 @@ export async function uploadTrack(request, env, user) {
     return apiJson({ message: "Missing R2 key for uploaded file." }, 400);
   }
 
-  const musician = await env.DB_musician.prepare(
+  const musician = await env.DB_musicians.prepare(
     "SELECT id FROM musicians WHERE user_id = ?"
   ).bind(user.id).first();
 
@@ -72,7 +72,7 @@ export async function uploadTrack(request, env, user) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB_musician.prepare(
+  await env.DB_musicians.prepare(
     `INSERT INTO tracks (id, artist_id, title, r2_key, artwork_r2_key, created_at)
      VALUES (?, ?, ?, ?, ?, ?)`
   ).bind(id, musician.id, title, r2_key, artwork_r2_key || null, now).run();
@@ -84,8 +84,10 @@ export async function uploadTrack(request, env, user) {
    PUBLIC MUSIC LIBRARY
 ============================================================ */
 export async function listMusic(env) {
-  const { results } = await env.DB_musician.prepare(
-    "SELECT id, artist_id, title, artwork_r2_key, created_at FROM tracks ORDER BY created_at DESC"
+  const { results } = await env.DB_musicians.prepare(
+    `SELECT id, artist_id, title, artwork_r2_key, created_at
+     FROM tracks
+     ORDER BY created_at DESC`
   ).all();
 
   return apiJson({ tracks: results });
@@ -105,7 +107,7 @@ export async function licenseTrack(request, env, user) {
     return apiJson({ message: "Only skaters can license music." }, 403);
   }
 
-  const track = await env.DB_musician.prepare(
+  const track = await env.DB_musicians.prepare(
     "SELECT * FROM tracks WHERE id = ?"
   ).bind(trackId).first();
 
@@ -116,7 +118,7 @@ export async function licenseTrack(request, env, user) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB_musician.prepare(
+  await env.DB_musicians.prepare(
     `INSERT INTO track_licenses (id, track_id, skater_id, amount_cents, created_at)
      VALUES (?, ?, ?, ?, ?)`
   ).bind(id, trackId, skater.id, amount_cents || 1000, now).run();
