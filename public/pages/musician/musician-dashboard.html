@@ -35,7 +35,7 @@
       background: #000;
     }
 
-    /* TOP NAV — MUSICIAN ONLY, ROLL SHOW STYLE */
+    /* TOP NAV — MUSICIAN ONLY */
     .rs-top-nav {
       position: fixed;
       top: 0;
@@ -102,7 +102,7 @@
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #f3d9ff; /* keep purple only in text */
+      color: #f3d9ff;
     }
 
     .rs-dash-sub {
@@ -128,7 +128,7 @@
       margin-top: 4px;
     }
 
-    /* QUICK NAV TABS (SPA FEEL) */
+    /* QUICK NAV TABS */
     .rs-dash-tabs {
       display: flex;
       flex-wrap: wrap;
@@ -159,7 +159,7 @@
       border-color: rgba(255,255,255,0.6);
     }
 
-    /* GRID LAYOUT */
+    /* GRID */
     .rs-dash-grid {
       display: grid;
       grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr);
@@ -215,7 +215,7 @@
       border-color: rgba(255,255,255,0.6);
     }
 
-    /* RIGHT COLUMN PANELS */
+    /* RIGHT PANELS */
     .rs-dash-panel {
       padding: 14px 16px;
       font-size: 13px;
@@ -269,67 +269,71 @@
       color: rgba(255,255,255,0.8);
     }
 
-   /* LOADING OVERLAY WITH MUSIC NOTES — FINAL VERSION */
-.rs-loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 55%),
-              rgba(0,0,0,0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  z-index: 9999;
-  color: #fff;
-  font-size: 14px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+    /* ============================================================
+       FIXED LOADING OVERLAY — NEVER GETS STUCK
+    ============================================================ */
+    .rs-loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 55%),
+                  rgba(0,0,0,0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 9999;
+      color: #fff;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
 
-  /* fade-out support */
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.35s ease, visibility 0.35s ease;
-}
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
 
-.rs-loading-notes {
-  font-size: 32px;
-  margin-bottom: 10px;
-  animation: rs-notes 1.2s infinite ease-in-out;
-}
+    .rs-loading-notes {
+      font-size: 32px;
+      margin-bottom: 10px;
+      animation: rs-notes 1.2s infinite ease-in-out;
+    }
 
-@keyframes rs-notes {
-  0% { transform: translateY(0); opacity: 0.4; }
-  50% { transform: translateY(-6px); opacity: 1; }
-  100% { transform: translateY(0); opacity: 0.4; }
-}
+    @keyframes rs-notes {
+      0% { transform: translateY(0); opacity: 0.4; }
+      50% { transform: translateY(-6px); opacity: 1; }
+      100% { transform: translateY(0); opacity: 0.4; }
+    }
 
-/* JS adds this when data is ready */
-.rs-loading-overlay.rs-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
+    .rs-loading-overlay.rs-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
-  .rs-dash-shell {
-    margin-top: 80px;
-  }
-  .rs-dash-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .rs-dash-shell {
+        margin-top: 80px;
+      }
+      .rs-dash-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body class="rs-body">
 
   <!-- BACKGROUND -->
   <img src="/app/images/backs/Roll-music.jpg" class="bg-landing" alt="Background">
 
-  <!-- LOADING OVERLAY (HIDDEN BY JS WHEN READY) -->
+  <!-- LOADING OVERLAY -->
   <div id="musician-loading" class="rs-loading-overlay">
     <div class="rs-loading-notes">🎵 🎶 🎵</div>
     <div>Loading your artist dashboard…</div>
   </div>
 
-  <!-- TOP NAV — MUSICIAN ONLY -->
+  <!-- TOP NAV -->
   <nav class="rs-top-nav">
     <a href="/pages/musician/musician-dashboard.html" class="rs-active">🎤 Artist Home</a>
     <a href="/pages/musician/musician-profile.html">Profile</a>
@@ -346,7 +350,7 @@
 
   <main class="rs-dash-shell rs-dash-musician">
 
-    <!-- HEADER: NAME + MAIN EARNINGS -->
+    <!-- HEADER -->
     <header class="rs-dash-header">
       <div>
         <h1 class="rs-dash-title" id="artist-name">Artist Name</h1>
@@ -358,7 +362,7 @@
       </div>
     </header>
 
-    <!-- TABS (SPA FEEL) -->
+    <!-- TABS -->
     <nav class="rs-dash-tabs" id="artist-nav">
       <button class="rs-dash-tab rs-active" data-section="overview">Overview</button>
       <button class="rs-dash-tab" data-section="music">Music</button>
@@ -367,15 +371,13 @@
       <button class="rs-dash-tab" data-section="tools">Tools</button>
     </nav>
 
-    <!-- OVERVIEW SECTION -->
+    <!-- OVERVIEW -->
     <section class="rs-dash-section" id="section-overview">
       <div class="rs-dash-grid">
 
         <article class="rs-dash-card">
           <h3>Today & This Week</h3>
-          <ul class="rs-dash-list" id="artist-overview-list">
-            <!-- JS: quick stats like plays today, new followers, track added, etc. -->
-          </ul>
+          <ul class="rs-dash-list" id="artist-overview-list"></ul>
           <a class="rs-dash-pill" href="/pages/musician/musician-analytics.html">Open Full Analytics</a>
         </article>
 
@@ -404,7 +406,7 @@
       </div>
     </section>
 
-    <!-- MUSIC SECTION -->
+    <!-- MUSIC -->
     <section class="rs-dash-section" id="section-music" style="display:none;">
       <div class="rs-dash-grid">
 
@@ -423,15 +425,13 @@
       </div>
     </section>
 
-    <!-- AUDIENCE SECTION -->
+    <!-- AUDIENCE -->
     <section class="rs-dash-section" id="section-audience" style="display:none;">
       <div class="rs-dash-grid">
 
         <article class="rs-dash-card">
           <h3>Audience Snapshot</h3>
-          <ul class="rs-dash-list" id="artist-audience-list">
-            <!-- JS: top cities, top shows using tracks, etc. -->
-          </ul>
+          <ul class="rs-dash-list" id="artist-audience-list"></ul>
           <a class="rs-dash-pill" href="/pages/musician/musician-analytics.html">Audience Analytics</a>
         </article>
 
@@ -444,15 +444,13 @@
       </div>
     </section>
 
-    <!-- CONTRACTS SECTION -->
+    <!-- CONTRACTS -->
     <section class="rs-dash-section" id="section-contracts" style="display:none;">
       <div class="rs-dash-grid">
 
         <article class="rs-dash-card">
           <h3>Active Contracts</h3>
-          <ul class="rs-dash-list" id="artist-contracts">
-            <!-- JS: list of active contracts -->
-          </ul>
+          <ul class="rs-dash-list" id="artist-contracts"></ul>
           <a class="rs-dash-pill" href="/pages/musician/musician-contracts.html">View All Contracts</a>
         </article>
 
@@ -465,43 +463,18 @@
       </div>
     </section>
 
-    <!-- TOOLS SECTION -->
+    <!-- TOOLS -->
     <section class="rs-dash-section" id="section-tools" style="display:none;">
       <div class="rs-dash-grid">
 
         <article class="rs-dash-card">
-          <h3>Upload Track</h3>
-          <p>Upload new music directly from here.</p>
-          <a class="rs-dash-pill" href="/pages/musician/upload-track.html">Upload Track</a>
-        </article>
+          <h3>Upload Track</Clay — I got you.  
+You don’t need to redo your database.  
+You don’t need to redo your backend.  
+You don’t need to redo your whole dashboard.
 
-        <article class="rs-dash-card">
-          <h3>Branding Studio</h3>
-          <p>Edit your artist visuals, logos, and promo assets.</p>
-          <a class="rs-dash-pill" href="/pages/musician/branding-studio.html">Branding Studio</a>
-        </article>
+**Your HTML is fine — except for ONE fatal issue:  
+your `<style>` block is BROKEN.**
 
-        <article class="rs-dash-card">
-          <h3>Music Library</h3>
-          <p>Manage your full public music library.</p>
-          <a class="rs-dash-pill" href="/pages/musician/music-library.html">Open Library</a>
-        </article>
+Look at what you pasted:
 
-        <article class="rs-dash-card">
-          <h3>Profile & Collabs</h3>
-          <p>Update your profile and manage collaborations.</p>
-          <a class="rs-dash-pill" href="/pages/musician/musician-profile.html">Profile</a>
-          <a class="rs-dash-pill" href="/pages/musician/musician-collabs.html" style="margin-left:6px;">Collabs</a>
-        </article>
-
-      </div>
-    </section>
-
-    <p class="rs-dash-status" id="artist-status">
-      Welcome to your Roll Show musician dashboard. Use the tabs above to move through your tools without losing context.
-    </p>
-  </main>
-
-  <script type="module" src="/app/js/musician/musician-dashboard.js"></script>
-</body>
-</html>
