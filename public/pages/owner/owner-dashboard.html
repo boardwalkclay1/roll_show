@@ -15,61 +15,159 @@
   background-size: cover;
 ">
 
-  <div class="owner-shell">
+  <!-- BURGER (MOBILE) -->
+  <div class="burger">
+    <div></div>
+  </div>
 
-    <header class="page-header">
-      <h1>Owner Dashboard</h1>
-      <p>Platform-wide metrics, activity, and controls.</p>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">ROLL SHOW</div>
+
+    <div class="nav-section-label">Owner</div>
+    <a class="nav-link active" href="/pages/owner/owner-dashboard.html"><span>Owner Dashboard</span></a>
+    <a class="nav-link" href="/pages/owner/users.html"><span>Users</span></a>
+    <a class="nav-link" href="/pages/owner/skaters.html"><span>Skaters</span></a>
+    <a class="nav-link" href="/pages/owner/businesses.html"><span>Businesses</span></a>
+    <a class="nav-link" href="/pages/owner/musicians.html"><span>Musicians</span></a>
+    <a class="nav-link" href="/pages/owner/shows.html"><span>Shows</span></a>
+    <a class="nav-link" href="/pages/owner/contracts.html"><span>Contracts</span></a>
+    <a class="nav-link" href="/pages/owner/music.html"><span>Music Library</span></a>
+    <a class="nav-link" href="/pages/owner/business-application.html"><span>Applications</span></a>
+    <a class="nav-link" href="/pages/owner/owner-verifications.html"><span>Verifications</span></a>
+    <a class="nav-link" href="/pages/owner/owner-payout.html"><span>Payouts</span></a>
+    <a class="nav-link" href="/pages/owner/owner-analytics.html"><span>Analytics</span></a>
+    <a class="nav-link" href="/pages/owner/settings.html"><span>Settings</span></a>
+
+    <div class="nav-section-label">Dashboards</div>
+    <a class="nav-link" href="/pages/business/business-dashboard.html"><span>Business Dashboard</span></a>
+    <a class="nav-link" href="/pages/skater/skater-dashboard.html"><span>Skater Dashboard</span></a>
+    <a class="nav-link" href="/pages/musician/musician-dashboard.html"><span>Musician Dashboard</span></a>
+    <a class="nav-link" href="/pages/buyer/buyer-dashboard.html"><span>Buyer Dashboard</span></a>
+
+    <div class="nav-section-label">System</div>
+    <a class="nav-link" href="/pages/system/messages.html"><span>Messages</span></a>
+    <a class="nav-link" href="/pages/system/notifications.html"><span>Notifications</span></a>
+    <a class="nav-link" href="/pages/system/search.html"><span>Search</span></a>
+    <a class="nav-link" href="/pages/system/map.html"><span>Map</span></a>
+    <a class="nav-link" href="/pages/system/qr.html"><span>QR Scanner</span></a>
+    <a class="nav-link" href="/pages/system/settings.html"><span>System Settings</span></a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <header class="main-header">
+      <h1 class="title">Owner Dashboard</h1>
+      <p class="subtitle">Platform-wide metrics, activity, and controls.</p>
     </header>
 
-    <!-- CINEMATIC TILE GRID -->
-    <section class="tile-grid">
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+      <a href="/pages/owner/users.html" class="quick-btn">View Users</a>
+      <a href="/pages/owner/owner-analytics.html" class="quick-btn">View Analytics</a>
+      <a href="/pages/owner/owner-payout.html" class="quick-btn">Payouts</a>
+      <a href="/pages/owner/business-application.html" class="quick-btn">Review Applications</a>
+      <a href="/pages/owner/owner-verifications.html" class="quick-btn">Verifications</a>
+    </div>
 
-      <!-- OWNER MODULES -->
-      <a class="tile" href="/pages/owner/users.html"><h3>Users</h3></a>
-      <a class="tile" href="/pages/owner/skaters.html"><h3>Skaters</h3></a>
-      <a class="tile" href="/pages/owner/businesses.html"><h3>Businesses</h3></a>
-      <a class="tile" href="/pages/owner/musicians.html"><h3>Musicians</h3></a>
-      <a class="tile" href="/pages/owner/shows.html"><h3>Shows</h3></a>
-      <a class="tile" href="/pages/owner/contracts.html"><h3>Contracts</h3></a>
-      <a class="tile" href="/pages/owner/music.html"><h3>Music Library</h3></a>
-      <a class="tile" href="/pages/owner/business-application.html"><h3>Applications</h3></a>
-      <a class="tile" href="/pages/owner/owner-verifications.html"><h3>Verifications</h3></a>
-      <a class="tile" href="/pages/owner/owner-payout.html"><h3>Payouts</h3></a>
-      <a class="tile" href="/pages/owner/owner-analytics.html"><h3>Analytics</h3></a>
-      <a class="tile" href="/pages/owner/settings.html"><h3>Settings</h3></a>
+    <!-- STATS + MODULES -->
+    <section class="section-row">
 
-      <!-- BUSINESS DASHBOARD -->
-      <a class="tile" href="/pages/business/business-dashboard.html"><h3>Business Dashboard</h3></a>
+      <!-- STATS -->
+      <div>
+        <h2 class="subtitle" style="margin-bottom:10px;">Key Stats</h2>
+        <div id="overview-grid" class="stat-grid">
+          <!-- Filled by JS -->
+        </div>
+      </div>
 
-      <!-- SKATER DASHBOARD -->
-      <a class="tile" href="/pages/skater/skater-dashboard.html"><h3>Skater Dashboard</h3></a>
+      <!-- MODULE CARDS -->
+      <div>
+        <h2 class="subtitle" style="margin-bottom:10px;">Owner Modules</h2>
+        <div class="module-grid">
 
-      <!-- MUSICIAN DASHBOARD -->
-      <a class="tile" href="/pages/musician/musician-dashboard.html"><h3>Musician Dashboard</h3></a>
+          <a class="module-card" href="/pages/owner/users.html">
+            <div class="module-title">Users</div>
+            <div class="module-meta">Manage all platform users.</div>
+          </a>
 
-      <!-- BUYER DASHBOARD -->
-      <a class="tile" href="/pages/buyer/buyer-dashboard.html"><h3>Buyer Dashboard</h3></a>
+          <a class="module-card" href="/pages/owner/skaters.html">
+            <div class="module-title">Skaters</div>
+            <div class="module-meta">Profiles, activity, and status.</div>
+          </a>
 
-      <!-- SYSTEM MODULES -->
-      <a class="tile" href="/pages/system/messages.html"><h3>Messages</h3></a>
-      <a class="tile" href="/pages/system/notifications.html"><h3>Notifications</h3></a>
-      <a class="tile" href="/pages/system/search.html"><h3>Search</h3></a>
-      <a class="tile" href="/pages/system/map.html"><h3>Map</h3></a>
-      <a class="tile" href="/pages/system/qr.html"><h3>QR Scanner</h3></a>
-      <a class="tile" href="/pages/system/settings.html"><h3>System Settings</h3></a>
+          <a class="module-card" href="/pages/owner/businesses.html">
+            <div class="module-title">Businesses</div>
+            <div class="module-meta">Partners and sponsors.</div>
+          </a>
+
+          <a class="module-card" href="/pages/owner/musicians.html">
+            <div class="module-title">Musicians</div>
+            <div class="module-meta">Artists and releases.</div>
+          </a>
+
+          <a class="module-card" href="/pages/owner/shows.html">
+            <div class="module-title">Shows</div>
+            <div class="module-meta">Events and lineups.</div>
+          </a>
+
+          <a class="module-card" href="/pages/owner/contracts.html">
+            <div class="module-title">Contracts</div>
+            <div class="module-meta">Agreements and terms.</div>
+          </a>
+
+          <a class="module-card" href="/pages/owner/music.html">
+            <div class="module-title">Music Library</div>
+            <div class="module-meta">Tracks and rights.</div>
+          </a>
+
+          <a class="module-card" href="/pages/owner/business-application.html">
+            <div class="module-title">Applications</div>
+            <div class="module-meta">Pending business applications.</div>
+          </a>
+
+          <a class="module-card" href="/pages/owner/owner-verifications.html">
+            <div class="module-title">Verifications</div>
+            <div class="module-meta">ID and account checks.</div>
+          </a>
+
+          <a class="module-card" href="/pages/owner/owner-payout.html">
+            <div class="module-title">Payouts</div>
+            <div class="module-meta">Owner and partner payouts.</div>
+          </a>
+
+          <a class="module-card" href="/pages/owner/owner-analytics.html">
+            <div class="module-title">Analytics</div>
+            <div class="module-meta">Platform performance.</div>
+          </a>
+
+          <a class="module-card" href="/pages/owner/settings.html">
+            <div class="module-title">Settings</div>
+            <div class="module-meta">Platform configuration.</div>
+          </a>
+
+        </div>
+      </div>
 
     </section>
 
-    <!-- OVERVIEW -->
-    <section class="owner-section full-width">
-      <h2>Platform Overview</h2>
-      <div id="overview-grid" class="overview-grid"></div>
+    <!-- SYSTEM MODULES (TILES) -->
+    <section style="margin-top: 10px;">
+      <h2 class="subtitle" style="margin-bottom:10px;">System Modules</h2>
+      <div class="tile-grid">
+        <a class="tile" href="/pages/system/messages.html"><h3>Messages</h3></a>
+        <a class="tile" href="/pages/system/notifications.html"><h3>Notifications</h3></a>
+        <a class="tile" href="/pages/system/search.html"><h3>Search</h3></a>
+        <a class="tile" href="/pages/system/map.html"><h3>Map</h3></a>
+        <a class="tile" href="/pages/system/qr.html"><h3>QR Scanner</h3></a>
+        <a class="tile" href="/pages/system/settings.html"><h3>System Settings</h3></a>
+      </div>
     </section>
 
-    <!-- MIGRATIONS -->
-    <section class="owner-section full-width">
-      <h2>Database Tools</h2>
+    <!-- DATABASE TOOLS -->
+    <section style="margin-top: 28px;">
+      <h2 class="subtitle" style="margin-bottom:10px;">Database Tools</h2>
 
       <button id="runMigrationsBtn" class="danger-btn">
         Run All Migrations
@@ -78,7 +176,7 @@
       <div id="migrationResult" class="migration-output"></div>
     </section>
 
-  </div>
+  </main>
 
   <script type="module" src="/app/js/owner-dashboard.js"></script>
 
