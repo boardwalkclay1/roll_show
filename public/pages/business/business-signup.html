@@ -1,127 +1,62 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Roll Show — Business Application</title>
+  <meta charset="UTF-8">
+  <title>Business Signup – Roll Show</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- BRAND -->
-  <meta name="theme-color" content="#000000">
-  <link rel="icon" href="/app/images/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
-  <link rel="manifest" href="/manifest.webmanifest">
-
-  <!-- SOCIAL -->
-  <meta property="og:title" content="Roll Show — Business Application">
-  <meta property="og:description" content="Apply to join Roll Show as a verified business partner.">
-  <meta property="og:image" content="/app/images/roll-index.jpg">
-  <meta property="og:type" content="website">
-
-  <!-- GLOBAL STYLES -->
+  <link rel="icon" href="/favicon.png">
   <link rel="stylesheet" href="/app/styles/styles.css">
 
-  <!-- SERVICE WORKER -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js");
-    }
-  </script>
-
   <style>
-    /* FULL SCREEN BACKGROUND */
-    .bg-landing {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: contain;
-      object-position: center -40px;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* CONTENT ABOVE BACKGROUND */
-    .rs-auth-shell,
-    .rs-card {
-      position: relative;
-      z-index: 5;
-    }
-
-    /* BACK BUTTON — TOP LEFT */
     .back-btn {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: rgba(0,0,0,0.55);
-      padding: 10px 16px;
-      border-radius: 8px;
-      color: white;
-      text-decoration: none;
-      font-size: 16px;
-      font-weight: 600;
-      backdrop-filter: blur(4px);
-      transition: 0.2s;
-      z-index: 10;
+      position:absolute; top:20px; left:20px;
+      background:rgba(0,0,0,0.55);
+      padding:10px 16px; border-radius:8px;
+      color:white; font-weight:600; text-decoration:none;
+      backdrop-filter:blur(4px); transition:.2s;
     }
-    .back-btn:hover {
-      background: rgba(0,0,0,0.75);
-    }
+    .back-btn:hover { background:rgba(0,0,0,0.75); }
 
-    /* LEARN MORE BUTTON — ROLL SHOW STYLE */
     .learn-btn {
-      display: block;
-      margin-top: 18px;
-      text-align: center;
-      background: #ff0050;
-      padding: 12px 18px;
-      border-radius: 8px;
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      transition: 0.2s;
+      display:block; margin-top:18px; text-align:center;
+      background:#f5b400; color:#1a1200;
+      padding:12px 18px; border-radius:8px;
+      font-weight:700; text-decoration:none;
+      transition:.2s;
     }
-    .learn-btn:hover {
-      background: #ff3370;
-    }
+    .learn-btn:hover { background:#ffca33; }
   </style>
 </head>
 
-<body class="rs-body">
+<body style="background:url('/app/images/2nd-rd/roll-board-jump.jpg') center/contain no-repeat;">
 
-  <!-- BACK BUTTON -->
   <a href="/index.html" class="back-btn">← Back</a>
 
-  <!-- FULL SCREEN BACKGROUND -->
-  <img src="/app/images/2nd-rd/roll-board-jump.jpg" class="bg-landing" alt="Background">
+  <main class="signup-shell">
+    <h1>Business Application</h1>
 
-  <main class="rs-auth-shell">
-    <section class="rs-card">
-      <h1 class="rs-title">Business Application</h1>
-      <p class="rs-subtitle">Apply to join Roll Show as a verified business partner.</p>
+    <form id="business-apply-form" class="signup-form">
+      <input name="company_name" placeholder="Company Name" required>
+      <input name="website" placeholder="Website">
+      <input name="phone" placeholder="Phone">
+      <textarea name="address" rows="2" placeholder="Address"></textarea>
+      <input name="ein" placeholder="EIN / Tax ID">
+      <input name="name" placeholder="Your Name" required>
+      <input name="email" placeholder="Email" required>
+      <input name="password" placeholder="Password" required>
+      <button type="submit">Submit Application</button>
+    </form>
 
-      <form id="business-apply-form" class="rs-form">
-        <label>Company Name <input type="text" name="company_name" required /></label>
-        <label>Website <input type="url" name="website" placeholder="https://example.com" /></label>
-        <label>Phone <input type="tel" name="phone" /></label>
-        <label>Address <textarea name="address" rows="2"></textarea></label>
-        <label>EIN / Tax ID <input type="text" name="ein" placeholder="XX-XXXXXXX" /></label>
-        <label>Your Name <input type="text" name="name" required /></label>
-        <label>Email <input type="email" name="email" required /></label>
-        <label>Password <input type="password" name="password" required /></label>
+    <a href="/pages/learn/learn-business.html" class="learn-btn">
+      Learn More About Business Accounts
+    </a>
 
-        <button type="submit" class="rs-btn-primary">Submit Application</button>
-      </form>
-
-      <!-- LEARN MORE BUTTON (THIS IS THE ONE YOU WANTED) -->
-      <a href="/pages/learn/learn-business.html" class="learn-btn">
-        Learn More About Business Accounts
-      </a>
-
-      <div id="business-apply-message" class="rs-message"></div>
-    </section>
+    <p class="signup-login-link">
+      Already have an account?
+      <a href="/pages/auth-login.html?role=business">Log in</a>
+    </p>
   </main>
 
-  <!-- BUSINESS SIGNUP JS -->
-  <script src="/app/js/business/business-signup.js" type="module"></script>
+  <script type="module" src="/app/js/business/business-signup.js"></script>
 </body>
 </html>
