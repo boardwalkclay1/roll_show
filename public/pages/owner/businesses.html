@@ -1,72 +1,77 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Roll Show — Owner Dashboard: Businesses</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- BRAND -->
-  <link rel="icon" href="/app/images/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="/app/images/icons/icon-512.png">
-  <link rel="manifest" href="/manifest.webmanifest">
-
-  <!-- GLOBAL STYLES -->
-  <link rel="stylesheet" href="/app/styles/styles.css">
-
-  <!-- SERVICE WORKER -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js");
-    }
-  </script>
+  <title>Owner • Businesses</title>
+  <link rel="icon" href="/favicon.png" />
+  <link rel="stylesheet" href="/app/styles/styles.css" />
+  <link rel="stylesheet" href="/pages/owner/css/owner.css" />
+  <style>
+    .bg-landing { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: cover; filter: brightness(0.35); z-index: -2; }
+    .owner-shell { padding: 30px; max-width: 1500px; margin: 0 auto; color: white; }
+    .page-header h1 { font-size: 36px; font-weight: 800; margin-bottom: 5px; }
+    .page-header p { opacity: 0.8; margin-bottom: 25px; }
+    .section-title { margin: 25px 0 10px; font-size: 22px; font-weight: 700; border-left: 4px solid gold; padding-left: 10px; }
+    .panel { background: rgba(0,0,0,0.55); border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); padding: 18px; backdrop-filter: blur(6px); }
+    .layout-grid { display: grid; grid-template-columns: 2fr 1.2fr; gap: 20px; }
+    .filters { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .filters input, .filters select { padding: 8px 10px; border-radius: 6px; border: none; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    th { text-align: left; opacity: 0.8; font-weight: 600; }
+    tr:hover { background: rgba(255,255,255,0.05); cursor: pointer; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; background: rgba(255,255,255,0.15); }
+  </style>
 </head>
+<body>
+  <img src="/favicon.png" class="bg-landing" alt="Background" />
 
-<body class="rs-body">
-
-  <!-- SIDEBAR -->
-  <aside class="rs-sidebar">
-    <div class="rs-sidebar-logo">ROLL SHOW</div>
-
-    <nav class="rs-sidebar-nav">
-      <a href="/pages/owner/owner-dashboard.html">Dashboard</a>
-      <a href="/pages/owner/users.html">Users</a>
-      <a href="/pages/owner/skaters.html">Skaters</a>
-      <a href="/pages/owner/businesses.html" class="active">Businesses</a>
-      <a href="/pages/owner/musicians.html">Musicians</a>
-      <a href="/pages/owner/shows.html">Shows</a>
-      <a href="/pages/owner/contracts.html">Contracts</a>
-      <a href="/pages/owner/music.html">Music</a>
-      <a href="/pages/owner/settings.html">Settings</a>
-    </nav>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main class="rs-main">
-    <header class="rs-header">
-      <h1 class="rs-title">Businesses</h1>
-      <p class="rs-subtitle">All verified and pending businesses on Roll Show.</p>
+  <div class="owner-shell">
+    <header class="page-header">
+      <h1>Businesses</h1>
+      <p>Brands, sponsorship capabilities, and ad readiness.</p>
     </header>
 
-    <section class="rs-card rs-table-card">
-      <table class="rs-table">
-        <thead>
-          <tr>
-            <th>Business Name</th>
-            <th>Contact Email</th>
-            <th>Offers</th>
-            <th>Join Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+    <div class="layout-grid">
+      <div>
+        <h2 class="section-title">Business List</h2>
+        <div class="panel">
+          <div class="filters">
+            <input id="businessSearch" type="text" placeholder="Search by company or email" />
+            <select id="businessStatus">
+              <option value="">All statuses</option>
+              <option value="approved">Approved</option>
+              <option value="pending">Pending</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div style="max-height: 500px; overflow: auto;">
+            <table id="businessesTable">
+              <thead>
+                <tr>
+                  <th>Company</th>
+                  <th>Owner</th>
+                  <th>Status</th>
+                  <th>Verified</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- JS injects rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-        <tbody id="businesses-table-body">
-          <!-- JS will populate rows -->
-        </tbody>
-      </table>
-    </section>
-  </main>
+      <div>
+        <h2 class="section-title">Business Details</h2>
+        <div class="panel" id="businessDetail">
+          <p>Select a business to view profile, sponsorship settings, and ad account status.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!-- JS -->
-  <script src="/app/js/owner/businesses.js" type="module"></script>
+  <script type="module" src="/app/js/owner/businesses.js"></script>
 </body>
 </html>
