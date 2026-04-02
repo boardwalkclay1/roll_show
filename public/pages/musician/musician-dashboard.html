@@ -9,69 +9,309 @@
   <link rel="stylesheet" href="/app/styles/styles.css">
   <link rel="stylesheet" href="/app/styles/dashboard.css">
 
+  <!-- CURSIVE FONT FOR BRAND LINKS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* LIGHT PURPLE DASHBOARD ACCENTS */
-    .rs-dash-musician .rs-dash-header,
-    .rs-dash-musician .rs-dash-card {
-      background: rgba(120, 60, 180, 0.45); /* translucent purple */
-      border: 1px solid rgba(255,255,255,0.25);
-      backdrop-filter: blur(6px);
+    /* BACKGROUND IMAGE LOCKED */
+    .bg-landing {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(0.35);
+      z-index: -2;
+      pointer-events: none;
     }
 
-    .rs-dash-musician .rs-dash-title {
-      color: #f3d9ff; /* soft lavender */
-    }
-
-    .rs-dash-musician .rs-dash-sub {
-      color: #e8caff;
-    }
-
-    .rs-dash-musician .rs-dash-pill {
-      background: #b46cff;
-      border: 2px solid #000;
+    body.rs-body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #fff;
+      background: #000;
     }
 
-    .rs-dash-musician .rs-dash-pill:hover {
-      background: #c98aff;
-    }
-
-    /* TOP NAVIGATION — ROLL SHOW STYLE */
+    /* TOP NAV — MUSICIAN ONLY, ROLL SHOW STYLE */
     .rs-top-nav {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      padding: 14px 20px;
+      padding: 12px 20px;
       display: flex;
       justify-content: center;
-      gap: 22px;
+      gap: 18px;
       z-index: 20;
       background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(6px);
-      border-bottom: 1px solid rgba(255,255,255,0.25);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255,255,255,0.18);
     }
 
     .rs-top-nav a {
       color: #fff;
       font-family: "Dancing Script", cursive;
-      font-size: 24px;
+      font-size: 22px;
       text-decoration: none;
-      padding: 6px 12px;
+      padding: 4px 10px;
       transition: 0.2s;
     }
 
     .rs-top-nav a:hover {
-      color: #ffd8ff;
+      color: #ffe6ff;
       transform: translateY(-2px);
     }
+
+    .rs-top-nav a.rs-active {
+      color: #ffd2ff;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    /* MAIN DASH SHELL */
+    .rs-dash-shell {
+      max-width: 1320px;
+      margin: 90px auto 40px;
+      padding: 0 20px 40px;
+      box-sizing: border-box;
+    }
+
+    .rs-dash-musician .rs-dash-header,
+    .rs-dash-musician .rs-dash-card,
+    .rs-dash-musician .rs-dash-panel {
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
+    }
+
+    .rs-dash-header {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .rs-dash-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #f3d9ff; /* keep purple only in text */
+    }
+
+    .rs-dash-sub {
+      font-size: 14px;
+      color: #e8caff;
+      margin-top: 4px;
+    }
+
+    .rs-dash-stat-main {
+      text-align: right;
+    }
+
+    .rs-dash-stat-label {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .rs-dash-stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    /* QUICK NAV TABS (SPA FEEL) */
+    .rs-dash-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .rs-dash-tab {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.28);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: 0.18s;
+    }
+
+    .rs-dash-tab:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .rs-dash-tab.rs-active {
+      background: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.6);
+    }
+
+    /* GRID LAYOUT */
+    .rs-dash-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .rs-dash-card {
+      padding: 16px 16px 14px;
+    }
+
+    .rs-dash-card h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .rs-dash-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .rs-dash-list li {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .rs-dash-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.28);
+      color: #f3d9ff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: 0.18s;
+    }
+
+    .rs-dash-pill:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.6);
+    }
+
+    /* RIGHT COLUMN PANELS */
+    .rs-dash-panel {
+      padding: 14px 16px;
+      font-size: 13px;
+    }
+
+    .rs-dash-panel h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .rs-dash-panel p {
+      margin: 4px 0;
+      color: #e0e0e0;
+    }
+
+    .rs-dash-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .rs-dash-metric {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.28);
+      font-size: 12px;
+    }
+
+    .rs-dash-metric-label {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 4px;
+    }
+
+    .rs-dash-metric-value {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    /* STATUS LINE */
+    .rs-dash-status {
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* LOADING OVERLAY WITH MUSIC NOTES */
+    .rs-loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 55%),
+                  rgba(0,0,0,0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 50;
+      color: #fff;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .rs-loading-notes {
+      font-size: 32px;
+      margin-bottom: 10px;
+      animation: rs-notes 1.2s infinite ease-in-out;
+    }
+
+    @keyframes rs-notes {
+      0% { transform: translateY(0); opacity: 0.4; }
+      50% { transform: translateY(-6px); opacity: 1; }
+      100% { transform: translateY(0); opacity: 0.4; }
+    }
+
+    .rs-loading-overlay.rs-hidden {
+      display: none;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .rs-dash-shell {
+        margin-top: 80px;
+      }
+      .rs-dash-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
   </style>
-
-  <!-- CURSIVE FONT -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
-
 </head>
 
 <body class="rs-body">
@@ -79,68 +319,183 @@
   <!-- BACKGROUND -->
   <img src="/app/images/backs/Roll-music.jpg" class="bg-landing" alt="Background">
 
-  <!-- TOP NAVIGATION (ROLL SHOW STYLE) -->
+  <!-- LOADING OVERLAY (HIDDEN BY JS WHEN READY) -->
+  <div id="musician-loading" class="rs-loading-overlay">
+    <div class="rs-loading-notes">🎵 🎶 🎵</div>
+    <div>Loading your artist dashboard…</div>
+  </div>
+
+  <!-- TOP NAV — MUSICIAN ONLY -->
   <nav class="rs-top-nav">
-    <a href="/pages/skater/skater-dashboard.html">🛹🛼 Skater</a>
-    <a href="/pages/musician/musician-dashboard.html">🎤🎵 Artist</a>
-    <a href="/pages/business/business-dashboard.html">💼 Business</a>
-    <a href="/pages/buyer/buyer-dashboard.html">🎫✨ Buyer</a>
-    <a href="/pages/owner/owner-dashboard.html">👑 Owner</a>
+    <a href="/pages/musician/musician-dashboard.html" class="rs-active">🎤 Artist Home</a>
+    <a href="/pages/musician/musician-profile.html">Profile</a>
+    <a href="/pages/musician/tracks.html">Tracks</a>
+    <a href="/pages/musician/musician-albulms.html">Albums</a>
+    <a href="/pages/musician/musician-analytics.html">Analytics</a>
+    <a href="/pages/musician/musician-collabs.html">Collabs</a>
+    <a href="/pages/musician/musician-feed.html">Feed</a>
+    <a href="/pages/musician/branding-studio.html">Branding Studio</a>
+    <a href="/pages/musician/music-library.html">Music Library</a>
+    <a href="/pages/musician/upload-track.html">Upload</a>
+    <a href="/pages/musician/musician-contracts.html">Contracts</a>
   </nav>
 
   <main class="rs-dash-shell rs-dash-musician">
 
+    <!-- HEADER: NAME + MAIN EARNINGS -->
     <header class="rs-dash-header">
       <div>
-        <h1 class="rs-dash-title" id="artist-name">Artist</h1>
-        <p class="rs-dash-sub">Your tracks, licenses, and tools.</p>
+        <h1 class="rs-dash-title" id="artist-name">Artist Name</h1>
+        <p class="rs-dash-sub">Your music, contracts, and audience in one place.</p>
       </div>
-      <div class="rs-dash-stat" id="artist-earnings">$0.00</div>
+      <div class="rs-dash-stat-main">
+        <div class="rs-dash-stat-label">Lifetime Earnings</div>
+        <div class="rs-dash-stat-value" id="artist-earnings">$0.00</div>
+      </div>
     </header>
 
-    <nav class="rs-dash-nav" id="artist-nav"></nav>
+    <!-- TABS (SPA FEEL) -->
+    <nav class="rs-dash-tabs" id="artist-nav">
+      <button class="rs-dash-tab rs-active" data-section="overview">Overview</button>
+      <button class="rs-dash-tab" data-section="music">Music</button>
+      <button class="rs-dash-tab" data-section="audience">Audience</button>
+      <button class="rs-dash-tab" data-section="contracts">Contracts</button>
+      <button class="rs-dash-tab" data-section="tools">Tools</button>
+    </nav>
 
-    <section class="rs-dash-grid">
+    <!-- OVERVIEW SECTION -->
+    <section class="rs-dash-section" id="section-overview">
+      <div class="rs-dash-grid">
 
-      <article class="rs-dash-card">
-        <h3>Tracks</h3>
-        <ul class="rs-dash-list" id="artist-tracks"></ul>
-        <a class="rs-dash-pill" id="tracks-link">View All Tracks</a>
-      </article>
+        <article class="rs-dash-card">
+          <h3>Today & This Week</h3>
+          <ul class="rs-dash-list" id="artist-overview-list">
+            <!-- JS: quick stats like plays today, new followers, track added, etc. -->
+          </ul>
+          <a class="rs-dash-pill" href="/pages/musician/musician-analytics.html">Open Full Analytics</a>
+        </article>
 
-      <article class="rs-dash-card">
-        <h3>Licenses</h3>
-        <ul class="rs-dash-list" id="artist-licenses"></ul>
-        <a class="rs-dash-pill" id="licenses-link">View All Licenses</a>
-      </article>
+        <aside class="rs-dash-panel">
+          <h3>Key Metrics</h3>
+          <div class="rs-dash-metrics">
+            <div class="rs-dash-metric">
+              <div class="rs-dash-metric-label">Followers</div>
+              <div class="rs-dash-metric-value" id="metric-followers">0</div>
+            </div>
+            <div class="rs-dash-metric">
+              <div class="rs-dash-metric-label">Monthly Plays</div>
+              <div class="rs-dash-metric-value" id="metric-monthly-plays">0</div>
+            </div>
+            <div class="rs-dash-metric">
+              <div class="rs-dash-metric-label">Active Licenses</div>
+              <div class="rs-dash-metric-value" id="metric-licenses">0</div>
+            </div>
+            <div class="rs-dash-metric">
+              <div class="rs-dash-metric-label">Open Contracts</div>
+              <div class="rs-dash-metric-value" id="metric-contracts">0</div>
+            </div>
+          </div>
+        </aside>
 
-      <article class="rs-dash-card">
-        <h3>Feed</h3>
-        <p>Quick access to your musician feed.</p>
-        <a class="rs-dash-pill" id="feed-link">Open Feed</a>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Upload Track</h3>
-        <p>Upload new music directly from here.</p>
-        <a class="rs-dash-pill" id="upload-link">Upload Track</a>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Branding Studio</h3>
-        <p>Edit your musician brand assets.</p>
-        <a class="rs-dash-pill" id="branding-link">Branding Studio</a>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Music Library</h3>
-        <p>Your full public music library.</p>
-        <a class="rs-dash-pill" id="library-link">Open Library</a>
-      </article>
-
+      </div>
     </section>
 
-    <p class="rs-dash-status" id="artist-status"></p>
+    <!-- MUSIC SECTION -->
+    <section class="rs-dash-section" id="section-music" style="display:none;">
+      <div class="rs-dash-grid">
+
+        <article class="rs-dash-card">
+          <h3>Recent Tracks</h3>
+          <ul class="rs-dash-list" id="artist-tracks"></ul>
+          <a class="rs-dash-pill" href="/pages/musician/tracks.html">View All Tracks</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Licenses</h3>
+          <ul class="rs-dash-list" id="artist-licenses"></ul>
+          <a class="rs-dash-pill" href="/pages/musician/musician-analytics.html">License Analytics</a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- AUDIENCE SECTION -->
+    <section class="rs-dash-section" id="section-audience" style="display:none;">
+      <div class="rs-dash-grid">
+
+        <article class="rs-dash-card">
+          <h3>Audience Snapshot</h3>
+          <ul class="rs-dash-list" id="artist-audience-list">
+            <!-- JS: top cities, top shows using tracks, etc. -->
+          </ul>
+          <a class="rs-dash-pill" href="/pages/musician/musician-analytics.html">Audience Analytics</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Feed & Engagement</h3>
+          <p>Stay active with your followers and collaborators.</p>
+          <a class="rs-dash-pill" href="/pages/musician/musician-feed.html">Open Feed</a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- CONTRACTS SECTION -->
+    <section class="rs-dash-section" id="section-contracts" style="display:none;">
+      <div class="rs-dash-grid">
+
+        <article class="rs-dash-card">
+          <h3>Active Contracts</h3>
+          <ul class="rs-dash-list" id="artist-contracts">
+            <!-- JS: list of active contracts -->
+          </ul>
+          <a class="rs-dash-pill" href="/pages/musician/musician-contracts.html">View All Contracts</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Send New Contract</h3>
+          <p>Start a new agreement with a skater, business, or Roll Show.</p>
+          <a class="rs-dash-pill" href="/pages/musician/musician-contracts.html#new">Create Contract</a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- TOOLS SECTION -->
+    <section class="rs-dash-section" id="section-tools" style="display:none;">
+      <div class="rs-dash-grid">
+
+        <article class="rs-dash-card">
+          <h3>Upload Track</h3>
+          <p>Upload new music directly from here.</p>
+          <a class="rs-dash-pill" href="/pages/musician/upload-track.html">Upload Track</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Branding Studio</h3>
+          <p>Edit your artist visuals, logos, and promo assets.</p>
+          <a class="rs-dash-pill" href="/pages/musician/branding-studio.html">Branding Studio</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Music Library</h3>
+          <p>Manage your full public music library.</p>
+          <a class="rs-dash-pill" href="/pages/musician/music-library.html">Open Library</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Profile & Collabs</h3>
+          <p>Update your profile and manage collaborations.</p>
+          <a class="rs-dash-pill" href="/pages/musician/musician-profile.html">Profile</a>
+          <a class="rs-dash-pill" href="/pages/musician/musician-collabs.html" style="margin-left:6px;">Collabs</a>
+        </article>
+
+      </div>
+    </section>
+
+    <p class="rs-dash-status" id="artist-status">
+      Welcome to your Roll Show musician dashboard. Use the tabs above to move through your tools without losing context.
+    </p>
   </main>
 
   <script type="module" src="/app/js/musician/musician-dashboard.js"></script>
