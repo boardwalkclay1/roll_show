@@ -13,128 +13,478 @@
   <!-- PLATFORM CSS -->
   <link rel="stylesheet" href="/app/styles/styles.css">
   <link rel="stylesheet" href="/app/styles/dashboard.css">
+
+  <!-- BRAND FONT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* BACKGROUND */
+    .bg-landing {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(0.35);
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    body.rs-body {
+      margin: 0;
+      color: #fff;
+      background: #000;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    /* TOP NAV — BUSINESS ONLY */
+    .rs-top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      z-index: 20;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .rs-top-nav a {
+      color: #fff;
+      font-family: "Dancing Script", cursive;
+      font-size: 22px;
+      text-decoration: none;
+      padding: 4px 10px;
+      transition: 0.2s;
+    }
+
+    .rs-top-nav a:hover {
+      color: #ffe6c7;
+      transform: translateY(-2px);
+    }
+
+    .rs-top-nav a.rs-active {
+      color: #ffdca0;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    /* MAIN SHELL */
+    .rs-dash-shell {
+      max-width: 1320px;
+      margin: 90px auto 40px;
+      padding: 0 20px 40px;
+      box-sizing: border-box;
+    }
+
+    /* GLASS CARDS */
+    .rs-dash-business .rs-dash-header,
+    .rs-dash-business .rs-dash-card,
+    .rs-dash-business .rs-dash-panel {
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
+    }
+
+    /* HEADER */
+    .rs-dash-header {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .rs-dash-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #ffe6c7;
+    }
+
+    .rs-dash-sub {
+      font-size: 14px;
+      color: #f7dcb8;
+      margin-top: 4px;
+    }
+
+    .rs-dash-stat {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffdca0;
+    }
+
+    /* TABS (SPA FEEL) */
+    .rs-dash-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .rs-dash-tab {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.28);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: 0.18s;
+    }
+
+    .rs-dash-tab:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .rs-dash-tab.rs-active {
+      background: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.6);
+    }
+
+    /* GRID */
+    .rs-dash-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .rs-dash-card {
+      padding: 16px 16px 14px;
+    }
+
+    .rs-dash-card h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .rs-dash-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .rs-dash-list li {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .rs-dash-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.28);
+      color: #ffe6c7;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: 0.18s;
+    }
+
+    .rs-dash-pill:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.6);
+    }
+
+    /* RIGHT PANELS */
+    .rs-dash-panel {
+      padding: 14px 16px;
+      font-size: 13px;
+    }
+
+    .rs-dash-panel h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* LOADING OVERLAY */
+    .rs-loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 55%),
+                  rgba(0,0,0,0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 50;
+      color: #fff;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .rs-loading-gold {
+      font-size: 32px;
+      margin-bottom: 10px;
+      animation: goldPulse 1.2s infinite ease-in-out;
+    }
+
+    @keyframes goldPulse {
+      0% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.08); }
+      100% { opacity: 0.4; transform: scale(1); }
+    }
+
+    .rs-loading-overlay.rs-hidden {
+      display: none;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .rs-dash-shell { margin-top: 80px; }
+      .rs-dash-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
 </head>
 
 <body class="rs-body">
 
-  <!-- FULLSCREEN CINEMATIC BACKGROUND -->
+  <!-- BACKGROUND -->
   <img src="/app/images/backs/roll-show-gold.jpg" class="bg-landing" alt="Background">
+
+  <!-- LOADING OVERLAY -->
+  <div id="business-loading" class="rs-loading-overlay">
+    <div class="rs-loading-gold">✨</div>
+    <div>Loading your business dashboard…</div>
+  </div>
+
+  <!-- TOP NAV — BUSINESS ONLY -->
+  <nav class="rs-top-nav">
+    <a href="/pages/business/business-dashboard.html" class="rs-active">💼 Business Home</a>
+    <a href="/pages/business/business-profile.html">Profile</a>
+    <a href="/pages/business/business-campaigns.html">Campaigns</a>
+    <a href="/pages/business/business-sponsorships.html">Sponsorships</a>
+    <a href="/pages/business/business-bookings.html">Bookings</a>
+    <a href="/pages/business/business-analytics.html">Analytics</a>
+    <a href="/pages/business/branding-studio.html">Branding</a>
+    <a href="/pages/business/offers.html">Offers</a>
+    <a href="/pages/business/offers-inbox.html">Inbox</a>
+    <a href="/pages/business/contracts.html">Contracts</a>
+    <a href="/pages/business/business-feed.html">Feed</a>
+    <a href="/pages/business/apply.html">Application</a>
+  </nav>
 
   <main class="rs-dash-shell rs-dash-business">
 
     <!-- HEADER -->
     <header class="rs-dash-header">
       <div>
-        <h1 class="rs-dash-title">Business Dashboard</h1>
+        <h1 class="rs-dash-title" id="business-name">Business Dashboard</h1>
         <p class="rs-dash-sub">Your campaigns, sponsorships, bookings, analytics, and brand tools.</p>
       </div>
       <div class="rs-dash-stat" id="business-revenue">$0.00</div>
     </header>
 
-    <!-- NAV -->
-    <nav class="rs-dash-nav" id="business-nav">
-      <a href="/business-dashboard.html" class="rs-dash-nav-link active">Dashboard</a>
-      <a href="/business-profile.html" class="rs-dash-nav-link">Profile</a>
-      <a href="/business-campains.html" class="rs-dash-nav-link">Campaigns</a>
-      <a href="/business-sponsorships.html" class="rs-dash-nav-link">Sponsorships</a>
-      <a href="/business-bookings.html" class="rs-dash-nav-link">Bookings</a>
-      <a href="/business-analytics.html" class="rs-dash-nav-link">Analytics</a>
-      <a href="/branding-studio.html" class="rs-dash-nav-link">Branding Studio</a>
-      <a href="/offers.html" class="rs-dash-nav-link">Offers</a>
-      <a href="/offers-inbox.html" class="rs-dash-nav-link">Offers Inbox</a>
-      <a href="/contracts.html" class="rs-dash-nav-link">Contracts</a>
-      <a href="/business-feed.html" class="rs-dash-nav-link">Feed</a>
-      <a href="/apply.html" class="rs-dash-nav-link">Application</a>
+    <!-- TABS -->
+    <nav class="rs-dash-tabs" id="business-tabs">
+      <button class="rs-dash-tab rs-active" data-section="overview">Overview</button>
+      <button class="rs-dash-tab" data-section="campaigns">Campaigns</button>
+      <button class="rs-dash-tab" data-section="sponsorships">Sponsorships</button>
+      <button class="rs-dash-tab" data-section="offers">Offers</button>
+      <button class="rs-dash-tab" data-section="contracts">Contracts</button>
+      <button class="rs-dash-tab" data-section="tools">Tools</button>
     </nav>
 
-    <!-- GRID -->
-    <section class="rs-dash-grid">
+    <!-- OVERVIEW -->
+    <section class="rs-dash-section" id="section-overview">
+      <div class="rs-dash-grid">
 
-      <!-- PROFILE -->
-      <article class="rs-dash-card">
-        <h3>Business Profile</h3>
-        <p>Manage your business identity, verification, and public presence.</p>
-        <a class="rs-dash-pill" href="/business-profile.html">Open Profile</a>
-      </article>
+        <article class="rs-dash-card">
+          <h3>Recent Activity</h3>
+          <ul class="rs-dash-list" id="business-activity-list"></ul>
+          <a class="rs-dash-pill" href="/pages/business/business-analytics.html">Open Analytics</a>
+        </article>
 
-      <!-- CAMPAIGNS -->
-      <article class="rs-dash-card">
-        <h3>Campaigns</h3>
-        <ul class="rs-dash-list" id="business-campaigns-mini"></ul>
-        <a class="rs-dash-pill" href="/business-campains.html">Open Campaigns</a>
-        <a class="rs-dash-pill" href="/create-offer.html">Create New Offer</a>
-      </article>
+        <aside class="rs-dash-panel">
+          <h3>Key Metrics</h3>
+          <div class="rs-dash-metrics">
+            <div class="rs-dash-metric">
+              <div class="rs-dash-metric-label">Active Campaigns</div>
+              <div class="rs-dash-metric-value" id="metric-campaigns">0</div>
+            </div>
+            <div class="rs-dash-metric">
+              <div class="rs-dash-metric-label">Sponsorships</div>
+              <div class="rs-dash-metric-value" id="metric-sponsorships">0</div>
+            </div>
+            <div class="rs-dash-metric">
+              <div class="rs-dash-metric-label">Bookings</div>
+              <div class="rs-dash-metric-value" id="metric-bookings">0</div>
+            </div>
+            <div class="rs-dash-metric">
+              <div class="rs-dash-metric-label">Open Offers</div>
+              <div class="rs-dash-metric-value" id="metric-offers">0</div>
+            </div>
+          </div>
+        </aside>
 
-      <!-- SPONSORSHIPS -->
-      <article class="rs-dash-card">
-        <h3>Sponsorships</h3>
-        <ul class="rs-dash-list" id="business-sponsorships-mini"></ul>
-        <a class="rs-dash-pill" href="/business-sponsorships.html">Manage Sponsorships</a>
-      </article>
-
-      <!-- BOOKINGS -->
-      <article class="rs-dash-card">
-        <h3>Bookings</h3>
-        <ul class="rs-dash-list" id="business-bookings-mini"></ul>
-        <a class="rs-dash-pill" href="/business-bookings.html">View Bookings</a>
-      </article>
-
-      <!-- ANALYTICS -->
-      <article class="rs-dash-card">
-        <h3>Analytics</h3>
-        <p>Track performance, engagement, and campaign results.</p>
-        <a class="rs-dash-pill" href="/business-analytics.html">Open Analytics</a>
-      </article>
-
-      <!-- BRANDING -->
-      <article class="rs-dash-card">
-        <h3>Branding Studio</h3>
-        <p>Upload logos, brand assets, and customize your business identity.</p>
-        <a class="rs-dash-pill" href="/branding-studio.html">Open Branding Studio</a>
-      </article>
-
-      <!-- OFFERS -->
-      <article class="rs-dash-card">
-        <h3>Offers</h3>
-        <ul class="rs-dash-list" id="business-offers-mini"></ul>
-        <a class="rs-dash-pill" href="/offers.html">View All Offers</a>
-        <a class="rs-dash-pill" href="/create-offer.html">Create Offer</a>
-      </article>
-
-      <!-- OFFERS INBOX -->
-      <article class="rs-dash-card">
-        <h3>Offers Inbox</h3>
-        <p>Incoming offers from skaters and collaborators.</p>
-        <a class="rs-dash-pill" href="/offers-inbox.html">Open Inbox</a>
-      </article>
-
-      <!-- CONTRACTS -->
-      <article class="rs-dash-card">
-        <h3>Contracts</h3>
-        <ul class="rs-dash-list" id="business-contracts-mini"></ul>
-        <a class="rs-dash-pill" href="/contracts.html">View Contracts</a>
-      </article>
-
-      <!-- FEED -->
-      <article class="rs-dash-card">
-        <h3>Business Feed</h3>
-        <p>Post updates, announcements, and engage with skaters.</p>
-        <a class="rs-dash-pill" href="/business-feed.html">Open Feed</a>
-      </article>
-
-      <!-- APPLICATION -->
-      <article class="rs-dash-card">
-        <h3>Business Application</h3>
-        <p>Review your verification status and required documents.</p>
-        <a class="rs-dash-pill" href="/apply.html">View Application</a>
-      </article>
-
+      </div>
     </section>
 
-    <p class="rs-dash-status" id="business-status"></p>
+    <!-- CAMPAIGNS -->
+    <section class="rs-dash-section" id="section-campaigns" style="display:none;">
+      <div class="rs-dash-grid">
+
+        <article class="rs-dash-card">
+          <h3>Campaigns</h3>
+          <ul class="rs-dash-list" id="business-campaigns-mini"></ul>
+          <a class="rs-dash-pill" href="/pages/business/business-campaigns.html">Open Campaigns</a>
+          <a class="rs-dash-pill" href="/pages/business/create-offer.html">Create Offer</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Bookings</h3>
+          <ul class="rs-dash-list" id="business-bookings-mini"></ul>
+          <a class="rs-dash-pill" href="/pages/business/business-bookings.html">View Bookings</a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- SPONSORSHIPS -->
+    <section class="rs-dash-section" id="section-sponsorships" style="display:none;">
+      <div class="rs-dash-grid">
+
+        <article class="rs-dash-card">
+          <h3>Sponsorships</h3>
+          <ul class="rs-dash-list" id="business-sponsorships-mini"></ul>
+          <a class="rs-dash-pill" href="/pages/business/business-sponsorships.html">Manage Sponsorships</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Branding Studio</h3>
+          <p>Upload logos, brand assets, and customize your identity.</p>
+          <a class="rs-dash-pill" href="/pages/business/branding-studio.html">Branding Studio</a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- OFFERS -->
+    <section class="rs-dash-section" id="section-offers" style="display:none;">
+      <div class="rs-dash-grid">
+
+        <article class="rs-dash-card">
+          <h3>Offers</h3>
+          <ul class="rs-dash-list" id="business-offers-mini"></ul>
+          <a class="rs-dash-pill" href="/pages/business/offers.html">View All Offers</a>
+          <a class="rs-dash-pill" href="/pages/business/create-offer.html">Create Offer</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Offers Inbox</h3>
+          <p>Incoming offers from skaters and collaborators.</p>
+          <a class="rs-dash-pill" href="/pages/business/offers-inbox.html">Open Inbox</a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- CONTRACTS -->
+    <section class="rs-dash-section" id="section-contracts" style="display:none;">
+      <div class="rs-dash-grid">
+
+        <article class="rs-dash-card">
+          <h3>Contracts</h3>
+          <ul class="rs-dash-list" id="business-contracts-mini"></ul>
+          <a class="rs-dash-pill" href="/pages/business/contracts.html">View Contracts</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Create Contract</h3>
+          <p>Start a new agreement with a skater or collaborator.</p>
+          <a class="rs-dash-pill" href="/pages/business/contracts.html#new">Create Contract</a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section class="rs-dash-section" id="section-tools" style="display:none;">
+      <div class="rs-dash-grid">
+
+        <article class="rs-dash-card">
+          <h3>Branding Studio</h3>
+          <p>Edit your business visuals, logos, and promo assets.</p>
+          <a class="rs-dash-pill" href="/pages/business/branding-studio.html">Branding Studio</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Feed</h3>
+          <p>Post updates, announcements, and engage with skaters.</p>
+          <a class="rs-dash-pill" href="/pages/business/business-feed.html">Open Feed</a>
+        </article>
+
+        <article class="rs-dash-card">
+          <h3>Application</h3>
+          <p>Review your verification status and required documents.</p>
+          <a class="rs-dash-pill" href="/pages/business/apply.html">View Application</a>
+        </article>
+
+      </div>
+    </section>
+
+    <p class="rs-dash-status" id="business-status">
+      Welcome to your Roll Show business dashboard. Use the tabs above to navigate without losing context.
+    </p>
   </main>
 
-  <!-- JS -->
-  <script type="module" src="/app/js/business/business-dashboard.js"></script>
-</body>
-</html>
+  <script type="module" src="/app/js/business/business-dashboardClay, I’ve got you — but before I rewrite the entire Business Dashboard **cleanly and completely**, I need one thing from you:
+
+### **Do you want the Business Dashboard to follow the EXACT same structure as the Musician Dashboard you approved?**
+
+Meaning:
+
+### **1. Top Nav (Business‑only)**
+- No Skater, Buyer, Musician links  
+- Only Business pages  
+- Same glass, cinematic Roll Show style  
+
+### **2. SPA‑Style Tabs**
+- Overview  
+- Campaigns  
+- Sponsorships  
+- Offers  
+- Contracts  
+- Tools  
+
+### **3. Grid Layout**
+- Left: cards  
+- Right: metrics panel  
+- All glass, gold‑accented, clean  
+
+### **4. Loading Screen**
+- Gold sparkles ✨  
+- Same animation style as musician  
+
+### **5. Remove all old links**
+Your current dashboard still links to:
+
