@@ -1,11 +1,55 @@
 import { apiJson, requireRole } from "../users.js";
 
 /* ============================================================
-   OWNER: OVERVIEW
+   OWNER: OVERVIEW (MAIN ANALYTICS)
 ============================================================ */
 export async function ownerOverview(request, env) {
   return requireRole(request, env, ["owner"], async () => {
-    return apiJson({ message: "Owner overview" });
+
+    const db = env.DB_users;
+
+    const total_users = (await db.prepare(
+      "SELECT COUNT(*) AS n FROM users"
+    ).first()).n;
+
+    const total_skaters = (await db.prepare(
+      "SELECT COUNT(*) AS n FROM skater_profiles"
+    ).first()).n;
+
+    const total_businesses = (await db.prepare(
+      "SELECT COUNT(*) AS n FROM business_profiles"
+    ).first()).n;
+
+    const total_musicians = (await db.prepare(
+      "SELECT COUNT(*) AS n FROM musician_profiles"
+    ).first()).n;
+
+    const tickets_sold = (await db.prepare(
+      "SELECT COUNT(*) AS n FROM tickets WHERE status = 'charged'"
+    ).first()).n;
+
+    const revenue = (await db.prepare(
+      "SELECT COALESCE(SUM(price_cents),0) AS total FROM tickets WHERE status = 'charged'"
+    ).first()).total;
+
+    const active_shows = (await db.prepare(
+      "SELECT COUNT(*) AS n FROM shows WHERE status = 'active'"
+    ).first()).n;
+
+    const pending_verifications = (await db.prepare(
+      "SELECT COUNT(*) AS n FROM verifications WHERE status = 'pending'"
+    ).first()).n;
+
+    return apiJson({
+      total_users,
+      total_skaters,
+      total_businesses,
+      total_musicians,
+      tickets_sold,
+      revenue,
+      active_shows,
+      pending_verifications
+    });
   });
 }
 
@@ -27,7 +71,10 @@ export async function ownerUsers(request, env) {
 export async function ownerSkaters(request, env) {
   return requireRole(request, env, ["owner"], async () => {
     const { results } = await env.DB_users.prepare(
-      "SELECT * FROM skaters ORDER BY created_at DESC"
+      `SELECT sp.*, u.email, u.name
+       FROM skater_profiles sp
+       JOIN users u ON sp.user_id = u.id
+       ORDER BY sp.created_at DESC`
     ).all();
     return apiJson({ skaters: results || [] });
   });
@@ -39,7 +86,10 @@ export async function ownerSkaters(request, env) {
 export async function ownerBusinesses(request, env) {
   return requireRole(request, env, ["owner"], async () => {
     const { results } = await env.DB_users.prepare(
-      "SELECT * FROM businesses ORDER BY submitted_at DESC"
+      `SELECT bp.*, u.email, u.name
+       FROM business_profiles bp
+       JOIN users u ON bp.user_id = u.id
+       ORDER BY bp.created_at DESC`
     ).all();
     return apiJson({ businesses: results || [] });
   });
@@ -51,7 +101,10 @@ export async function ownerBusinesses(request, env) {
 export async function ownerMusicians(request, env) {
   return requireRole(request, env, ["owner"], async () => {
     const { results } = await env.DB_users.prepare(
-      "SELECT * FROM musicians ORDER BY created_at DESC"
+      `SELECT mp.*, u.email, u.name
+       FROM musician_profiles mp
+       JOIN users u ON mp.user_id = u.id
+       ORDER BY mp.created_at DESC`
     ).all();
     return apiJson({ musicians: results || [] });
   });
@@ -82,7 +135,7 @@ export async function ownerContracts(request, env) {
 }
 
 /* ============================================================
-   OWNER: MUSIC (TRACKS)
+   OWNER: MUSIC LIBRARY
 ============================================================ */
 export async function ownerMusic(request, env) {
   return requireRole(request, env, ["owner"], async () => {
@@ -94,74 +147,16 @@ export async function ownerMusic(request, env) {
 }
 
 /* ============================================================
-   OWNER: BRANDING SETTINGS
-============================================================ */
-export async function ownerSettingsBranding(request, env) {
-  return requireRole(request, env, ["owner"], async () => {
-    return apiJson({ message: "Branding settings" });
-  });
-}
-
-/* ============================================================
-   OWNER: NOTES SETTINGS
-============================================================ */
-export async function ownerSettingsNotes(request, env) {
-  return requireRole(request, env, ["owner"], async () => {
-    return apiJson({ message: "Notes settings" });
-  });
-}
-
-/* ============================================================
-   OWNER: ADS LIST
-============================================================ */
-export async function ownerAds(request, env) {
-  return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_users.prepare(
-      "SELECT * FROM business_ads ORDER BY created_at DESC"
-    ).all();
-    return apiJson({ ads: results || [] });
-  });
-}
-
-/* ============================================================
-   OWNER: UPDATE AD STATUS
-============================================================ */
-export async function ownerUpdateAdStatus(request, env) {
-  return requireRole(request, env, ["owner"], async (req) => {
-    const body = await req.json().catch(() => ({}));
-    const { adId, status } = body;
-
-    await env.DB_users.prepare(
-      "UPDATE business_ads SET status = ? WHERE id = ?"
-    ).bind(status, adId).run();
-
-    return apiJson({ adId, status });
-  });
-}
-
-/* ============================================================
-   OWNER: SPONSORSHIPS
-============================================================ */
-export async function ownerSponsorships(request, env) {
-  return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_users.prepare(
-      "SELECT * FROM sponsorships ORDER BY created_at DESC"
-    ).all();
-    return apiJson({ sponsorships: results || [] });
-  });
-}
-
-/* ============================================================
    OWNER: BUSINESS APPLICATIONS
 ============================================================ */
 export async function ownerBusinessApplications(request, env) {
   return requireRole(request, env, ["owner"], async () => {
     const { results } = await env.DB_users.prepare(
-      `SELECT b.*, u.email AS owner_email, u.name AS owner_name
-       FROM businesses b
-       JOIN users u ON b.user_id = u.id
-       WHERE b.review_status IN ('pending','needs_info')
-       ORDER BY b.submitted_at DESC`
+      `SELECT bp.*, u.email, u.name
+       FROM business_profiles bp
+       JOIN users u ON bp.user_id = u.id
+       WHERE bp.review_status IN ('pending','needs_info')
+       ORDER BY bp.created_at DESC`
     ).all();
 
     return apiJson({ applications: results || [] });
@@ -190,7 +185,7 @@ export async function ownerBusinessUpdateStatus(request, env) {
         : "needs_info";
 
     await env.DB_users.prepare(
-      `UPDATE businesses
+      `UPDATE business_profiles
        SET verified = ?, review_status = ?, review_notes = ?
        WHERE id = ?`
     ).bind(verified, review_status, notes || "", businessId).run();
