@@ -20,59 +20,125 @@
 
   <main class="rs-dash-shell rs-dash-skater">
 
+    <!-- HEADER -->
     <header class="rs-dash-header">
       <div>
         <h1 class="rs-dash-title" id="skater-name">Skater</h1>
-        <p class="rs-dash-sub">Your shows, merch, sponsorships, and fans.</p>
+        <p class="rs-dash-sub">Your shows, bookings, merch, campaigns, and fans in one place.</p>
       </div>
       <div class="rs-dash-stat" id="skater-earnings">$0.00</div>
     </header>
 
-    <nav class="rs-dash-nav" id="skater-nav"></nav>
+    <!-- NAV: QUICK JUMPS TO ALL SKATER PAGES -->
+    <nav class="rs-dash-nav" id="skater-nav">
+      <a href="/skater-dashboard.html" class="rs-dash-nav-link active">Dashboard</a>
+      <a href="/skater-profile.html" class="rs-dash-nav-link">Profile</a>
+      <a href="/skater-shows.html" class="rs-dash-nav-link">Shows</a>
+      <a href="/skater-bookings.html" class="rs-dash-nav-link">Bookings</a>
+      <a href="/skater-calendar.html" class="rs-dash-nav-link">Calendar</a>
+      <a href="/skater-music.html" class="rs-dash-nav-link">Music</a>
+      <a href="/skater-cards.html" class="rs-dash-nav-link">Cards</a>
+      <a href="/skater-offerings.html" class="rs-dash-nav-link">Offerings</a>
+      <a href="/skater-campaigns.html" class="rs-dash-nav-link">Campaigns</a>
+      <a href="/skater-groups.html" class="rs-dash-nav-link">Groups</a>
+      <a href="/skater-analytic.html" class="rs-dash-nav-link">Analytics</a>
+      <a href="/skater-feed.html" class="rs-dash-nav-link">Feed</a>
+    </nav>
 
+    <!-- GRID: MINI VIEWS / PANELS -->
     <section class="rs-dash-grid">
 
+      <!-- SHOWS & TICKETS -->
       <article class="rs-dash-card">
         <h3>Shows & Tickets</h3>
         <ul class="rs-dash-list" id="skater-shows"></ul>
-        <a class="rs-dash-pill" id="create-show-link">Create Show</a>
-        <a class="rs-dash-pill" id="tickets-link">Manage Tickets</a>
-        <a class="rs-dash-pill" id="golden-ticket-link">Golden Tickets</a>
+        <a class="rs-dash-pill" id="create-show-link" href="/create-show.html">Create Show</a>
+        <a class="rs-dash-pill" id="tickets-link" href="/shows.html">Manage Tickets</a>
+        <a class="rs-dash-pill" id="golden-ticket-link" href="/skater-cards.html">Golden Tickets</a>
       </article>
 
+      <!-- BOOKINGS -->
+      <article class="rs-dash-card">
+        <h3>Bookings</h3>
+        <ul class="rs-dash-list" id="skater-bookings-mini"></ul>
+        <a class="rs-dash-pill" href="/skater-bookings.html">Open Bookings Board</a>
+        <a class="rs-dash-pill" href="/skater-calendar.html">View Calendar</a>
+      </article>
+
+      <!-- CONTRACTS & PRO TIER -->
       <article class="rs-dash-card">
         <h3>Contracts & Pro Tier</h3>
-        <p id="skater-contract-status">Review and sign required contracts to unlock royalties and Pro features.</p>
-        <a class="rs-dash-pill" id="view-contracts-link">View Contracts</a>
-        <a class="rs-dash-pill" id="pro-tier-link">Upgrade to Pro Skater</a>
+        <p id="skater-contract-status">
+          Review and sign required contracts to unlock royalties and Pro features.
+        </p>
+        <a class="rs-dash-pill" id="view-contracts-link" href="/skater-intent.html">View Contracts</a>
+        <a class="rs-dash-pill" id="pro-tier-link" href="/skater-intent.html">Upgrade to Pro Skater</a>
       </article>
 
+      <!-- MERCH & GIFTS -->
       <article class="rs-dash-card">
         <h3>Merch & Gifts</h3>
         <ul class="rs-dash-list" id="skater-merch"></ul>
-        <a class="rs-dash-pill" id="add-merch-link">Add Merch (Posters, Apparel)</a>
-        <a class="rs-dash-pill" id="gifts-link">Gift Options (Roses, Skates, Boards)</a>
+        <a class="rs-dash-pill" id="add-merch-link" href="/skater-offerings.html">Add Merch (Posters, Apparel)</a>
+        <a class="rs-dash-pill" id="gifts-link" href="/skater-offerings.html">Gift Options (Roses, Skates, Boards)</a>
       </article>
 
+      <!-- MUSIC & LIBRARY -->
+      <article class="rs-dash-card">
+        <h3>Music & Sound</h3>
+        <ul class="rs-dash-list" id="skater-music-mini"></ul>
+        <a class="rs-dash-pill" href="/skater-music.html">Open Skater Music Library</a>
+        <a class="rs-dash-pill" href="/upload-video.html">Attach Music to Clips</a>
+      </article>
+
+      <!-- CARDS & COLLECTIBLES -->
+      <article class="rs-dash-card">
+        <h3>Cards & Collectibles</h3>
+        <ul class="rs-dash-list" id="skater-cards-mini"></ul>
+        <a class="rs-dash-pill" href="/skater-cards.html">Manage Skate Cards</a>
+        <a class="rs-dash-pill" href="/skater-cards.html">View Sales & Drops</a>
+      </article>
+
+      <!-- SECONDARY TALENT -->
       <article class="rs-dash-card">
         <h3>Secondary Talent & Cross-Sell</h3>
-        <p id="secondary-talent-text">Showcase your other talents (music, art, books, etc.).</p>
-        <a class="rs-dash-pill" id="edit-secondary-talent-link">Edit Secondary Talent</a>
-        <a class="rs-dash-pill" id="art-store-link">Manage Art / Books Store</a>
+        <p id="secondary-talent-text">
+          Showcase your other talents (music, art, books, etc.).
+        </p>
+        <a class="rs-dash-pill" id="edit-secondary-talent-link" href="/skater-profile.html">Edit Secondary Talent</a>
+        <a class="rs-dash-pill" id="art-store-link" href="/skater-offerings.html">Manage Art / Books Store</a>
       </article>
 
+      <!-- PROFILE & BRANDING -->
       <article class="rs-dash-card">
         <h3>Profile & Branding</h3>
         <p>Customize your skater profile and brand your tickets.</p>
-        <a class="rs-dash-pill" id="edit-profile-link">Edit Profile</a>
-        <a class="rs-dash-pill" id="ticket-branding-link">Ticket Branding Studio</a>
+        <a class="rs-dash-pill" id="edit-profile-link" href="/skater-profile.html">Edit Profile</a>
+        <a class="rs-dash-pill" id="ticket-branding-link" href="/skater-branding.html">Ticket Branding Studio</a>
       </article>
 
+      <!-- CAMPAIGNS & PROMO -->
+      <article class="rs-dash-card">
+        <h3>Campaigns & Promo</h3>
+        <ul class="rs-dash-list" id="skater-campaigns-mini"></ul>
+        <a class="rs-dash-pill" href="/skater-campaigns.html">Open Campaigns</a>
+        <a class="rs-dash-pill" href="/skater-analytic.html">View Performance Analytics</a>
+      </article>
+
+      <!-- GROUPS & CREWS -->
+      <article class="rs-dash-card">
+        <h3>Groups & Crews</h3>
+        <ul class="rs-dash-list" id="skater-groups-mini"></ul>
+        <a class="rs-dash-pill" href="/skater-groups.html">Manage Groups</a>
+        <a class="rs-dash-pill" href="/skater-group.html">Create New Group</a>
+      </article>
+
+      <!-- SOCIAL & BADGES -->
       <article class="rs-dash-card">
         <h3>Social & Badges</h3>
         <p id="skater-badges">Performer badges based on your shows and activity.</p>
-        <a class="rs-dash-pill" id="feed-link">Open Skater Feed</a>
-        <a class="rs-dash-pill" id="followers-link">Followers & Fans</a>
+        <a class="rs-dash-pill" id="feed-link" href="/skater-feed.html">Open Skater Feed</a>
+        <a class="rs-dash-pill" id="followers-link" href="/skaters-feed.html">Followers & Fans</a>
       </article>
 
     </section>
