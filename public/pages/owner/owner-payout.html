@@ -2,28 +2,91 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Payouts • Roll Show</title>
-  <link rel="stylesheet" href="/css/global.css" />
-  <link rel="stylesheet" href="/css/owner.css" />
+  <title>Owner • Payouts</title>
+  <link rel="icon" href="/favicon.png" />
+  <link rel="stylesheet" href="/app/styles/styles.css" />
+  <link rel="stylesheet" href="/pages/owner/css/owner.css" />
+  <style>
+    .bg-landing { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: cover; filter: brightness(0.35); z-index: -2; }
+    .owner-shell { padding: 30px; max-width: 1500px; margin: 0 auto; color: white; }
+    .page-header h1 { font-size: 36px; font-weight: 800; margin-bottom: 5px; }
+    .page-header p { opacity: 0.8; margin-bottom: 25px; }
+    .section-title { margin: 25px 0 10px; font-size: 22px; font-weight: 700; border-left: 4px solid gold; padding-left: 10px; }
+    .panel { background: rgba(0,0,0,0.55); border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); padding: 18px; backdrop-filter: blur(6px); }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 25px; }
+    .summary-card { background: rgba(0,0,0,0.6); border-radius: 10px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.25); }
+    .summary-label { font-size: 12px; opacity: 0.75; text-transform: uppercase; }
+    .summary-value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+    .layout-grid { display: grid; grid-template-columns: 2fr 1.2fr; gap: 20px; }
+    .filters { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .filters input, .filters select { padding: 8px 10px; border-radius: 6px; border: none; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    th { text-align: left; opacity: 0.8; font-weight: 600; }
+    tr:hover { background: rgba(255,255,255,0.05); cursor: pointer; }
+  </style>
 </head>
-
-<body class="bg-owner">
+<body>
+  <img src="/favicon.png" class="bg-landing" alt="Background" />
 
   <div class="owner-shell">
-
     <header class="page-header">
       <h1>Payouts</h1>
-      <p>Manage platform payouts and revenue distribution.</p>
+      <p>Track platform revenue, obligations, and completed payouts.</p>
     </header>
 
-    <main class="owner-main">
-      <section class="owner-section">
-        <div id="payouts-list" class="card-list"></div>
-      </section>
-    </main>
+    <h2 class="section-title">Summary</h2>
+    <div class="summary-grid" id="payoutSummary">
+      <!-- JS injects cards -->
+    </div>
 
+    <div class="layout-grid">
+      <div>
+        <h2 class="section-title">Payout Queue</h2>
+        <div class="panel">
+          <div class="filters">
+            <select id="payoutStatus">
+              <option value="">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="paid">Paid</option>
+            </select>
+            <select id="payoutType">
+              <option value="">All types</option>
+              <option value="skater">Skater</option>
+              <option value="business">Business</option>
+              <option value="musician">Musician</option>
+            </select>
+            <input id="payoutSearch" type="text" placeholder="Search by name or email" />
+          </div>
+          <div style="max-height: 500px; overflow: auto;">
+            <table id="payoutsTable">
+              <thead>
+                <tr>
+                  <th>Recipient</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Requested</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- JS injects rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">Payout Details</h2>
+        <div class="panel" id="payoutDetail">
+          <p>Select a payout to view breakdown and history.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script type="module" src="/js/owner/owner-payouts.js"></script>
+  <script type="module" src="/app/js/owner/owner-payout.js"></script>
 </body>
 </html>
