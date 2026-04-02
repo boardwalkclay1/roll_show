@@ -32,23 +32,29 @@
       border-color: rgba(255,0,80,0.55);
     }
 
-    /* ARTIST (LIGHT PURPLE) */
+    /* ============================================================
+       ARTIST ENTRY — DEEP RED + BLACK
+    ============================================================ */
     .side-card:nth-child(1) .btn-side {
-      background: #a200ff;
-      color: #fff;
+      background: #7a0000; /* deep red */
+      color: #ffffff;
+      border: 1px solid #000000;
     }
     .side-card:nth-child(1) .btn-side:hover {
-      background: #bb33ff;
+      background: #a30000;
     }
     .side-card:nth-child(1) .btn-side-ghost {
-      border-color: rgba(162,0,255,0.5);
-      color: #d9baff;
+      border-color: rgba(255,0,0,0.45);
+      color: #ffb3b3;
+      background: rgba(0,0,0,0.35);
     }
     .side-card:nth-child(1) .btn-side-ghost:hover {
-      background: rgba(162,0,255,0.25);
+      background: rgba(0,0,0,0.55);
     }
 
-    /* BUSINESS (GOLD) */
+    /* ============================================================
+       BUSINESS ENTRY — GOLD (unchanged from your last request)
+    ============================================================ */
     .side-card:nth-child(2) .btn-side {
       background: #f5b400;
       color: #1a1200;
@@ -64,20 +70,24 @@
       background: rgba(245,180,0,0.25);
     }
 
-    /* BUYER (TICKET RED) */
+    /* ============================================================
+       BUYER ENTRY — YELLOW + BLACK
+    ============================================================ */
     .side-card:nth-child(3) .btn-side {
-      background: #ff0050;
-      color: #fff;
+      background: #ffd500; /* bright ticket yellow */
+      color: #000000;
+      border: 1px solid #000000;
     }
     .side-card:nth-child(3) .btn-side:hover {
-      background: #ff3370;
+      background: #ffea4d;
     }
     .side-card:nth-child(3) .btn-side-ghost {
-      border-color: rgba(255,0,80,0.5);
-      color: #ffc7d6;
+      border-color: rgba(255,213,0,0.6);
+      color: #fff7b3;
+      background: rgba(0,0,0,0.35);
     }
     .side-card:nth-child(3) .btn-side-ghost:hover {
-      background: rgba(255,0,80,0.25);
+      background: rgba(0,0,0,0.55);
     }
   </style>
 </head>
@@ -139,7 +149,7 @@
       <!-- SIDE ROLES -->
       <div class="hero-side-roles">
 
-        <!-- ARTIST (PURPLE) -->
+        <!-- ARTIST (DEEP RED + BLACK) -->
         <div class="side-card">
           <h3>Indie Artist</h3>
           <p>No‑upfront label. Keep ownership, share royalties.</p>
@@ -155,7 +165,7 @@
           <a href="/pages/auth-login.html?role=business" class="btn-side-ghost">Login</a>
         </div>
 
-        <!-- BUYER (TICKET RED) -->
+        <!-- BUYER (YELLOW + BLACK) -->
         <div class="side-card">
           <h3>Ticket Buyer</h3>
           <p>Watch shows and support the culture.</p>
