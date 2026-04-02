@@ -4,31 +4,44 @@
   <meta charset="UTF-8" />
   <title>Owner Dashboard • Roll Show</title>
 
-  <!-- FAVICON (your platform standard) -->
-  <link rel="icon" href="/favicon.ico" />
+  <!-- FAVICON -->
+  <link rel="icon" href="/public/favicon.ico" />
 
   <!-- GLOBAL + OWNER CSS -->
-  <link rel="stylesheet" href="/css/global.css" />
-  <link rel="stylesheet" href="/css/owner.css" />
-
-  <!-- BACKGROUND (your platform standard) -->
-  <style>
-    body.bg-owner {
-      background: url('/public/favicon.ico') no-repeat center center fixed;
-      background-size: cover;
-    }
-  </style>
+  <link rel="stylesheet" href="/public/css/global.css" />
+  <link rel="stylesheet" href="/public/pages/owner/css/owner.css" />
 </head>
 
-<body class="bg-owner">
+<body style="
+  background: url('/public/favicon.ico') no-repeat center center fixed;
+  background-size: cover;
+">
 
   <div class="owner-shell">
 
+    <!-- HEADER -->
     <header class="page-header">
       <h1>Owner Dashboard</h1>
       <p>Platform-wide metrics, activity, and controls.</p>
     </header>
 
+    <!-- NAVIGATION -->
+    <nav class="owner-nav">
+      <a href="/public/pages/owner/users.html">Users</a>
+      <a href="/public/pages/owner/skaters.html">Skaters</a>
+      <a href="/public/pages/owner/businesses.html">Businesses</a>
+      <a href="/public/pages/owner/musicians.html">Musicians</a>
+      <a href="/public/pages/owner/shows.html">Shows</a>
+      <a href="/public/pages/owner/contracts.html">Contracts</a>
+      <a href="/public/pages/owner/music.html">Music Library</a>
+      <a href="/public/pages/owner/business-application.html">Applications</a>
+      <a href="/public/pages/owner/owner-verifications.html">Verifications</a>
+      <a href="/public/pages/owner/owner-payout.html">Payouts</a>
+      <a href="/public/pages/owner/owner-analytics.html">Analytics</a>
+      <a href="/public/pages/owner/settings.html">Settings</a>
+    </nav>
+
+    <!-- MAIN CONTENT -->
     <main class="owner-main">
 
       <!-- OVERVIEW GRID -->
@@ -52,73 +65,8 @@
 
   </div>
 
-  <!-- INLINE JS (NO BROKEN PATHS) -->
-  <script type="module">
-    /* ============================================================
-       LOAD OWNER OVERVIEW
-    ============================================================ */
-    async function loadOwnerOverview() {
-      const user = JSON.parse(localStorage.getItem("rollshow_user"));
-      if (!user) return;
-
-      const res = await fetch(`/api/owner/overview?owner=1&user=${user.id}`);
-
-      if (!res.ok) {
-        console.error("Owner API failed:", await res.text());
-        return;
-      }
-
-      const data = await res.json();
-      const grid = document.getElementById("overview-grid");
-
-      const items = [
-        { label: "Total Users", value: data.total_users },
-        { label: "Skaters", value: data.total_skaters },
-        { label: "Businesses", value: data.total_businesses },
-        { label: "Musicians", value: data.total_musicians },
-        { label: "Shows", value: data.total_shows },
-        { label: "Tickets Sold", value: data.total_tickets },
-        { label: "Purchases", value: data.total_purchases },
-        { label: "Revenue", value: "$" + data.total_revenue }
-      ];
-
-      grid.innerHTML = "";
-
-      items.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <h3>${item.label}</h3>
-          <p>${item.value}</p>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    loadOwnerOverview();
-
-
-    /* ============================================================
-       RUN MIGRATIONS BUTTON
-    ============================================================ */
-    document.getElementById("runMigrationsBtn").addEventListener("click", async () => {
-      const user = JSON.parse(localStorage.getItem("rollshow_user"));
-      if (!user) return;
-
-      document.getElementById("migrationResult").innerHTML =
-        "<p>Running migrations…</p>";
-
-      const res = await fetch(`/api/owner/run-migrations?owner=1&user=${user.id}`, {
-        method: "POST"
-      });
-
-      const data = await res.json();
-
-      document.getElementById("migrationResult").innerHTML = `
-        <pre>${JSON.stringify(data, null, 2)}</pre>
-      `;
-    });
-  </script>
+  <!-- JS -->
+  <script type="module" src="/public/js/owner/owner-dashboard.js"></script>
 
 </body>
 </html>
