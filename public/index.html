@@ -13,15 +13,20 @@
 
   <link rel="stylesheet" href="/app/styles/landing.css">
 
+  <!-- REAL CURSIVE FONT (works on all devices) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* GLOBAL CURSIVE FONT FOR ALL BUTTONS */
+    /* GLOBAL CURSIVE FONT */
     .btn-ticket-main,
     .btn-ticket-ghost,
     .btn-skater-main,
     .btn-skater-ghost,
     .btn-side,
     .btn-side-ghost {
-      font-family: "Brush Script MT", cursive !important;
+      font-family: "Dancing Script", cursive !important;
       font-size: 22px;
       letter-spacing: 0.5px;
     }
@@ -56,6 +61,7 @@
     .side-card:nth-child(1) .btn-side:hover {
       background: #a30000;
     }
+
     .side-card:nth-child(1) .btn-side-ghost {
       border: 2px solid #7a0000;
       color: #ffb3b3;
@@ -80,6 +86,7 @@
     .side-card:nth-child(2) .btn-side:hover {
       background: #ffca33;
     }
+
     .side-card:nth-child(2) .btn-side-ghost {
       border: 2px solid #f5b400;
       color: #ffe9a3;
@@ -92,7 +99,7 @@
     }
 
     /* ============================================================
-       BUYER ENTRY — WHITE + BLACK (NO YELLOW BORDER)
+       BUYER ENTRY — WHITE + BLACK (NO YELLOW ANYWHERE)
     ============================================================ */
     .side-card:nth-child(3) .btn-side {
       background: #ffffff;
@@ -100,20 +107,21 @@
       border: 2px solid #ffffff; /* FIXED: WHITE BORDER */
       width: 100%;
       text-align: center;
-      padding: 14px 20px; /* FULL BUTTON COVERAGE */
-      font-size: 24px; /* BIGGER SIGN UP TEXT */
+      padding: 10px 16px; /* FIXED: smaller */
+      font-size: 22px; /* FIXED: normal size */
     }
     .side-card:nth-child(3) .btn-side:hover {
       background: #f2f2f2;
     }
 
     .side-card:nth-child(3) .btn-side-ghost {
-      border: 2px solid #ffffff; /* FIXED: WHITE BORDER */
+      border: 2px solid #ffffff; /* FIXED: white border */
       color: #ffffff;
       background: rgba(0,0,0,0.55);
       width: 100%;
       text-align: center;
-      font-size: 20px; /* LOGIN TEXT A TAD BIGGER */
+      font-size: 20px; /* FIXED: slightly bigger */
+      padding: 8px 14px;
     }
     .side-card:nth-child(3) .btn-side-ghost:hover {
       background: rgba(0,0,0,0.75);
