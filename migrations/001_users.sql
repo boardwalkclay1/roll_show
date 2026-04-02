@@ -1,3 +1,5 @@
+-- 001_users.sql — CLEAN, D1-SAFE
+
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
