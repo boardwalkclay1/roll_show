@@ -12,6 +12,74 @@
   <link rel="manifest" href="/manifest.webmanifest">
 
   <link rel="stylesheet" href="/app/styles/landing.css">
+
+  <style>
+    /* LEARN MORE BUTTON (HEADER) */
+    .btn-ticket-ghost {
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.25);
+      transition: 0.2s;
+    }
+    .btn-ticket-ghost:hover {
+      background: rgba(255,0,80,0.25);
+      border-color: rgba(255,0,80,0.55);
+    }
+
+    /* ARTIST (LIGHT PURPLE) */
+    .side-card:nth-child(1) .btn-side {
+      background: #a200ff;
+      color: #fff;
+    }
+    .side-card:nth-child(1) .btn-side:hover {
+      background: #bb33ff;
+    }
+    .side-card:nth-child(1) .btn-side-ghost {
+      border-color: rgba(162,0,255,0.5);
+      color: #d9baff;
+    }
+    .side-card:nth-child(1) .btn-side-ghost:hover {
+      background: rgba(162,0,255,0.25);
+    }
+
+    /* BUSINESS (GOLD) */
+    .side-card:nth-child(2) .btn-side {
+      background: #f5b400;
+      color: #1a1200;
+    }
+    .side-card:nth-child(2) .btn-side:hover {
+      background: #ffca33;
+    }
+    .side-card:nth-child(2) .btn-side-ghost {
+      border-color: rgba(245,180,0,0.6);
+      color: #ffe9a3;
+    }
+    .side-card:nth-child(2) .btn-side-ghost:hover {
+      background: rgba(245,180,0,0.25);
+    }
+
+    /* BUYER (TICKET RED) */
+    .side-card:nth-child(3) .btn-side {
+      background: #ff0050;
+      color: #fff;
+    }
+    .side-card:nth-child(3) .btn-side:hover {
+      background: #ff3370;
+    }
+    .side-card:nth-child(3) .btn-side-ghost {
+      border-color: rgba(255,0,80,0.5);
+      color: #ffc7d6;
+    }
+    .side-card:nth-child(3) .btn-side-ghost:hover {
+      background: rgba(255,0,80,0.25);
+    }
+  </style>
 </head>
 
 <body>
@@ -71,6 +139,7 @@
       <!-- SIDE ROLES -->
       <div class="hero-side-roles">
 
+        <!-- ARTIST (PURPLE) -->
         <div class="side-card">
           <h3>Indie Artist</h3>
           <p>No‑upfront label. Keep ownership, share royalties.</p>
@@ -78,6 +147,7 @@
           <a href="/pages/auth-login.html?role=musician" class="btn-side-ghost">Login</a>
         </div>
 
+        <!-- BUSINESS (GOLD) -->
         <div class="side-card">
           <h3>Business / Collab</h3>
           <p>Brands • Events • Sponsors • Opportunities</p>
@@ -85,6 +155,7 @@
           <a href="/pages/auth-login.html?role=business" class="btn-side-ghost">Login</a>
         </div>
 
+        <!-- BUYER (TICKET RED) -->
         <div class="side-card">
           <h3>Ticket Buyer</h3>
           <p>Watch shows and support the culture.</p>
