@@ -1,5 +1,5 @@
 // public/app/js/skater/skater-dashboard.js
-import API from "../api.js";
+import { apiGet } from "/app/js/api.js";
 
 /* ============================================================
    STATE
@@ -28,11 +28,6 @@ function hideSkaterLoader() {
   if (loader) loader.classList.add("rs-hidden");
 }
 
-// Failsafe: hide loader after full window load regardless
-window.addEventListener("load", () => {
-  setTimeout(hideSkaterLoader, 800);
-});
-
 /* ============================================================
    CORE INIT
 ============================================================ */
@@ -40,9 +35,8 @@ async function initSkaterDashboard() {
   try {
     const userRaw = localStorage.getItem("user");
     if (!userRaw) {
-      console.error("No user found in localStorage");
-      // optional redirect:
-      // window.location.href = "/login.html";
+      console.error("No user found");
+      window.location.href = "/login.html";
       return;
     }
 
@@ -58,12 +52,13 @@ async function initSkaterDashboard() {
     renderStatus();
     setupNav();
     setupActions();
+
   } catch (err) {
     console.error("Skater dashboard init failed", err);
     const statusEl = $("skater-status");
     if (statusEl) {
       statusEl.textContent =
-        "There was a problem loading your skater dashboard. Please refresh or try again.";
+        "There was a problem loading your skater dashboard.";
     }
   } finally {
     hideSkaterLoader();
@@ -75,8 +70,8 @@ async function initSkaterDashboard() {
 ============================================================ */
 async function loadDashboard(user) {
   try {
-    const res = await API.get("/api/skater/dashboard", API.withUser(user));
-    if (!res || !res.success) {
+    const res = await apiGet("/api/skater/dashboard", user);
+    if (!res?.success) {
       console.error("Dashboard load failed", res?.error);
       return;
     }
@@ -88,6 +83,7 @@ async function loadDashboard(user) {
     state.contracts = Array.isArray(data.contracts) ? data.contracts : [];
     state.badges = Array.isArray(data.badges) ? data.badges : [];
     state.secondaryTalent = data.secondary_talent || null;
+
   } catch (err) {
     console.error("Dashboard load error", err);
   }
@@ -95,14 +91,15 @@ async function loadDashboard(user) {
 
 async function loadShows(user) {
   try {
-    const res = await API.get("/api/skater/shows", API.withUser(user));
-    if (!res || !res.success) {
+    const res = await apiGet("/api/skater/shows", user);
+    if (!res?.success) {
       console.error("Shows load failed", res?.error);
       return;
     }
 
     const data = res.data || {};
     state.shows = Array.isArray(data.shows) ? data.shows : [];
+
   } catch (err) {
     console.error("Shows load error", err);
   }
@@ -116,16 +113,14 @@ function renderHeader() {
   const earningsEl = $("skater-earnings");
 
   if (nameEl) {
-    if (state.skater) {
-      nameEl.textContent = state.skater.display_name || state.skater.name || "Skater";
-    } else {
-      nameEl.textContent = "Skater";
-    }
+    nameEl.textContent =
+      state.skater?.display_name ||
+      state.skater?.name ||
+      "Skater";
   }
 
   if (earningsEl) {
-    const value = Number(state.earnings || 0);
-    earningsEl.textContent = `$${value.toFixed(2)}`;
+    earningsEl.textContent = `$${Number(state.earnings || 0).toFixed(2)}`;
   }
 }
 
@@ -135,17 +130,14 @@ function renderShows() {
 
   list.innerHTML = "";
 
-  if (!state.shows || !state.shows.length) {
+  if (!state.shows.length) {
     list.innerHTML = `<li>No shows yet. Create your first show.</li>`;
     return;
   }
 
   state.shows.forEach((show) => {
     const li = document.createElement("li");
-    const title = show.title || "Untitled show";
-    const type = show.type || "show";
-    const duration = show.duration_seconds || 0;
-    li.textContent = `${title} — ${type} — ${duration}s`;
+    li.textContent = `${show.title || "Untitled"} — ${show.type || "show"} — ${show.duration_seconds || 0}s`;
     list.appendChild(li);
   });
 }
@@ -154,9 +146,8 @@ function renderContractsSection() {
   const statusEl = $("skater-contract-status");
   if (!statusEl) return;
 
-  const contracts = Array.isArray(state.contracts) ? state.contracts : [];
-  const required = contracts.filter((c) => c.required);
-  const unsigned = required.filter((c) => !c.signed_at);
+  const required = state.contracts.filter(c => c.required);
+  const unsigned = required.filter(c => !c.signed_at);
 
   if (!required.length) {
     statusEl.textContent = "No contracts required yet.";
@@ -164,10 +155,9 @@ function renderContractsSection() {
   }
 
   if (unsigned.length) {
-    statusEl.textContent = `You have ${unsigned.length} required contract(s) to sign before unlocking royalties and Pro features.`;
+    statusEl.textContent = `You have ${unsigned.length} required contract(s) to sign.`;
   } else {
-    statusEl.textContent =
-      "All required contracts signed. Royalties and Pro features unlocked.";
+    statusEl.textContent = "All required contracts signed.";
   }
 }
 
@@ -175,35 +165,26 @@ function renderSecondaryTalent() {
   const el = $("secondary-talent-text");
   if (!el) return;
 
-  const st = state.secondaryTalent;
-
-  if (!st) {
-    el.textContent = "Showcase your other talents (music, art, books, etc.).";
+  if (!state.secondaryTalent) {
+    el.textContent = "Showcase your other talents.";
     return;
   }
 
-  const label = st.label || st.type || "Secondary talent";
-  el.textContent = `Secondary talent: ${label}`;
+  el.textContent =
+    `Secondary talent: ${state.secondaryTalent.label || state.secondaryTalent.type}`;
 }
 
 function renderStatus() {
   const el = $("skater-status");
   if (!el) return;
 
-  const contracts = Array.isArray(state.contracts) ? state.contracts : [];
-  const pro = contracts.find((c) => c.slug === "pro-skater");
-  const rights = contracts.find((c) => c.slug === "video-rights");
+  const pro = state.contracts.find(c => c.slug === "pro-skater");
+  const rights = state.contracts.find(c => c.slug === "video-rights");
 
-  const parts = [];
-
-  parts.push(pro?.signed_at ? "Pro Skater active." : "Pro Skater not active.");
-  parts.push(
-    rights?.signed_at
-      ? "Video rights contract signed."
-      : "Video rights contract not signed."
-  );
-
-  el.textContent = parts.join(" ");
+  el.textContent = [
+    pro?.signed_at ? "Pro Skater active." : "Pro Skater not active.",
+    rights?.signed_at ? "Video rights signed." : "Video rights not signed."
+  ].join(" ");
 }
 
 /* ============================================================
@@ -225,10 +206,8 @@ function setupNav() {
     if (!link) return;
     e.preventDefault();
 
-    nav.querySelectorAll("a").forEach((a) => a.classList.remove("rs-dash-nav-active"));
+    nav.querySelectorAll("a").forEach(a => a.classList.remove("rs-dash-nav-active"));
     link.classList.add("rs-dash-nav-active");
-
-    // If you later wire tabbed sections, you can toggle them here by data-tab
   });
 }
 
@@ -259,8 +238,5 @@ function bind(id, fn) {
    BOOTSTRAP
 ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  initSkaterDashboard().catch((err) => {
-    console.error("Skater dashboard init failed", err);
-    hideSkaterLoader();
-  });
+  initSkaterDashboard();
 });
