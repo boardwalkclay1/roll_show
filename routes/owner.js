@@ -26,7 +26,7 @@ export async function ownerUsers(request, env) {
 ============================================================ */
 export async function ownerSkaters(request, env) {
   return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_skaters.prepare(
+    const { results } = await env.DB_users.prepare(
       "SELECT * FROM skaters ORDER BY created_at DESC"
     ).all();
     return apiJson({ skaters: results || [] });
@@ -38,7 +38,7 @@ export async function ownerSkaters(request, env) {
 ============================================================ */
 export async function ownerBusinesses(request, env) {
   return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_business.prepare(
+    const { results } = await env.DB_users.prepare(
       "SELECT * FROM businesses ORDER BY submitted_at DESC"
     ).all();
     return apiJson({ businesses: results || [] });
@@ -46,11 +46,11 @@ export async function ownerBusinesses(request, env) {
 }
 
 /* ============================================================
-   OWNER: MUSICIANS  (FIXED DB NAME)
+   OWNER: MUSICIANS
 ============================================================ */
 export async function ownerMusicians(request, env) {
   return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_musicians.prepare(
+    const { results } = await env.DB_users.prepare(
       "SELECT * FROM musicians ORDER BY created_at DESC"
     ).all();
     return apiJson({ musicians: results || [] });
@@ -62,7 +62,7 @@ export async function ownerMusicians(request, env) {
 ============================================================ */
 export async function ownerShows(request, env) {
   return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_shows.prepare(
+    const { results } = await env.DB_users.prepare(
       "SELECT * FROM shows ORDER BY created_at DESC"
     ).all();
     return apiJson({ shows: results || [] });
@@ -74,7 +74,7 @@ export async function ownerShows(request, env) {
 ============================================================ */
 export async function ownerContracts(request, env) {
   return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_business.prepare(
+    const { results } = await env.DB_users.prepare(
       "SELECT * FROM contracts ORDER BY created_at DESC"
     ).all();
     return apiJson({ contracts: results || [] });
@@ -86,7 +86,7 @@ export async function ownerContracts(request, env) {
 ============================================================ */
 export async function ownerMusic(request, env) {
   return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_musicians.prepare(
+    const { results } = await env.DB_users.prepare(
       "SELECT * FROM tracks ORDER BY created_at DESC"
     ).all();
     return apiJson({ tracks: results || [] });
@@ -112,11 +112,11 @@ export async function ownerSettingsNotes(request, env) {
 }
 
 /* ============================================================
-   OWNER: ADS LIST (FIXED TABLE NAME)
+   OWNER: ADS LIST
 ============================================================ */
 export async function ownerAds(request, env) {
   return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_business.prepare(
+    const { results } = await env.DB_users.prepare(
       "SELECT * FROM business_ads ORDER BY created_at DESC"
     ).all();
     return apiJson({ ads: results || [] });
@@ -131,7 +131,7 @@ export async function ownerUpdateAdStatus(request, env) {
     const body = await req.json().catch(() => ({}));
     const { adId, status } = body;
 
-    await env.DB_business.prepare(
+    await env.DB_users.prepare(
       "UPDATE business_ads SET status = ? WHERE id = ?"
     ).bind(status, adId).run();
 
@@ -144,7 +144,7 @@ export async function ownerUpdateAdStatus(request, env) {
 ============================================================ */
 export async function ownerSponsorships(request, env) {
   return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_business.prepare(
+    const { results } = await env.DB_users.prepare(
       "SELECT * FROM sponsorships ORDER BY created_at DESC"
     ).all();
     return apiJson({ sponsorships: results || [] });
@@ -156,7 +156,7 @@ export async function ownerSponsorships(request, env) {
 ============================================================ */
 export async function ownerBusinessApplications(request, env) {
   return requireRole(request, env, ["owner"], async () => {
-    const { results } = await env.DB_business.prepare(
+    const { results } = await env.DB_users.prepare(
       `SELECT b.*, u.email AS owner_email, u.name AS owner_name
        FROM businesses b
        JOIN users u ON b.user_id = u.id
@@ -189,7 +189,7 @@ export async function ownerBusinessUpdateStatus(request, env) {
         ? "rejected"
         : "needs_info";
 
-    await env.DB_business.prepare(
+    await env.DB_users.prepare(
       `UPDATE businesses
        SET verified = ?, review_status = ?, review_notes = ?
        WHERE id = ?`
