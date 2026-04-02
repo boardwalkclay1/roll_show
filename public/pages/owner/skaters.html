@@ -2,278 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Roll Show • Owner — Skaters</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="icon" type="image/png" href="/favicon.png" />
-
-  <link rel="stylesheet" href="/app/styles/styles.css">
-  <link rel="stylesheet" href="/app/styles/dashboard.css">
-  <link rel="stylesheet" href="/app/styles/owner.css">
+  <title>Owner • Skaters</title>
+  <link rel="icon" href="/favicon.png" />
+  <link rel="stylesheet" href="/app/styles/styles.css" />
+  <link rel="stylesheet" href="/pages/owner/css/owner.css" />
+  <style>
+    .bg-landing { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: cover; filter: brightness(0.35); z-index: -2; }
+    .owner-shell { padding: 30px; max-width: 1500px; margin: 0 auto; color: white; }
+    .page-header h1 { font-size: 36px; font-weight: 800; margin-bottom: 5px; }
+    .page-header p { opacity: 0.8; margin-bottom: 25px; }
+    .section-title { margin: 25px 0 10px; font-size: 22px; font-weight: 700; border-left: 4px solid gold; padding-left: 10px; }
+    .panel { background: rgba(0,0,0,0.55); border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); padding: 18px; backdrop-filter: blur(6px); }
+    .layout-grid { display: grid; grid-template-columns: 2fr 1.2fr; gap: 20px; }
+    .filters { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .filters input, .filters select { padding: 8px 10px; border-radius: 6px; border: none; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    th { text-align: left; opacity: 0.8; font-weight: 600; }
+    tr:hover { background: rgba(255,255,255,0.05); cursor: pointer; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; background: rgba(255,255,255,0.15); }
+  </style>
 </head>
+<body>
+  <img src="/favicon.png" class="bg-landing" alt="Background" />
 
-<body class="rs-body">
+  <div class="owner-shell">
+    <header class="page-header">
+      <h1>Skaters</h1>
+      <p>Profiles, disciplines, and sponsorship readiness.</p>
+    </header>
 
-  <!-- BACKGROUND (you can change this if you want a different owner bg) -->
-  <img src="/app/images/backs/roll-show-stage.jpg" class="bg-landing" alt="Background">
-
-  <!-- OWNER SIDEBAR -->
-  <aside class="owner-sidebar">
-    <h1 class="owner-title glow">OWNER</h1>
-
-    <a class="owner-link" href="/pages/owner/owner-dashboard.html">Dashboard Overview</a>
-    <a class="owner-link" href="/pages/owner/users.html">Users</a>
-    <a class="owner-link owner-link-active" href="/pages/owner/skaters.html">Skaters</a>
-    <a class="owner-link" href="/pages/owner/businesses.html">Businesses</a>
-    <a class="owner-link" href="/pages/owner/musicians.html">Musicians</a>
-    <a class="owner-link" href="/pages/owner/shows.html">Shows</a>
-    <a class="owner-link" href="/pages/owner/contracts.html">Contracts</a>
-    <a class="owner-link" href="/pages/owner/music.html">Music Library</a>
-    <a class="owner-link" href="/pages/owner/settings.html">Platform Settings</a>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main class="owner-main">
-
-    <h1 class="owner-heading glow">Skaters Control</h1>
-    <p class="owner-sub">Manage skaters, Pro tier, contracts, royalties, and game applications.</p>
-
-    <!-- OVERVIEW -->
-    <section class="rs-dash-grid">
-
-      <article class="rs-dash-card">
-        <h3>Skater Overview</h3>
-        <ul class="rs-dash-list" id="skaters-overview">
-          <li>Total skaters: <span id="total-skaters">0</span></li>
-          <li>Pro skaters: <span id="pro-skaters">0</span></li>
-          <li>Standard skaters: <span id="standard-skaters">0</span></li>
-        </ul>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Royalties & Revenue</h3>
-        <ul class="rs-dash-list">
-          <li>Total skater royalties (lifetime): <span id="total-royalties">$0.00</span></li>
-          <li>Platform share (lifetime): <span id="platform-share">$0.00</span></li>
-        </ul>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Pro Skater Tier</h3>
-        <p>Manage Pro Skater subscriptions and features.</p>
-        <a class="rs-dash-pill" id="view-pro-skaters-link">View Pro Skaters</a>
-        <a class="rs-dash-pill" id="pro-settings-link">Pro Tier Settings</a>
-      </article>
-
-      <article class="rs-dash-card">
-        <h3>Game Applications</h3>
-        <p>Review Pro Skaters applying for the Roll Show video game.</p>
-        <a class="rs-dash-pill" id="game-applications-link">View Game Applicants</a>
-      </article>
-
-    </section>
-
-    <!-- SKATER TABLES -->
-    <section class="rs-dash-grid" style="margin-top: 2rem; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);">
-
-      <!-- SKATERS LIST -->
-      <article class="rs-dash-card">
-        <h3>Skaters</h3>
-        <p>Filter and manage individual skaters.</p>
-        <div style="margin-bottom: 0.75rem;">
-          <select id="skater-filter">
-            <option value="all">All skaters</option>
-            <option value="pro">Pro skaters</option>
-            <option value="standard">Standard skaters</option>
-          </select>
+    <div class="layout-grid">
+      <div>
+        <h2 class="section-title">Skater List</h2>
+        <div class="panel">
+          <div class="filters">
+            <input id="skaterSearch" type="text" placeholder="Search by name or email" />
+            <select id="skaterDiscipline">
+              <option value="">All disciplines</option>
+              <option value="roller">Roller</option>
+              <option value="skateboard">Skateboard</option>
+              <option value="longboard">Longboard</option>
+            </select>
+          </div>
+          <div style="max-height: 500px; overflow: auto;">
+            <table id="skatersTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Discipline</th>
+                  <th>City</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- JS injects rows -->
+              </tbody>
+            </table>
+          </div>
         </div>
-        <ul class="rs-dash-list" id="skaters-list">
-          <!-- populated by JS -->
-        </ul>
-      </article>
-
-      <!-- CONTRACTS & PERCENTAGES -->
-      <article class="rs-dash-card">
-        <h3>Contracts & Percentages</h3>
-        <p>View and adjust royalty percentages and required contracts.</p>
-        <ul class="rs-dash-list" id="contracts-summary">
-          <!-- populated by JS -->
-        </ul>
-        <a class="rs-dash-pill" href="/pages/owner/contracts.html">Open Contracts Manager</a>
-      </article>
-
-    </section>
-
-    <!-- ANNOUNCEMENTS -->
-    <section class="rs-dash-card" style="margin-top: 2rem;">
-      <h3>Announcements & Newsletter</h3>
-      <p>Send updates to skaters, Pro skaters, or everyone.</p>
-      <div style="margin-bottom: 0.75rem;">
-        <select id="announcement-target">
-          <option value="all">Everyone</option>
-          <option value="skaters">All skaters</option>
-          <option value="pro-skaters">Pro skaters only</option>
-          <option value="buyers">Buyers</option>
-          <option value="musicians">Musicians</option>
-        </select>
       </div>
-      <textarea id="announcement-body" rows="3" style="width:100%; margin-bottom:0.75rem;" placeholder="Write your announcement..."></textarea>
-      <a class="rs-dash-pill" id="send-announcement-link">Send Announcement</a>
-    </section>
 
-  </main>
+      <div>
+        <h2 class="section-title">Skater Details</h2>
+        <div class="panel" id="skaterDetail">
+          <p>Select a skater to view profile details, sponsorship status, and recent shows.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <script type="module">
-    const state = {
-      skaters: [],
-      contracts: [],
-      totals: {
-        total: 0,
-        pro: 0,
-        standard: 0,
-        totalRoyalties: 0,
-        platformShare: 0,
-      },
-    };
-
-    async function initOwnerSkaters() {
-      await Promise.all([
-        loadSkaters(),
-        loadContractsSummary(),
-      ]);
-
-      renderOverview();
-      renderSkatersList();
-      renderContractsSummary();
-      setupFilter();
-      setupAnnouncement();
-    }
-
-    async function loadSkaters() {
-      const res = await fetch("/api/owner/skaters");
-      if (!res.ok) return;
-      const data = await res.json();
-      state.skaters = data.skaters || [];
-      state.totals.total = state.skaters.length;
-      state.totals.pro = state.skaters.filter(s => s.is_pro).length;
-      state.totals.standard = state.totals.total - state.totals.pro;
-      state.totals.totalRoyalties = data.total_royalties || 0;
-      state.totals.platformShare = data.platform_share || 0;
-    }
-
-    async function loadContractsSummary() {
-      const res = await fetch("/api/owner/skater-contracts-summary");
-      if (!res.ok) return;
-      const data = await res.json();
-      state.contracts = data.contracts || [];
-    }
-
-    function renderOverview() {
-      document.getElementById("total-skaters").textContent = state.totals.total;
-      document.getElementById("pro-skaters").textContent = state.totals.pro;
-      document.getElementById("standard-skaters").textContent = state.totals.standard;
-      document.getElementById("total-royalties").textContent = `$${state.totals.totalRoyalties.toFixed(2)}`;
-      document.getElementById("platform-share").textContent = `$${state.totals.platformShare.toFixed(2)}`;
-    }
-
-    function renderSkatersList() {
-      const list = document.getElementById("skaters-list");
-      if (!list) return;
-      list.innerHTML = "";
-
-      const filter = document.getElementById("skater-filter").value;
-      let skaters = state.skaters;
-
-      if (filter === "pro") skaters = skaters.filter(s => s.is_pro);
-      if (filter === "standard") skaters = skaters.filter(s => !s.is_pro);
-
-      if (!skaters.length) {
-        list.innerHTML = "<li>No skaters found for this filter.</li>";
-        return;
-      }
-
-      skaters.forEach(skater => {
-        const li = document.createElement("li");
-        const proLabel = skater.is_pro ? "Pro" : "Standard";
-        li.innerHTML = `
-          <strong>${skater.display_name || skater.email}</strong> — ${proLabel}<br>
-          Royalties: ${skater.royalty_percent || 0}% • Platform: ${skater.platform_percent || 0}%<br>
-          <a href="#" data-skater-id="${skater.id}" data-action="view">View</a> •
-          <a href="#" data-skater-id="${skater.id}" data-action="edit-royalties">Edit Percentages</a> •
-          <a href="#" data-skater-id="${skater.id}" data-action="contracts">Contracts</a>
-        `;
-        list.appendChild(li);
-      });
-
-      list.addEventListener("click", (e) => {
-        const link = e.target.closest("a[data-action]");
-        if (!link) return;
-        e.preventDefault();
-        const id = link.getAttribute("data-skater-id");
-        const action = link.getAttribute("data-action");
-        handleSkaterAction(id, action);
-      }, { once: true });
-    }
-
-    function renderContractsSummary() {
-      const list = document.getElementById("contracts-summary");
-      if (!list) return;
-      list.innerHTML = "";
-
-      if (!state.contracts.length) {
-        list.innerHTML = "<li>No skater contracts configured yet.</li>";
-        return;
-      }
-
-      state.contracts.forEach(c => {
-        const li = document.createElement("li");
-        li.textContent = `${c.name} — Required: ${c.required ? "Yes" : "No"} — Active: ${c.active ? "Yes" : "No"}`;
-        list.appendChild(li);
-      });
-    }
-
-    function setupFilter() {
-      const filter = document.getElementById("skater-filter");
-      if (!filter) return;
-      filter.addEventListener("change", () => {
-        renderSkatersList();
-      });
-    }
-
-    function setupAnnouncement() {
-      const sendBtn = document.getElementById("send-announcement-link");
-      if (!sendBtn) return;
-
-      sendBtn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        const target = document.getElementById("announcement-target").value;
-        const body = document.getElementById("announcement-body").value.trim();
-        if (!body) return;
-
-        await fetch("/api/owner/announcement", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ target, body }),
-        });
-
-        document.getElementById("announcement-body").value = "";
-        alert("Announcement sent.");
-      });
-    }
-
-    function handleSkaterAction(id, action) {
-      console.log("Skater action", id, action);
-      // You can later route to:
-      // /pages/owner/skater-detail.html?id=...
-      // or open modals for editing royalties/contracts.
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      initOwnerSkaters().catch(err => {
-        console.error("Owner skaters init failed", err);
-      });
-    });
-  </script>
-
+  <script type="module" src="/app/js/owner/skaters.js"></script>
 </body>
 </html>
