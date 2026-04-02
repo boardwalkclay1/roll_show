@@ -4,10 +4,8 @@
   <meta charset="UTF-8" />
   <title>Owner Dashboard • Roll Show</title>
 
-  <!-- FAVICON -->
   <link rel="icon" href="/public/favicon.ico" />
 
-  <!-- GLOBAL + OWNER CSS -->
   <link rel="stylesheet" href="/public/css/global.css" />
   <link rel="stylesheet" href="/public/pages/owner/css/owner.css" />
 </head>
@@ -19,53 +17,83 @@
 
   <div class="owner-shell">
 
-    <!-- HEADER -->
     <header class="page-header">
       <h1>Owner Dashboard</h1>
       <p>Platform-wide metrics, activity, and controls.</p>
     </header>
 
-    <!-- NAVIGATION -->
-    <nav class="owner-nav">
-      <a href="/public/pages/owner/users.html">Users</a>
-      <a href="/public/pages/owner/skaters.html">Skaters</a>
-      <a href="/public/pages/owner/businesses.html">Businesses</a>
-      <a href="/public/pages/owner/musicians.html">Musicians</a>
-      <a href="/public/pages/owner/shows.html">Shows</a>
-      <a href="/public/pages/owner/contracts.html">Contracts</a>
-      <a href="/public/pages/owner/music.html">Music Library</a>
-      <a href="/public/pages/owner/business-application.html">Applications</a>
-      <a href="/public/pages/owner/owner-verifications.html">Verifications</a>
-      <a href="/public/pages/owner/owner-payout.html">Payouts</a>
-      <a href="/public/pages/owner/owner-analytics.html">Analytics</a>
-      <a href="/public/pages/owner/settings.html">Settings</a>
-    </nav>
+    <!-- CINEMATIC TILE GRID -->
+    <section class="tile-grid">
 
-    <!-- MAIN CONTENT -->
-    <main class="owner-main">
+      <a class="tile" href="/public/pages/owner/users.html">
+        <h3>Users</h3>
+      </a>
 
-      <!-- OVERVIEW GRID -->
-      <section class="owner-section full-width">
-        <h2>Platform Overview</h2>
-        <div id="overview-grid" class="overview-grid"></div>
-      </section>
+      <a class="tile" href="/public/pages/owner/skaters.html">
+        <h3>Skaters</h3>
+      </a>
 
-      <!-- MIGRATION RUNNER -->
-      <section class="owner-section full-width">
-        <h2>Database Tools</h2>
+      <a class="tile" href="/public/pages/owner/businesses.html">
+        <h3>Businesses</h3>
+      </a>
 
-        <button id="runMigrationsBtn" class="danger-btn">
-          Run All Migrations
-        </button>
+      <a class="tile" href="/public/pages/owner/musicians.html">
+        <h3>Musicians</h3>
+      </a>
 
-        <div id="migrationResult" class="migration-output"></div>
-      </section>
+      <a class="tile" href="/public/pages/owner/shows.html">
+        <h3>Shows</h3>
+      </a>
 
-    </main>
+      <a class="tile" href="/public/pages/owner/contracts.html">
+        <h3>Contracts</h3>
+      </a>
+
+      <a class="tile" href="/public/pages/owner/music.html">
+        <h3>Music Library</h3>
+      </a>
+
+      <a class="tile" href="/public/pages/owner/business-application.html">
+        <h3>Applications</h3>
+      </a>
+
+      <a class="tile" href="/public/pages/owner/owner-verifications.html">
+        <h3>Verifications</h3>
+      </a>
+
+      <a class="tile" href="/public/pages/owner/owner-payout.html">
+        <h3>Payouts</h3>
+      </a>
+
+      <a class="tile" href="/public/pages/owner/owner-analytics.html">
+        <h3>Analytics</h3>
+      </a>
+
+      <a class="tile" href="/public/pages/owner/settings.html">
+        <h3>Settings</h3>
+      </a>
+
+    </section>
+
+    <!-- OVERVIEW -->
+    <section class="owner-section full-width">
+      <h2>Platform Overview</h2>
+      <div id="overview-grid" class="overview-grid"></div>
+    </section>
+
+    <!-- MIGRATIONS -->
+    <section class="owner-section full-width">
+      <h2>Database Tools</h2>
+
+      <button id="runMigrationsBtn" class="danger-btn">
+        Run All Migrations
+      </button>
+
+      <div id="migrationResult" class="migration-output"></div>
+    </section>
 
   </div>
 
-  <!-- JS -->
   <script type="module" src="/public/js/owner/owner-dashboard.js"></script>
 
 </body>
