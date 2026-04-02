@@ -1,18 +1,18 @@
-// worker.js — FULL CLEAN REBUILD WITH MIGRATION RUNNER
+// worker.js — FULL CLEAN REBUILD WITH AUTO MIGRATION RUNNER
 
-import { 
-  cors, 
-  apiJson, 
-  login, 
-  requireRole 
+import {
+  cors,
+  apiJson,
+  login,
+  requireRole
 } from "./users.js";
 
-import { 
-  signupBuyer, 
-  listTickets, 
-  listPurchases, 
-  createTicket, 
-  partnerWebhook 
+import {
+  signupBuyer,
+  listTickets,
+  listPurchases,
+  createTicket,
+  partnerWebhook
 } from "./buyers.js";
 
 import {
@@ -102,23 +102,24 @@ async function withOwnerOverride(request, env, allowedRoles, handler) {
 }
 
 /* ============================================================
-   ONE‑TIME MIGRATION RUNNER
+   AUTO-DETECT MIGRATION RUNNER
 ============================================================ */
-async function runMigrations(request, env, user) {
-  const migrationFiles = [
-    "001_init.sql",
-    "002_users.sql",
-    "003_business.sql",
-    "004_buyers.sql",
-    "005_musicians.sql",
-    "006_contracts.sql",
-    "007_shows.sql"
-  ];
+async function runAllMigrations(request, env, user) {
+  const base = new URL(request.url);
+  const listUrl = new URL("/migrations/", base).toString();
+
+  // Cloudflare serves folder index as HTML
+  const indexHtml = await fetch(listUrl).then(r => r.text());
+
+  // Extract all .sql filenames
+  const files = [...indexHtml.matchAll(/>(\d+[^<]+\.sql)</g)]
+    .map(m => m[1])
+    .sort();
 
   const results = [];
 
-  for (const file of migrationFiles) {
-    const sqlUrl = new URL(`/migrations/${file}`, request.url).toString();
+  for (const file of files) {
+    const sqlUrl = new URL(`/migrations/${file}`, base).toString();
     const sql = await fetch(sqlUrl).then(r => r.text());
 
     await env.DB_users.exec(sql);
@@ -253,7 +254,7 @@ export default {
          OWNER
       ============================================================ */
       if (path === "/api/owner/run-migrations" && method === "POST") {
-        return withOwnerOverride(request.clone(), env, ["owner"], runMigrations);
+        return withOwnerOverride(request.clone(), env, ["owner"], runAllMigrations);
       }
 
       if (path === "/api/owner/overview" && method === "GET") {
