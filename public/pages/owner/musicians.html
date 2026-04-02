@@ -2,75 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Roll Show • Owner • Musicians</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner • Musicians</title>
+  <link rel="icon" href="/favicon.png" />
+  <link rel="stylesheet" href="/app/styles/styles.css" />
+  <link rel="stylesheet" href="/pages/owner/css/owner.css" />
   <style>
-    body { margin:0; background:#0b0b0c; color:#fff; font-family:Inter,sans-serif; }
-    .sidebar { position:fixed; top:0; left:0; width:260px; height:100vh; background:#111; border-right:1px solid rgba(255,255,255,0.08); padding:30px 20px; box-sizing:border-box; }
-    .sidebar h1 { font-size:26px; margin-bottom:40px; font-weight:700; letter-spacing:1px; color:#ff0050; }
-    .nav-link { display:block; padding:12px 10px; margin-bottom:10px; border-radius:6px; color:#ccc; text-decoration:none; font-size:15px; transition:0.2s; }
-    .nav-link:hover { background:rgba(255,0,80,0.15); color:#fff; }
-    .main { margin-left:260px; padding:40px; }
-    .title { font-size:30px; font-weight:800; margin-bottom:10px; }
-    .subtitle { color:#aaa; margin-bottom:30px; }
-    table { width:100%; border-collapse:collapse; background:#141416; border-radius:10px; overflow:hidden; }
-    th, td { padding:12px 14px; font-size:14px; border-bottom:1px solid rgba(255,255,255,0.06); }
-    th { text-align:left; background:#18181a; color:#ff0050; }
-    tr:hover { background:#18181a; }
+    .bg-landing { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: cover; filter: brightness(0.35); z-index: -2; }
+    .owner-shell { padding: 30px; max-width: 1500px; margin: 0 auto; color: white; }
+    .page-header h1 { font-size: 36px; font-weight: 800; margin-bottom: 5px; }
+    .page-header p { opacity: 0.8; margin-bottom: 25px; }
+    .section-title { margin: 25px 0 10px; font-size: 22px; font-weight: 700; border-left: 4px solid gold; padding-left: 10px; }
+    .panel { background: rgba(0,0,0,0.55); border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); padding: 18px; backdrop-filter: blur(6px); }
+    .layout-grid { display: grid; grid-template-columns: 2fr 1.2fr; gap: 20px; }
+    .filters { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .filters input { padding: 8px 10px; border-radius: 6px; border: none; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    th { text-align: left; opacity: 0.8; font-weight: 600; }
+    tr:hover { background: rgba(255,255,255,0.05); cursor: pointer; }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <h1>OWNER</h1>
-    <a class="nav-link" href="./owner-dashboard.html">Dashboard Overview</a>
-    <a class="nav-link" href="./users.html">Users</a>
-    <a class="nav-link" href="./skaters.html">Skaters</a>
-    <a class="nav-link" href="./businesses.html">Businesses</a>
-    <a class="nav-link" href="./musicians.html">Musicians</a>
-    <a class="nav-link" href="./shows.html">Shows</a>
-    <a class="nav-link" href="./contracts.html">Contracts</a>
-    <a class="nav-link" href="./music.html">Music Library</a>
-    <a class="nav-link" href="./settings.html">Platform Settings</a>
+  <img src="/favicon.png" class="bg-landing" alt="Background" />
+
+  <div class="owner-shell">
+    <header class="page-header">
+      <h1>Musicians</h1>
+      <p>Artists contributing to the Roll Show soundscape.</p>
+    </header>
+
+    <div class="layout-grid">
+      <div>
+        <h2 class="section-title">Musician List</h2>
+        <div class="panel">
+          <div class="filters">
+            <input id="musicianSearch" type="text" placeholder="Search by name or email" />
+          </div>
+          <div style="max-height: 500px; overflow: auto;">
+            <table id="musiciansTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Genre</th>
+                  <th>Tracks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- JS injects rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">Musician Details</h2>
+        <div class="panel" id="musicianDetail">
+          <p>Select a musician to view profile, tracks, and collaboration history.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="main">
-    <div class="title">Musicians</div>
-    <div class="subtitle">Artists providing music for Roll Show.</div>
-
-    <table id="musicians-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Tracks</th>
-          <th>Joined</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <script>
-    async function loadMusicians() {
-      const owner = JSON.parse(localStorage.getItem("rollshow_user") || "{}");
-      const res = await fetch("/api/owner/musicians", {
-        headers: { "x-owner-id": owner.id }
-      });
-      const data = await res.json();
-      const tbody = document.querySelector("#musicians-table tbody");
-      tbody.innerHTML = "";
-      data.musicians.forEach(m => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${m.name || "-"}</td>
-          <td>${m.email || "-"}</td>
-          <td>${m.track_count || 0}</td>
-          <td>${m.created_at || "-"}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-    loadMusicians();
-  </script>
+  <script type="module" src="/app/js/owner/musicians.js"></script>
 </body>
 </html>
