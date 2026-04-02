@@ -1,19 +1,4 @@
 /* ============================================================
-   BACKGROUND (FULLSCREEN, LOCKED, PERFECT)
-============================================================ */
-.bg-landing {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  object-position: center;
-  z-index: -2;
-  pointer-events: none;
-}
-
-/* ============================================================
    SIDEBAR
 ============================================================ */
 .sidebar {
@@ -87,15 +72,15 @@
 }
 
 /* ============================================================
-   MAIN CONTENT (FIXED + CLEAN)
+   MAIN CONTENT
 ============================================================ */
 .main {
-  margin-left: 260px;   /* FIX: prevents overlap */
+  margin-left: 260px;
   padding: 40px;
   position: relative;
   z-index: 10;
   color: #fff;
-  min-height: 100vh;    /* FIX: ensures full height */
+  min-height: 100vh;
 }
 
 .title {
@@ -169,6 +154,32 @@
 }
 
 /* ============================================================
+   TILE GRID
+============================================================ */
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin: 40px 0;
+}
+
+.tile {
+  background: rgba(0,0,0,0.55);
+  padding: 30px;
+  border-radius: 14px;
+  text-align: center;
+  color: white;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  transition: 0.2s;
+}
+
+.tile:hover {
+  background: rgba(0,0,0,0.75);
+  transform: scale(1.03);
+}
+
+/* ============================================================
    MOBILE RESPONSIVE
 ============================================================ */
 @media (max-width: 900px) {
@@ -193,26 +204,4 @@
   .main.shifted {
     margin-left: 260px;
   }
-}
-.tile-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-  margin: 40px 0;
-}
-
-.tile {
-  background: rgba(0,0,0,0.55);
-  padding: 30px;
-  border-radius: 14px;
-  text-align: center;
-  color: white;
-  text-decoration: none;
-  backdrop-filter: blur(6px);
-  transition: 0.2s;
-}
-
-.tile:hover {
-  background: rgba(0,0,0,0.75);
-  transform: scale(1.03);
 }
