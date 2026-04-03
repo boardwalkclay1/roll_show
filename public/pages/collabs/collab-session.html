@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Collab Session</title>
+
+  <link rel="icon" type="image/png" href="/assets/icons/rollshow-favicon.png" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/collabs.css" />
+
+  <style>
+    :root {
+      --collabs-bg-image: url('/assets/backgrounds/collab-session-bg.jpg');
+    }
+
+    body.collab-session-page {
+      background-image: var(--collabs-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .session-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    .collabs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      opacity: 0.8;
+    }
+
+    .session-main {
+      flex: 1;
+      padding: 1rem 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: rgba(10, 10, 15, 0.9);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.9;
+      margin-bottom: 0.75rem;
+    }
+
+    .session-status {
+      font-size: 0.8rem;
+      opacity: 0.85;
+      margin-bottom: 0.75rem;
+    }
+
+    .session-chat {
+      max-height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .chat-bubble {
+      padding: 0.5rem 0.75rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 0.8rem;
+      max-width: 80%;
+    }
+
+    .chat-bubble.me {
+      align-self: flex-end;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 0.5rem 0.7rem;
+      color: #f9fafb;
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    .chat-send-btn {
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.75rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      color: #0b0b10;
+      font-weight: 600;
+    }
+
+    .upload-box {
+      border: 1px dashed rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      opacity: 0.85;
+      cursor: pointer;
+      margin-bottom: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      border: none;
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      color: #0b0b10;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0.5rem 1.5rem 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+      backdrop-filter: blur(16px);
+    }
+
+    .bottom-nav-btn {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      opacity: 0.85;
+    }
+
+    .bottom-nav-btn.primary {
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      border-color: transparent;
+      color: #0b0b10;
+      font-weight: 600;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body class="collab-session-page">
+  <div class="session-shell">
+    <header class="collabs-header">
+      <div class="brand-title">Roll Show · Collab Session</div>
+      <span class="pill" id="collab-session-status-pill">Active</span>
+    </header>
+
+    <main class="session-main">
+      <!-- LEFT: Chat -->
+      <section class="panel">
+        <div class="panel-title">Session Chat</div>
+
+        <div class="session-status" id="collab-session-status">
+          You and @otherSkater are in an active collab session. Use this chat to coordinate and lock in clips.
+        </div>
+
+        <div class="session-chat" id="session-chat">
+          <div class="chat-bubble">Yo, I’m at the spot.</div>
+          <div class="chat-bubble me">On the way, 5 minutes.</div>
+        </div>
+
+        <div class="chat-input-row">
+          <input id="chat-input" class="chat-input" placeholder="Send a message…" />
+          <button class="chat-send-btn" id="chat-send">Send</button>
+        </div>
+      </section>
+
+      <!-- RIGHT: Upload + Controls -->
+      <aside class="panel">
+        <div class="panel-title">Upload Clips</div>
+
+        <div class="upload-box" id="upload-clip">
+          Click to upload your collab clip
+        </div>
+
+        <button class="btn-primary" id="session-mark-complete">
+          Mark Session Complete
+        </button>
+      </aside>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="bottom-nav-btn" id="nav-collab-back">Back</button>
+      <button class="bottom-nav-btn primary" id="nav-collab-finish">Finish</button>
+    </nav>
+  </div>
+
+  <!-- JS later: websocket/poll chat, upload to /api/media, mark collab complete -->
+</body>
+</html>
