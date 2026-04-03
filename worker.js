@@ -1,9 +1,10 @@
 // worker.js — FULL CLEAN REBUILD WITH AUTH PIPELINE + OWNER OVERRIDE + MIGRATIONS + MEDIA (R2 + KV)
 
+import bcrypt from "bcryptjs";
+
 import {
   cors,
   apiJson,
-  login,
   requireRole
 } from "./users.js";
 
@@ -77,9 +78,7 @@ function logRequest(request, extra = {}) {
 }
 
 /* ============================================================
-   AUTH HEADER INJECTION (FRONTEND → WORKER)
-   - Frontend sends: x-user: JSON.stringify(user)
-   - Worker needs:   x-user-id, x-user-role
+   AUTH HEADER INJECTION
 ============================================================ */
 function attachAuthHeaders(request) {
   const raw = request.headers.get("x-user");
@@ -87,8 +86,8 @@ function attachAuthHeaders(request) {
 
   try {
     const user = JSON.parse(raw);
-
     const newHeaders = new Headers(request.headers);
+
     if (user.id) newHeaders.set("x-user-id", user.id);
     if (user.role) newHeaders.set("x-user-role", user.role);
 
@@ -124,7 +123,7 @@ async function withOwnerOverride(request, env, allowedRoles, handler) {
 }
 
 /* ============================================================
-   AUTO-DETECT MIGRATION RUNNER
+   MIGRATIONS
 ============================================================ */
 async function runAllMigrations(request, env, user) {
   const base = new URL(request.url);
@@ -163,8 +162,7 @@ async function getMediaMeta(env, id) {
 }
 
 /* ============================================================
-   MEDIA: INIT UPLOAD (CREATE ID + KEY + METADATA SHELL)
-   body: { type: "music"|"video"|"photo", filename, contentType, size }
+   MEDIA: INIT UPLOAD
 ============================================================ */
 async function mediaInitUpload(request, env, user) {
   const { type, filename, contentType, size } = await request.json();
@@ -202,16 +200,12 @@ async function mediaInitUpload(request, env, user) {
 }
 
 /* ============================================================
-   MEDIA: UPLOAD FILE BODY TO R2
-   PUT /api/media/upload/:id  (body = file)
+   MEDIA: UPLOAD FILE
 ============================================================ */
 async function mediaUpload(request, env, user, id) {
   const meta = await getMediaMeta(env, id);
-  if (!meta) {
-    return apiJson({ message: "Media not initialized" }, 404);
-  }
+  if (!meta) return apiJson({ message: "Media not initialized" }, 404);
 
-  // Optional: enforce owner of media
   if (meta.user_id !== user.id && user.role !== "owner") {
     return apiJson({ message: "Forbidden" }, 403);
   }
@@ -229,32 +223,24 @@ async function mediaUpload(request, env, user, id) {
 }
 
 /* ============================================================
-   MEDIA: GET METADATA
-   GET /api/media/meta/:id
+   MEDIA: GET META
 ============================================================ */
 async function mediaGetMeta(request, env, user, id) {
   const meta = await getMediaMeta(env, id);
-  if (!meta) {
-    return apiJson({ message: "Not found" }, 404);
-  }
+  if (!meta) return apiJson({ message: "Not found" }, 404);
 
   return apiJson({ media: meta });
 }
 
 /* ============================================================
-   MEDIA: STREAM FILE FROM R2
-   GET /api/media/file/:id
+   MEDIA: STREAM FILE
 ============================================================ */
 async function mediaGetFile(request, env, user, id) {
   const meta = await getMediaMeta(env, id);
-  if (!meta) {
-    return apiJson({ message: "Not found" }, 404);
-  }
+  if (!meta) return apiJson({ message: "Not found" }, 404);
 
   const obj = await env.R2.get(meta.key);
-  if (!obj) {
-    return apiJson({ message: "File missing" }, 404);
-  }
+  if (!obj) return apiJson({ message: "File missing" }, 404);
 
   const headers = {
     "Content-Type": obj.httpMetadata?.contentType || "application/octet-stream",
@@ -270,7 +256,6 @@ async function mediaGetFile(request, env, user, id) {
 export default {
   async fetch(request, env, ctx) {
     try {
-      // Inject auth headers from x-user
       request = attachAuthHeaders(request);
 
       const url = new URL(request.url);
@@ -284,12 +269,39 @@ export default {
         return new Response(null, { status: 204, headers: cors() });
       }
 
-      /* AUTH */
+      /* ============================================================
+         ⭐ FIXED LOGIN ROUTE (UNLOCKS OWNER)
+      ============================================================ */
       if (path === "/api/login" && method === "POST") {
-        return login(request.clone(), env);
+        const body = await request.clone().json();
+        const { email, password } = body;
+
+        const row = await env.DB_users
+          .prepare("SELECT id, email, role, password_hash FROM users WHERE email = ?")
+          .bind(email)
+          .first();
+
+        if (!row) return apiJson({ success: false }, 401);
+
+        const ok = await bcrypt.compare(password, row.password_hash);
+        if (!ok) return apiJson({ success: false }, 401);
+
+        const is_owner = row.role === "owner";
+
+        return apiJson({
+          success: true,
+          user: {
+            id: row.id,
+            email: row.email,
+            role: row.role,
+            is_owner
+          }
+        });
       }
 
-      /* SIGNUP */
+      /* ============================================================
+         SIGNUP
+      ============================================================ */
       const signupRoutes = {
         "/api/buyer/signup": signupBuyer,
         "/api/skater/signup": signupSkater,
@@ -301,7 +313,9 @@ export default {
         return signupRoutes[path](request.clone(), env);
       }
 
-      /* PUBLIC SHOWS */
+      /* ============================================================
+         PUBLIC SHOWS
+      ============================================================ */
       if (path === "/api/shows" && method === "GET") {
         return listShows(env);
       }
@@ -312,10 +326,8 @@ export default {
       }
 
       /* ============================================================
-         MEDIA (R2 + KV)
+         MEDIA
       ============================================================ */
-
-      // INIT UPLOAD (create media id + key + metadata shell)
       if (path === "/api/media/init-upload" && method === "POST") {
         return requireRole(
           request.clone(),
@@ -325,7 +337,6 @@ export default {
         );
       }
 
-      // UPLOAD FILE BODY
       if (path.startsWith("/api/media/upload/") && method === "PUT") {
         const id = path.split("/").pop();
         return requireRole(
@@ -336,7 +347,6 @@ export default {
         );
       }
 
-      // GET METADATA
       if (path.startsWith("/api/media/meta/") && method === "GET") {
         const id = path.split("/").pop();
         return requireRole(
@@ -347,7 +357,6 @@ export default {
         );
       }
 
-      // STREAM FILE
       if (path.startsWith("/api/media/file/") && method === "GET") {
         const id = path.split("/").pop();
         return requireRole(
@@ -503,7 +512,7 @@ export default {
       }
 
       /* ============================================================
-         SYSTEM (STUBS)
+         SYSTEM STUBS
       ============================================================ */
       if (path === "/api/messages" && method === "GET") {
         return apiJson({ data: [], success: true });
