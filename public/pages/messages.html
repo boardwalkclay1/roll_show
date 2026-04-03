@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show — Messages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-logo">ROLL SHOW</div>
+
+      <div class="app-header-right">
+        <div class="messages-search">
+          <input
+            type="text"
+            id="messages-search-input"
+            placeholder="Search messages, people, tags..."
+          />
+          <button id="messages-search-btn">Search</button>
+        </div>
+
+        <button id="notifications-button" class="icon-button">
+          <span class="icon-bell"></span>
+          <span id="notifications-badge" class="badge hidden"></span>
+        </button>
+      </div>
+    </header>
+
+    <main class="messages-layout">
+      <!-- LEFT: FOLDERS + THREAD LIST -->
+      <aside class="messages-sidebar">
+        <div class="messages-tabs">
+          <button class="tab-button active" data-folder="requests">Requests</button>
+          <button class="tab-button" data-folder="important">Important</button>
+          <button class="tab-button" data-folder="conversations">Conversations</button>
+        </div>
+
+        <div class="messages-filters">
+          <select id="messages-role-filter">
+            <option value="">All roles</option>
+            <option value="skater">Skaters</option>
+            <option value="musician">Musicians</option>
+            <option value="business">Businesses</option>
+            <option value="buyer">Buyers</option>
+          </select>
+
+          <select id="messages-tag-filter">
+            <option value="">All tags</option>
+            <!-- tags injected by JS -->
+          </select>
+        </div>
+
+        <div id="messages-thread-list" class="thread-list">
+          <!-- threads injected by JS -->
+        </div>
+      </aside>
+
+      <!-- RIGHT: ACTIVE THREAD -->
+      <section class="messages-thread-panel">
+        <div id="thread-empty-state" class="thread-empty">
+          <h2>Messages</h2>
+          <p>Select a conversation or open a request to start.</p>
+        </div>
+
+        <div id="thread-panel" class="thread-panel hidden">
+          <header class="thread-header">
+            <div class="thread-partner">
+              <img id="thread-partner-avatar" class="avatar" src="" alt="" />
+              <div>
+                <div id="thread-partner-name" class="partner-name"></div>
+                <div class="partner-meta">
+                  <span id="thread-partner-role" class="role-pill"></span>
+                  <span id="thread-partner-tags" class="tags-line"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="thread-actions">
+              <button id="thread-star-btn" class="icon-button" title="Mark as important">
+                ★
+              </button>
+              <button id="thread-more-btn" class="icon-button" title="More">
+                ⋮
+              </button>
+            </div>
+          </header>
+
+          <div id="thread-system-banner" class="thread-banner hidden">
+            <!-- e.g. "Message request from Buyer" / "Silent moderation notice" -->
+          </div>
+
+          <div id="thread-messages" class="thread-messages">
+            <!-- message bubbles injected by JS -->
+          </div>
+
+          <footer class="thread-composer">
+            <div id="thread-composer-locked" class="composer-locked hidden">
+              <p>This conversation is locked. You can’t send messages here.</p>
+            </div>
+
+            <div id="thread-composer-active" class="composer-active">
+              <textarea
+                id="thread-input"
+                placeholder="Type a message..."
+                rows="2"
+              ></textarea>
+              <div class="composer-actions">
+                <button id="thread-send-btn" class="btn-primary">Send</button>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
