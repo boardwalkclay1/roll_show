@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Event Detail</title>
+
+  <link rel="icon" type="image/png" href="/assets/icons/rollshow-favicon.png" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/events.css" />
+
+  <style>
+    :root {
+      --events-bg-image: url('/assets/backgrounds/events-detail-bg.jpg');
+    }
+
+    body.event-detail-page {
+      background-image: var(--events-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .events-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    .events-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+    }
+
+    .events-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #ffd29f, #ff7b54, #3b1f2b);
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .events-main {
+      flex: 1;
+      padding: 1rem 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.1fr);
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: rgba(10, 10, 15, 0.82);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.9;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      opacity: 0.8;
+    }
+
+    .event-title-main {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .event-category-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.85;
+      margin-bottom: 0.5rem;
+    }
+
+    .event-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      opacity: 0.85;
+      margin-bottom: 0.75rem;
+    }
+
+    .event-meta-pill {
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.75rem;
+      opacity: 0.85;
+    }
+
+    .event-description {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      line-height: 1.5;
+      margin-bottom: 0.75rem;
+    }
+
+    .event-section-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.8;
+      margin-top: 0.75rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .event-detail-list {
+      font-size: 0.8rem;
+      opacity: 0.85;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .event-qr-block {
+      margin-top: 0.75rem;
+      padding: 0.75rem 0.85rem;
+      border-radius: 12px;
+      border: 1px dashed rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .event-qr-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(34, 197, 94, 0.6);
+      background: rgba(22, 163, 74, 0.12);
+    }
+
+    .event-qr-button {
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      color: #0b0b10;
+      font-weight: 600;
+    }
+
+    .sidebar-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .sidebar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    .sidebar-item span {
+      display: block;
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0.5rem 1.5rem 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+      backdrop-filter: blur(16px);
+    }
+
+    .bottom-nav-btn {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      opacity: 0.85;
+    }
+
+    .bottom-nav-btn.primary {
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      border-color: transparent;
+      color: #0b0b10;
+      font-weight: 600;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body class="event-detail-page">
+  <div class="events-shell">
+    <header class="events-header">
+      <div class="events-header-left">
+        <div class="brand-mark"></div>
+        <div>
+          <div class="brand-title">Roll Show</div>
+          <div style="font-size: 0.75rem; opacity: 0.7;">Event Detail</div>
+        </div>
+      </div>
+      <div class="events-header-right">
+        <span class="pill" id="event-category-pill">Skater Event</span>
+      </div>
+    </header>
+
+    <main class="events-main">
+      <!-- LEFT: Event detail -->
+      <section class="panel" id="event-detail-panel">
+        <div class="panel-header">
+          <div class="panel-title">Event</div>
+          <span class="pill">Read Only</span>
+        </div>
+
+        <h1 class="event-title-main" id="event-title">
+          Sunset Dancer Jam · BeltLine
+        </h1>
+
+        <div class="event-category-tag" id="event-category-tag">
+          <span style="width: 8px; height: 8px; border-radius: 999px; background: #22c55e;"></span>
+          Skater · Longboarder · Dancer
+        </div>
+
+        <div class="event-meta-row">
+          <div class="event-meta-pill" id="event-date-time">
+            Today · 6:30 PM – 9:00 PM
+          </div>
+          <div class="event-meta-pill" id="event-location">
+            Atlanta BeltLine · Eastside Trail
+          </div>
+          <div class="event-meta-pill" id="event-host">
+            Hosted by Roll Show
+          </div>
+        </div>
+
+        <div class="event-description" id="event-description">
+          A curated sunset jam for longboard dancers and flow skaters. We’re taking over a smooth stretch of the BeltLine
+          for a cinematic session—music, combos, and flow. All levels welcome. Bring your board, your best lines, and your
+          favorite tracks.
+        </div>
+
+        <div class="event-section-title">Details</div>
+        <div class="event-detail-list" id="event-details-list">
+          <div>• Category: Skater Event</div>
+          <div>• Recommended roles: Skaters, buyers, photographers</div>
+          <div>• Dress code: Comfortable, expressive, camera‑ready</div>
+          <div>• Weather plan: Light rain = still on, heavy rain = reschedule</div>
+        </div>
+
+        <div class="event-section-title">Access & Check‑In</div>
+        <div class="event-qr-block">
+          <div>
+            <div style="font-size: 0.8rem; opacity: 0.9; margin-bottom: 0.25rem;">
+              This event uses QR check‑in for attendance and rewards.
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; font-size: 0.75rem; opacity: 0.8;">
+              <span>• Scan on arrival to check in</span>
+              <span>• Unlock session badges</span>
+              <span>• Eligible for future invites</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;">
+            <div class="event-qr-indicator">
+              <span style="width: 8px; height: 8px; border-radius: 999px; background: #22c55e;"></span>
+              QR Enabled
+            </div>
+            <button class="event-qr-button" id="event-open-qr">
+              View QR Check‑In
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Sidebar -->
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Context</div>
+          <span class="pill">For You</span>
+        </div>
+
+        <section class="sidebar-section">
+          <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 0.35rem;">Who this is for</div>
+          <div class="sidebar-list">
+            <div class="sidebar-item">
+              Skaters
+              <span>Flow, dance, and session skaters looking for a cinematic group run.</span>
+            </div>
+            <div class="sidebar-item">
+              Buyers
+              <span>People who want to experience the culture and discover skaters and brands.</span>
+            </div>
+            <div class="sidebar-item">
+              Businesses
+              <span>Brands scouting talent, culture, and authentic community energy.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="sidebar-section">
+          <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 0.35rem;">What to expect</div>
+          <div class="sidebar-list">
+            <div class="sidebar-item">
+              Flow Sessions
+              <span>Open space to run lines, film combos, and meet other skaters.</span>
+            </div>
+            <div class="sidebar-item">
+              Cameras & Clips
+              <span>Expect phones, cameras, and content—this is a cinematic environment.</span>
+            </div>
+            <div class="sidebar-item">
+              Future Invites
+              <span>Check‑ins help us invite you to future sessions and events.</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="bottom-nav-btn" id="nav-events-back">All Events</button>
+      <button class="bottom-nav-btn primary" id="nav-events-cta">I’m Going</button>
+      <button class="bottom-nav-btn" id="nav-events-share">Share</button>
+    </nav>
+  </div>
+
+  <!-- JS later: load event by ID, wire QR button, navigation -->
+</body>
+</html>
