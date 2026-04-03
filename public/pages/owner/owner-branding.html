@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show — Branding Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/css/owner.css" />
+</head>
+
+<body>
+  <div class="owner-shell">
+    <aside class="owner-sidebar">
+      <div class="owner-logo">ROLL SHOW</div>
+
+      <div class="owner-nav">
+        <a href="/pages/owner/owner-branding.html" class="active">Branding</a>
+        <a href="/pages/owner/owner-notes.html">Owner Notes</a>
+        <a href="/pages/owner/owner-ads.html">Ads</a>
+        <a href="/pages/owner/owner-sponsorships.html">Sponsorships</a>
+      </div>
+    </aside>
+
+    <main class="owner-main">
+      <section class="owner-section active">
+        <div class="section-title">Branding</div>
+        <div class="section-subtitle">Control the global Roll Show look.</div>
+
+        <div class="card">
+          <h3>Colors</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Primary Color</label>
+              <input type="color" id="brand-primary" />
+            </div>
+            <div class="field">
+              <label>Secondary Color</label>
+              <input type="color" id="brand-secondary" />
+            </div>
+            <div class="field">
+              <label>Accent Color</label>
+              <input type="color" id="brand-accent" />
+            </div>
+            <div class="field">
+              <label>Theme Mode</label>
+              <select id="brand-theme">
+                <option value="cinematic">Cinematic</option>
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btn-save-branding">Save Branding</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Logos & Background</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Main Logo</label>
+              <input type="file" id="brand-logo" accept="image/*" />
+            </div>
+            <div class="field">
+              <label>Favicon</label>
+              <input type="file" id="brand-favicon" accept="image/*" />
+            </div>
+            <div class="field">
+              <label>Cinematic Background</label>
+              <input type="file" id="brand-background" accept="image/*,video/*" />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btn-upload-brand-assets">Upload Assets</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/owner-branding.js"></script>
+</body>
+</html>
