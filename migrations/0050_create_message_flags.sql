@@ -1,0 +1,6 @@
+CREATE TABLE message_flags (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  message_id TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+)

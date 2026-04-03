@@ -1,0 +1,8 @@
+CREATE TABLE qr_scans (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  qr_id TEXT NOT NULL,
+  viewer_id TEXT,
+  ip TEXT,
+  user_agent TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+)
