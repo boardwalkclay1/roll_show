@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Start Stitch Collab</title>
+
+  <link rel="icon" href="/assets/icons/rollshow-favicon.png" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/collabs.css" />
+
+  <style>
+    :root {
+      --collabs-bg-image: url('/assets/backgrounds/collabs-stitch-bg.jpg');
+    }
+
+    body.collab-start-stitch-page {
+      background-image: var(--collabs-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .collabs-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    .collabs-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+    }
+
+    .collabs-main {
+      flex: 1;
+      padding: 1rem 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: rgba(10, 10, 15, 0.9);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.9;
+      margin-bottom: 0.75rem;
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .form-input, .form-textarea {
+      background: rgba(0,0,0,0.6);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.16);
+      padding: 0.5rem 0.7rem;
+      color: #fff;
+      font-size: 0.8rem;
+    }
+
+    .upload-box {
+      border: 1px dashed rgba(255,255,255,0.25);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      opacity: 0.85;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg,#ffb86c,#ff6b6b);
+      border: none;
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      color: #0b0b10;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 0.5rem 1.5rem 0.9rem;
+      display: flex;
+      gap: 0.75rem;
+      background: linear-gradient(to top,rgba(0,0,0,0.9),transparent);
+      backdrop-filter: blur(16px);
+    }
+
+    .bottom-nav-btn {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      color: #fff;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .bottom-nav-btn.primary {
+      background: linear-gradient(135deg,#ffb86c,#ff6b6b);
+      border-color: transparent;
+      color: #0b0b10;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body class="collab-start-stitch-page">
+  <div class="collabs-shell">
+
+    <header class="collabs-header">
+      <div class="brand-title">Roll Show · Stitch Collab</div>
+      <span class="pill">Skater</span>
+    </header>
+
+    <main class="collabs-main">
+
+      <section class="panel">
+        <div class="panel-title">Remote Stitch Collab</div>
+
+        <form id="collab-stitch-form">
+
+          <div class="form-row">
+            <label>Invite Skater</label>
+            <input class="form-input" name="target_skater" placeholder="@skaterhandle" />
+          </div>
+
+          <div class="form-row">
+            <label>Your Clip</label>
+            <div class="upload-box" id="upload-clip-box">
+              Click to upload your clip
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>Intent</label>
+            <textarea class="form-textarea" name="intent" placeholder="Describe the concept for the split-screen edit."></textarea>
+          </div>
+
+          <div class="form-row">
+            <label>Deadline</label>
+            <input class="form-input" type="date" name="deadline" />
+          </div>
+
+          <button class="btn-primary" type="submit">Send Stitch Offer</button>
+
+        </form>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-title">How Stitch Works</div>
+
+        <p style="opacity:0.85; font-size:0.8rem;">
+          Each skater uploads a clip. Roll Show stitches the final edit into a cinematic split-screen video.
+        </p>
+
+        <ul style="opacity:0.8; font-size:0.8rem; line-height:1.5;">
+          <li>Upload your clip</li>
+          <li>Invite another skater</li>
+          <li>They upload their clip</li>
+          <li>System stitches the final edit</li>
+          <li>Post to feed</li>
+        </ul>
+      </aside>
+
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="bottom-nav-btn">Back</button>
+      <button class="bottom-nav-btn primary">Send Offer</button>
+    </nav>
+
+  </div>
+</body>
+</html>
