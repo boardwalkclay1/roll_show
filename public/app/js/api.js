@@ -1,4 +1,4 @@
-// js/api.js — FINAL UNIFIED API CLIENT
+// js/api.js — FINAL UNIFIED API CLIENT WITH MEDIA SUPPORT
 
 const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
 
@@ -9,7 +9,6 @@ async function safeJson(res) {
   const text = await res.text();
   const type = res.headers.get("content-type") || "";
 
-  // Worker sometimes returns HTML on errors → catch it
   if (!type.includes("application/json")) {
     return {
       success: false,
@@ -39,13 +38,18 @@ async function request(method, path, payload = null, extraHeaders = {}) {
   const options = { method, headers };
 
   // JSON payload
-  if (payload && !(payload instanceof FormData)) {
+  if (payload && !(payload instanceof FormData) && !(payload instanceof Blob)) {
     headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(payload);
   }
 
   // FormData payload
   if (payload instanceof FormData) {
+    options.body = payload;
+  }
+
+  // Binary payload (file upload)
+  if (payload instanceof Blob) {
     options.body = payload;
   }
 
@@ -97,22 +101,14 @@ const API = {
 
   // Attach user headers to any request
   withUser(user) {
-    if (!user || !user.id || !user.role) return {};
+    if (!user) return {};
     return {
-      "x-user-id": user.id,
-      "x-user-role": user.role
+      "x-user": JSON.stringify(user)
     };
   },
 
   /* ------------------------------------------------------------
      REAL-TIME POLLING
-     Usage:
-       const stop = API.poll("/api/notifications", {
-         interval: 5000,
-         headers: API.withUser(user),
-         onData: (res) => { ... }
-       });
-       // later: stop();
   ------------------------------------------------------------ */
   poll(path, { interval = 5000, headers = {}, onData } = {}) {
     let stopped = false;
@@ -129,6 +125,67 @@ const API = {
     return () => {
       stopped = true;
     };
+  },
+
+  /* ------------------------------------------------------------
+     MEDIA API (R2 + KV)
+  ------------------------------------------------------------ */
+  media: {
+    // Step 1: Initialize upload (get media ID + upload path)
+    initUpload(type, file, user) {
+      return request(
+        "POST",
+        "/api/media/init-upload",
+        {
+          type,
+          filename: file.name,
+          contentType: file.type,
+          size: file.size
+        },
+        API.withUser(user)
+      );
+    },
+
+    // Step 2: Upload file body (PUT binary)
+    async uploadFile(mediaId, file, user) {
+      return request(
+        "PUT",
+        `/api/media/upload/${mediaId}`,
+        file,
+        {
+          "Content-Type": file.type,
+          ...API.withUser(user)
+        }
+      );
+    },
+
+    // Step 3: Get metadata
+    getMeta(mediaId, user) {
+      return request(
+        "GET",
+        `/api/media/meta/${mediaId}`,
+        null,
+        API.withUser(user)
+      );
+    },
+
+    // Step 4: Stream file (returns a real Response, not JSON)
+    async getFile(mediaId, user) {
+      const res = await fetch(API_BASE + `/api/media/file/${mediaId}`, {
+        method: "GET",
+        headers: API.withUser(user)
+      });
+
+      if (!res.ok) {
+        return {
+          success: false,
+          status: res.status,
+          error: { message: "Failed to fetch file" }
+        };
+      }
+
+      return res; // caller handles blob/stream
+    }
   }
 };
 
