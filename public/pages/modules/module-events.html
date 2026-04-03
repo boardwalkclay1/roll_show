@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Events Module</title>
+
+  <link rel="icon" href="/assets/icons/rollshow-favicon.png" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/modules.css" />
+
+  <style>
+    :root {
+      --modules-bg-image: url('/assets/backgrounds/module-events-bg.jpg');
+    }
+
+    body.module-events-page {
+      background-image: var(--modules-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .module-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    .module-main {
+      flex: 1;
+      padding: 1rem 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: rgba(10,10,15,0.9);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .event-card {
+      padding: 0.75rem 0.85rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 0.75rem;
+    }
+
+    .event-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .event-meta {
+      font-size: 0.75rem;
+      opacity: 0.75;
+    }
+  </style>
+</head>
+
+<body class="module-events-page">
+  <div class="module-shell">
+
+    <header class="collabs-header">
+      <div class="brand-title">Roll Show · Events Module</div>
+      <span class="pill">Module</span>
+    </header>
+
+    <main class="module-main">
+
+      <section class="panel">
+        <div class="panel-title">Upcoming Events</div>
+
+        <div id="module-events-list">
+          <div class="event-card">
+            <div class="event-title">Sunset Dancer Jam</div>
+            <div class="event-meta">Today · 6:30 PM · Atlanta</div>
+          </div>
+
+          <div class="event-card">
+            <div class="event-title">Brand Collab Mixer</div>
+            <div class="event-meta">Friday · 7:00 PM · Studio</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-title">Event Types</div>
+
+        <ul style="opacity:0.8; font-size:0.8rem; line-height:1.5;">
+          <li>Skater Jams</li>
+          <li>Business Activations</li>
+          <li>Buyer Access Nights</li>
+          <li>QR‑Only Events</li>
+        </ul>
+      </aside>
+
+    </main>
+
+  </div>
+</body>
+</html>
