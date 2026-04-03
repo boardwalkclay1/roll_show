@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show — Search</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-logo">ROLL SHOW</div>
+      <div class="search-header">
+        <input
+          type="text"
+          id="global-search-input"
+          placeholder="Search people, tags, roles..."
+        />
+        <button id="global-search-btn">Search</button>
+      </div>
+    </header>
+
+    <main class="search-layout">
+      <aside class="search-filters">
+        <h2>Filters</h2>
+
+        <div class="field">
+          <label>Role</label>
+          <select id="global-search-role-filter">
+            <option value="">All roles</option>
+            <option value="skater">Skaters</option>
+            <option value="musician">Musicians</option>
+            <option value="business">Businesses</option>
+            <option value="buyer">Buyers</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Tag</label>
+          <select id="global-search-tag-filter">
+            <option value="">All tags</option>
+            <!-- tags injected by JS -->
+          </select>
+        </div>
+      </aside>
+
+      <section class="search-results-panel">
+        <div id="search-results" class="search-results">
+          <!-- results injected by JS -->
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
