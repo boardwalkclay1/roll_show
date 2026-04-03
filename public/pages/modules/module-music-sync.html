@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Music Sync</title>
+
+  <link rel="icon" href="/assets/icons/rollshow-favicon.png" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/modules.css" />
+
+  <style>
+    :root {
+      --modules-bg-image: url('/assets/backgrounds/music-sync-bg.jpg');
+    }
+
+    body.music-sync-page {
+      background-image: var(--modules-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .track-card {
+      padding: 0.75rem 0.85rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .track-info {
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg,#ffb86c,#ff6b6b);
+      border: none;
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      color: #0b0b10;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body class="music-sync-page">
+  <div class="module-shell">
+
+    <header class="collabs-header">
+      <div class="brand-title">Roll Show · Music Sync</div>
+      <span class="pill">Dancer</span>
+    </header>
+
+    <main class="module-main">
+
+      <section class="panel">
+        <div class="panel-title">Your Tracks</div>
+
+        <div id="track-list">
+          <div class="track-card">
+            <div class="track-info">“Sunset Flow” · 92 BPM</div>
+            <button class="btn-primary">Use</button>
+          </div>
+
+          <div class="track-card">
+            <div class="track-info">“Night Drive” · 108 BPM</div>
+            <button class="btn-primary">Use</button>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="upload-track-btn">Upload Track</button>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-title">Sync Your Runs</div>
+
+        <p style="opacity:0.85; font-size:0.8rem;">
+          Pair your dancer runs with music. Sync BPM, mood, and flow for cinematic edits.
+        </p>
+
+        <ul style="opacity:0.8; font-size:0.8rem; line-height:1.5;">
+          <li>Upload tracks</li>
+          <li>Auto BPM detection</li>
+          <li>Match combos to beats</li>
+          <li>Export synced edits</li>
+        </ul>
+      </aside>
+
+    </main>
+
+  </div>
+</body>
+</html>
