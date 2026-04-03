@@ -25,8 +25,8 @@ preview_bucket_name = "rollshow"
 # ============================================================
 [[kv_namespaces]]
 binding = "KV"
-id = "rollshow_kv"
-preview_id = "rollshow_kv"
+id = "94027daf38234d6a914cfd48c91e55f3"
+preview_id = "94027daf38234d6a914cfd48c91e55f3"
 
 # ============================================================
 # SERVICE BINDING TO AUTH WORKER
