@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Spot Finder</title>
+
+  <link rel="icon" href="/assets/icons/rollshow-favicon.png" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/modules.css" />
+
+  <style>
+    :root {
+      --modules-bg-image: url('/assets/backgrounds/spot-finder-bg.jpg');
+    }
+
+    body.spot-finder-page {
+      background-image: var(--modules-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .spot-card {
+      padding: 0.75rem 0.85rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 0.75rem;
+    }
+
+    .spot-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .spot-meta {
+      font-size: 0.75rem;
+      opacity: 0.75;
+    }
+  </style>
+</head>
+
+<body class="spot-finder-page">
+  <div class="module-shell">
+
+    <header class="collabs-header">
+      <div class="brand-title">Roll Show · Spot Finder</div>
+      <span class="pill">Dancer</span>
+    </header>
+
+    <main class="module-main">
+
+      <section class="panel">
+        <div class="panel-title">Nearby Spots</div>
+
+        <div id="spot-list">
+          <div class="spot-card">
+            <div class="spot-title">BeltLine · Eastside Trail</div>
+            <div class="spot-meta">Smooth · Long · Cinematic</div>
+          </div>
+
+          <div class="spot-card">
+            <div class="spot-title">Piedmont Park Loop</div>
+            <div class="spot-meta">Open · Scenic · Beginner Friendly</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-title">Spot Criteria</div>
+
+        <ul style="opacity:0.8; font-size:0.8rem; line-height:1.5;">
+          <li>Surface quality</li>
+          <li>Length</li>
+          <li>Traffic</li>
+          <li>Lighting</li>
+          <li>Filming potential</li>
+        </ul>
+      </aside>
+
+    </main>
+
+  </div>
+</body>
+</html>
