@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Events</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/icons/rollshow-favicon.png" />
+
+  <!-- Global dashboard styles -->
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+
+  <!-- Events-specific styles -->
+  <link rel="stylesheet" href="/assets/css/events.css" />
+
+  <!-- Background hook for this category -->
+  <style>
+    :root {
+      --events-bg-image: url('/assets/backgrounds/events-bg.jpg');
+    }
+
+    body.events-page {
+      background-image: var(--events-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .events-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    .events-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+    }
+
+    .events-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #ffd29f, #ff7b54, #3b1f2b);
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .events-main {
+      flex: 1;
+      padding: 1rem 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.1fr);
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: rgba(10, 10, 15, 0.82);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.9;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      opacity: 0.8;
+    }
+
+    .events-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .filter-chip {
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      cursor: pointer;
+      opacity: 0.8;
+      font-size: 0.75rem;
+      transition: all 0.15s ease-out;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .filter-chip.active {
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      border-color: transparent;
+      color: #0b0b10;
+      opacity: 1;
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.7);
+    }
+
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .event-card {
+      padding: 0.8rem 0.9rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      cursor: pointer;
+      transition: background 0.15s ease-out, transform 0.12s ease-out;
+    }
+
+    .event-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateY(-1px);
+    }
+
+    .event-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .event-title {
+      font-weight: 600;
+    }
+
+    .event-tag {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.8;
+    }
+
+    .event-meta {
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    .event-submeta {
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
+    .event-qr-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      opacity: 0.8;
+    }
+
+    .events-sidebar-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .events-sidebar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .events-sidebar-item {
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    .events-sidebar-item span {
+      display: block;
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0.5rem 1.5rem 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+      backdrop-filter: blur(16px);
+    }
+
+    .bottom-nav-btn {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      opacity: 0.85;
+    }
+
+    .bottom-nav-btn.primary {
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      border-color: transparent;
+      color: #0b0b10;
+      font-weight: 600;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body class="events-page">
+  <div class="events-shell">
+    <!-- HEADER -->
+    <header class="events-header">
+      <div class="events-header-left">
+        <div class="brand-mark"></div>
+        <div>
+          <div class="brand-title">Roll Show</div>
+          <div style="font-size: 0.75rem; opacity: 0.7;">Events · Business · Skater · Buyer</div>
+        </div>
+      </div>
+      <div class="events-header-right">
+        <span class="pill">
+          <span style="width: 8px; height: 8px; border-radius: 999px; background: #4ade80;"></span>
+          Live Events
+        </span>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="events-main">
+      <!-- LEFT: Events list -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">All Events</div>
+          <span class="pill">Read Only</span>
+        </div>
+
+        <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 0.75rem;">
+          Events are created by Roll Show. Skaters, businesses, and buyers can see and attend, but not create.
+        </div>
+
+        <!-- Filters -->
+        <div class="events-filters" id="events-filters">
+          <button class="filter-chip active" data-filter="all">All</button>
+          <button class="filter-chip" data-filter="business">Business</button>
+          <button class="filter-chip" data-filter="skater">Skater</button>
+          <button class="filter-chip" data-filter="buyer">Buyer</button>
+          <button class="filter-chip" data-filter="today">Today</button>
+          <button class="filter-chip" data-filter="weekend">This Weekend</button>
+          <button class="filter-chip" data-filter="qr">QR Enabled</button>
+        </div>
+
+        <!-- Events list -->
+        <div class="events-list" id="events-list">
+          <!-- Example cards; real data will be injected by JS later -->
+          <article class="event-card" data-event-id="1" data-category="skater" data-qr="true">
+            <div class="event-title-row">
+              <div class="event-title">Sunset Dancer Jam · BeltLine</div>
+              <div class="event-tag">Skater</div>
+            </div>
+            <div class="event-meta">Today · 6:30 PM · Atlanta, GA</div>
+            <div class="event-submeta">Longboarder · Dancer · Hosted by Roll Show</div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem;">
+              <div class="event-submeta">Open to all skaters and buyers.</div>
+              <div class="event-qr-pill">
+                <span style="width: 8px; height: 8px; border-radius: 999px; background: #22c55e;"></span>
+                QR Check‑In
+              </div>
+            </div>
+          </article>
+
+          <article class="event-card" data-event-id="2" data-category="business" data-qr="false">
+            <div class="event-title-row">
+              <div class="event-title">Brand Collab Night · Rink Takeover</div>
+              <div class="event-tag">Business</div>
+            </div>
+            <div class="event-meta">Friday · 8:00 PM · Decatur, GA</div>
+            <div class="event-submeta">Business showcase · Skater performances · Buyers welcome</div>
+            <div class="event-submeta">Hosted by Roll Show · Sponsored brands on site</div>
+          </article>
+
+          <article class="event-card" data-event-id="3" data-category="buyer" data-qr="true">
+            <div class="event-title-row">
+              <div class="event-title">Exclusive Merch Drop · Pop‑Up</div>
+              <div class="event-tag">Buyer</div>
+            </div>
+            <div class="event-meta">Saturday · 2:00 PM · Downtown</div>
+            <div class="event-submeta">Limited merch · QR‑only access · Hosted by Roll Show</div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem;">
+              <div class="event-submeta">Buyers and skaters welcome.</div>
+              <div class="event-qr-pill">
+                <span style="width: 8px; height: 8px; border-radius: 999px; background: #22c55e;"></span>
+                QR Required
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- RIGHT: Highlights / Upcoming / Categories -->
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Highlights</div>
+          <span class="pill">Curated</span>
+        </div>
+
+        <section class="events-sidebar-section">
+          <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 0.4rem;">Featured This Week</div>
+          <div class="events-sidebar-list" id="events-featured">
+            <div class="events-sidebar-item">
+              Sunset Dancer Jam
+              <span>Skater · Longboarder · Dancer · Today · 6:30 PM</span>
+            </div>
+            <div class="events-sidebar-item">
+              Brand Collab Night
+              <span>Business · Rink · Friday · 8:00 PM</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="events-sidebar-section">
+          <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 0.4rem;">By Category</div>
+          <div class="events-sidebar-list">
+            <div class="events-sidebar-item">
+              Business Events
+              <span>Launches, collabs, showcases, pop‑ups.</span>
+            </div>
+            <div class="events-sidebar-item">
+              Skater Events
+              <span>Jams, sessions, battles, meetups.</span>
+            </div>
+            <div class="events-sidebar-item">
+              Buyer Events
+              <span>Merch drops, access events, QR exclusives.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="events-sidebar-section">
+          <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 0.4rem;">How Events Work</div>
+          <div class="events-sidebar-list">
+            <div class="events-sidebar-item">
+              Created by Roll Show
+              <span>Events are curated and created by the platform, not users.</span>
+            </div>
+            <div class="events-sidebar-item">
+              QR Check‑Ins
+              <span>Some events use QR for attendance, access, and rewards.</span>
+            </div>
+            <div class="events-sidebar-item">
+              Role‑Aware
+              <span>Events can be targeted to skaters, businesses, or buyers.</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <!-- Bottom nav (shared pattern; can later be replaced with /shared/nav.html include) -->
+    <nav class="bottom-nav">
+      <button class="bottom-nav-btn" id="nav-feed">Feed</button>
+      <button class="bottom-nav-btn primary" id="nav-events">Events</button>
+      <button class="bottom-nav-btn" id="nav-collabs">Collabs</button>
+      <button class="bottom-nav-btn" id="nav-modules">Modules</button>
+    </nav>
+  </div>
+
+  <!-- JS will be added later: filters, event loading, navigation wiring -->
+</body>
+</html>
