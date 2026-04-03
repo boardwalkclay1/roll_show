@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Analytics</title>
+
+  <link rel="icon" href="/assets/icons/rollshow-favicon.png" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/modules.css" />
+
+  <style>
+    :root {
+      --modules-bg-image: url('/assets/backgrounds/analytics-bg.jpg');
+    }
+
+    body.analytics-page {
+      background-image: var(--modules-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .module-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    .module-main {
+      flex: 1;
+      padding: 1rem 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: rgba(10,10,15,0.9);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .analytics-block {
+      padding: 0.75rem 0.85rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 0.75rem;
+    }
+
+    .analytics-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .analytics-meta {
+      font-size: 0.75rem;
+      opacity: 0.75;
+    }
+  </style>
+</head>
+
+<body class="analytics-page">
+  <div class="module-shell">
+
+    <header class="collabs-header">
+      <div class="brand-title">Roll Show · Analytics</div>
+      <span class="pill">Module</span>
+    </header>
+
+    <main class="module-main">
+
+      <section class="panel">
+        <div class="panel-title">Your Analytics</div>
+
+        <div id="analytics-list">
+          <div class="analytics-block">
+            <div class="analytics-title">Session Streak</div>
+            <div class="analytics-meta">4 days active</div>
+          </div>
+
+          <div class="analytics-block">
+            <div class="analytics-title">Total Time Logged</div>
+            <div class="analytics-meta">6 hours 22 minutes</div>
+          </div>
+
+          <div class="analytics-block">
+            <div class="analytics-title">Most Used Spot</div>
+            <div class="analytics-meta">BeltLine · Eastside Trail</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-title">About Analytics</div>
+
+        <p style="opacity:0.85; font-size:0.8rem;">
+          Analytics help you understand your progression, habits, and performance across sessions, events, and collabs.
+        </p>
+
+        <ul style="opacity:0.8; font-size:0.8rem; line-height:1.5;">
+          <li>Session streaks</li>
+          <li>Spot usage</li>
+          <li>Time on board</li>
+          <li>Collab frequency</li>
+        </ul>
+      </aside>
+
+    </main>
+
+  </div>
+</body>
+</html>
