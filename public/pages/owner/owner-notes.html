@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show — Owner Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/css/owner.css" />
+</head>
+
+<body>
+  <div class="owner-shell">
+    <aside class="owner-sidebar">
+      <div class="owner-logo">ROLL SHOW</div>
+
+      <div class="owner-nav">
+        <a href="/pages/owner/owner-branding.html">Branding</a>
+        <a href="/pages/owner/owner-notes.html" class="active">Owner Notes</a>
+        <a href="/pages/owner/owner-ads.html">Ads</a>
+        <a href="/pages/owner/owner-sponsorships.html">Sponsorships</a>
+      </div>
+    </aside>
+
+    <main class="owner-main">
+      <section class="owner-section active">
+        <div class="section-title">Owner Notes</div>
+        <div class="section-subtitle">Private notes only you can see.</div>
+
+        <div class="card">
+          <h3>New Note</h3>
+          <textarea id="note-text" placeholder="Write a note..."></textarea>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btn-add-note">Add Note</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Notes</h3>
+          <div id="notes-list" class="notes-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/owner-notes.js"></script>
+</body>
+</html>
