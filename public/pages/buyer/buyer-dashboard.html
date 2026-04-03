@@ -13,102 +13,248 @@
   <!-- PLATFORM CSS -->
   <link rel="stylesheet" href="/app/styles/styles.css">
   <link rel="stylesheet" href="/app/styles/dashboard.css">
+
+  <!-- BRAND FONT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* BACKGROUND */
+    .bg-landing {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(0.35);
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    body.rs-body {
+      margin: 0;
+      color: #fff;
+      background: #000;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    /* TOP NAV */
+    .rs-top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      z-index: 20;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .rs-top-nav a {
+      color: #fff;
+      font-family: "Dancing Script", cursive;
+      font-size: 22px;
+      text-decoration: none;
+      padding: 4px 10px;
+      transition: 0.2s;
+    }
+
+    .rs-top-nav a:hover {
+      color: #ffe6ff;
+      transform: translateY(-2px);
+    }
+
+    .rs-top-nav a.rs-active {
+      color: #ffd2ff;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    /* MAIN SHELL */
+    .rs-dash-shell {
+      max-width: 1320px;
+      margin: 90px auto 40px;
+      padding: 0 20px 40px;
+      box-sizing: border-box;
+    }
+
+    /* GLASS CARDS */
+    .rs-dash-buyer .rs-dash-header,
+    .rs-dash-buyer .rs-dash-card,
+    .rs-dash-buyer .rs-dash-panel {
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
+    }
+
+    /* HEADER */
+    .rs-dash-header {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .rs-dash-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #ffe6ff;
+    }
+
+    .rs-dash-sub {
+      font-size: 14px;
+      color: #f7d0ff;
+      margin-top: 4px;
+    }
+
+    /* GRID */
+    .rs-dash-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .rs-dash-card {
+      padding: 16px 16px 14px;
+    }
+
+    .rs-dash-card h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .rs-dash-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .rs-dash-list li {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* ACTION GRID */
+    .rs-dash-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .rs-dash-action {
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .rs-dash-action:hover {
+      background: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.6);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .rs-dash-shell { margin-top: 80px; }
+      .rs-dash-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
 </head>
 
 <body class="rs-body">
 
-  <!-- FULLSCREEN CINEMATIC BACKGROUND -->
-  <img src="/app/images/backs/roll-show-gold.jpg" class="bg-landing" alt="Background">
+  <!-- BACKGROUND -->
+  <img src="/app/images/backs/roll-show-purple.jpg" class="bg-landing" alt="Background">
 
-  <main class="rs-dash-shell rs-dash-buyer">
+  <!-- TOP NAV -->
+  <nav class="rs-top-nav">
+    <a href="/buyer/buyer-dashboard.html" class="rs-active">Dashboard</a>
+    <a href="/buyer/buyer-profile.html">Profile</a>
+    <a href="/buyer/buyer-feed.html">Feed</a>
+    <a href="/buyer/buyer-music-library.html">Library</a>
+  </nav>
+
+  <!-- DASHBOARD SHELL -->
+  <div class="rs-dash-shell rs-dash-buyer">
 
     <!-- HEADER -->
     <header class="rs-dash-header">
       <div>
-        <h1 class="rs-dash-title">Buyer Dashboard</h1>
-        <p class="rs-dash-sub">Your tickets, cards, music, and events — all in one place.</p>
+        <div class="rs-dash-title" id="buyer-name">Buyer</div>
+        <div class="rs-dash-sub">Your Roll Show ticket hub</div>
       </div>
-      <div class="rs-dash-stat" id="buyer-stat">$0.00</div>
     </header>
 
-    <!-- NAV -->
-    <nav class="rs-dash-nav" id="buyer-nav">
-      <a href="/buyer-dashboard.html" class="rs-dash-nav-link active">Dashboard</a>
-      <a href="/buyer-profile.html" class="rs-dash-nav-link">Profile</a>
-      <a href="/buyer-tickets.html" class="rs-dash-nav-link">Tickets</a>
-      <a href="/buyer-cards.html" class="rs-dash-nav-link">Cards</a>
-      <a href="/buyer-music-library.html" class="rs-dash-nav-link">Music</a>
-      <a href="/buyer-calendar.html" class="rs-dash-nav-link">Calendar</a>
-      <a href="/buyer-feed.html" class="rs-dash-nav-link">Feed</a>
-      <a href="/purchase-history.html" class="rs-dash-nav-link">Purchases</a>
-    </nav>
-
-    <!-- GRID -->
-    <section class="rs-dash-grid">
-
-      <!-- PROFILE -->
-      <article class="rs-dash-card">
-        <h3>My Profile</h3>
-        <p>Manage your buyer account, preferences, and saved info.</p>
-        <a class="rs-dash-pill" href="/buyer-profile.html">Open Profile</a>
-      </article>
+    <!-- MAIN GRID -->
+    <div class="rs-dash-grid">
 
       <!-- TICKETS -->
-      <article class="rs-dash-card">
-        <h3>My Tickets</h3>
-        <ul class="rs-dash-list" id="buyer-tickets-mini"></ul>
-        <a class="rs-dash-pill" href="/buyer-tickets.html">View All Tickets</a>
-        <a class="rs-dash-pill" href="/ticket-wallet.html">Ticket Wallet</a>
-      </article>
+      <div class="rs-dash-card">
+        <h3>Your Tickets</h3>
+        <ul class="rs-dash-list" id="buyer-tickets"></ul>
+      </div>
 
-      <!-- CARDS -->
-      <article class="rs-dash-card">
-        <h3>My Skate Cards</h3>
-        <ul class="rs-dash-list" id="buyer-cards-mini"></ul>
-        <a class="rs-dash-pill" href="/buyer-cards.html">Open Card Library</a>
-      </article>
+      <!-- RECOMMENDED SKATERS -->
+      <div class="rs-dash-panel">
+        <h3>Recommended Skaters</h3>
+        <ul class="rs-dash-list" id="recommended-skaters"></ul>
+      </div>
 
-      <!-- MUSIC -->
-      <article class="rs-dash-card">
-        <h3>Music Library</h3>
-        <ul class="rs-dash-list" id="buyer-music-mini"></ul>
-        <a class="rs-dash-pill" href="/buyer-music-library.html">Open Music Library</a>
-      </article>
+    </div>
 
-      <!-- CALENDAR -->
-      <article class="rs-dash-card">
-        <h3>My Calendar</h3>
-        <p>See your upcoming shows, events, and reminders.</p>
-        <a class="rs-dash-pill" href="/buyer-calendar.html">Open Calendar</a>
-      </article>
+    <!-- FULL ACTION GRID (GROUPED BY FUNCTION) -->
+    <div class="rs-dash-actions">
+
+      <!-- TICKETS -->
+      <div class="rs-dash-action" onclick="location.href='/buyer/buyer-tickets.html'">My Tickets</div>
+      <div class="rs-dash-action" onclick="location.href='/buyer/ticket-wallet.html'">Ticket Wallet</div>
+      <div class="rs-dash-action" onclick="location.href='/buyer/purchase-history.html'">Purchase History</div>
+      <div class="rs-dash-action" onclick="location.href='/buyer/ticket-confirmation.html'">Confirmations</div>
+      <div class="rs-dash-action" onclick="location.href='/buyer/ticket-view.html'">Ticket Viewer</div>
+
+      <!-- BUYER TOOLS -->
+      <div class="rs-dash-action" onclick="location.href='/buyer/buyer-cards.html'">Cards</div>
+      <div class="rs-dash-action" onclick="location.href='/buyer/buyer-calendar.html'">Calendar</div>
+
+      <!-- MEDIA -->
+      <div class="rs-dash-action" onclick="location.href='/buyer/buyer-music-library.html'">Music Library</div>
 
       <!-- FEED -->
-      <article class="rs-dash-card">
-        <h3>Skater Feed</h3>
-        <p>Follow your favorite skaters and see their latest posts.</p>
-        <a class="rs-dash-pill" href="/buyer-feed.html">Open Feed</a>
-      </article>
+      <div class="rs-dash-action" onclick="location.href='/buyer/buyer-feed.html'">Feed</div>
 
-      <!-- PURCHASE HISTORY -->
-      <article class="rs-dash-card">
-        <h3>Purchase History</h3>
-        <p>View your past purchases, receipts, and confirmations.</p>
-        <a class="rs-dash-pill" href="/purchase-history.html">View History</a>
-      </article>
+      <!-- PROFILE -->
+      <div class="rs-dash-action" onclick="location.href='/buyer/buyer-profile.html'">Profile</div>
 
-      <!-- CONFIRMATIONS -->
-      <article class="rs-dash-card">
-        <h3>Ticket Confirmations</h3>
-        <p>Access your confirmation codes and QR links.</p>
-        <a class="rs-dash-pill" href="/ticket-confirmation.html">Open Confirmations</a>
-      </article>
+    </div>
 
-    </section>
-
-    <p class="rs-dash-status" id="buyer-status"></p>
-  </main>
+  </div>
 
   <!-- JS -->
   <script type="module" src="/app/js/buyer/buyer-dashboard.js"></script>
+
 </body>
 </html>
