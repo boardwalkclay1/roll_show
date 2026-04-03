@@ -8,9 +8,9 @@ assets = { directory = "./public" }
 # D1 DATABASE
 # ============================================================
 [[d1_databases]]
-binding = "DB_users"
+binding = "roll_show"
 database_name = "roll_show"
-database_id = "862b2a72-249e-4d39-bf02-55d721a41985"
+database_id = "35817a7d-6156-46ee-9ded-6c70548698b1"
 
 # ============================================================
 # R2 BUCKET FOR REAL MEDIA (MUSIC, VIDEO, PHOTOS)
