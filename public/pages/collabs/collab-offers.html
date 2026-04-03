@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Collab Offers</title>
+
+  <link rel="icon" type="image/png" href="/assets/icons/rollshow-favicon.png" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/collabs.css" />
+
+  <style>
+    :root {
+      --collabs-bg-image: url('/assets/backgrounds/collabs-bg.jpg');
+    }
+
+    body.collab-offers-page {
+      background-image: var(--collabs-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .collabs-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    .collabs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+    }
+
+    .collabs-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #ffd29f, #ff7b54, #3b1f2b);
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      opacity: 0.8;
+    }
+
+    .collabs-main {
+      flex: 1;
+      padding: 1rem 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr);
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: rgba(10, 10, 15, 0.9);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.9;
+    }
+
+    .collab-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .collab-tab {
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      cursor: pointer;
+      opacity: 0.8;
+      font-size: 0.75rem;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .collab-tab.active {
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      border-color: transparent;
+      color: #0b0b10;
+      opacity: 1;
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.7);
+    }
+
+    .collab-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+
+    .collab-card {
+      padding: 0.75rem 0.85rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      cursor: pointer;
+      transition: background 0.15s ease-out, transform 0.12s ease-out;
+    }
+
+    .collab-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateY(-1px);
+    }
+
+    .collab-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .collab-card-meta {
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
+    .collab-type-pill {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.8;
+    }
+
+    .collab-actions-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .btn-small {
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.7rem;
+      cursor: pointer;
+      background: transparent;
+      color: #f9fafb;
+    }
+
+    .btn-small.primary {
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      border-color: transparent;
+      color: #0b0b10;
+      font-weight: 600;
+    }
+
+    .sidebar-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .sidebar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    .sidebar-item span {
+      display: block;
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0.5rem 1.5rem 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+      backdrop-filter: blur(16px);
+    }
+
+    .bottom-nav-btn {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      opacity: 0.85;
+    }
+
+    .bottom-nav-btn.primary {
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      border-color: transparent;
+      color: #0b0b10;
+      font-weight: 600;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body class="collab-offers-page">
+  <div class="collabs-shell">
+    <header class="collabs-header">
+      <div class="collabs-header-left">
+        <div class="brand-mark"></div>
+        <div>
+          <div class="brand-title">Roll Show</div>
+          <div style="font-size: 0.75rem; opacity: 0.7;">Collab Offers</div>
+        </div>
+      </div>
+      <div class="collabs-header-right">
+        <span class="pill">Skater</span>
+      </div>
+    </header>
+
+    <main class="collabs-main">
+      <!-- LEFT: Offers -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Offers</div>
+          <span class="pill">In‑Person · Stitch</span>
+        </div>
+
+        <div class="collab-tabs" id="collab-tabs">
+          <button class="collab-tab active" data-tab="incoming">Incoming</button>
+          <button class="collab-tab" data-tab="outgoing">Outgoing</button>
+        </div>
+
+        <div class="collab-list" id="collab-list">
+          <!-- Incoming example -->
+          <article class="collab-card" data-collab-id="1" data-direction="incoming">
+            <div class="collab-card-header">
+              <span>@vertblade → @boardwalkclay</span>
+              <span class="collab-card-meta">12 min ago</span>
+            </div>
+            <div style="font-size: 0.8rem;">
+              In‑person collab at the BeltLine this weekend. Looking to film a split‑line with a longboard dancer.
+            </div>
+            <div class="collab-card-meta">
+              Spot: BeltLine · Eastside · Saturday · 6:00 PM
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem;">
+              <span class="collab-type-pill">In‑Person</span>
+              <div class="collab-actions-row">
+                <button class="btn-small" data-action="decline">Decline</button>
+                <button class="btn-small primary" data-action="accept">Accept</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Outgoing example -->
+          <article class="collab-card" data-collab-id="2" data-direction="outgoing">
+            <div class="collab-card-header">
+              <span>@boardwalkclay → @rinkqueen</span>
+              <span class="collab-card-meta">Pending</span>
+            </div>
+            <div style="font-size: 0.8rem;">
+              Remote stitch collab: dancer line on the BeltLine + rink line at your local spot. Split‑screen edit.
+            </div>
+            <div class="collab-card-meta">
+              Type: Remote Stitch · Clips due Sunday
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem;">
+              <span class="collab-type-pill">Stitch</span>
+              <div class="collab-actions-row">
+                <button class="btn-small" data-action="view">View</button>
+                <button class="btn-small" data-action="cancel">Cancel</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- RIGHT: Context / Shortcuts -->
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Collab Context</div>
+          <span class="pill">For You</span>
+        </div>
+
+        <section class="sidebar-section">
+          <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 0.35rem;">Types</div>
+          <div class="sidebar-list">
+            <div class="sidebar-item">
+              In‑Person
+              <span>Meet at a spot, film together, create a joint post.</span>
+            </div>
+            <div class="sidebar-item">
+              Remote Stitch
+              <span>Each skater films separately; system stitches the final edit.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="sidebar-section">
+          <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 0.35rem;">Status</div>
+          <div class="sidebar-list">
+            <div class="sidebar-item">
+              Incoming
+              <span>Offers sent to you. Accept or decline.</span>
+            </div>
+            <div class="sidebar-item">
+              Outgoing
+              <span>Offers you’ve sent. Track pending, accepted, or declined.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="sidebar-section">
+          <div style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 0.35rem;">Shortcuts</div>
+          <div class="sidebar-list">
+            <div class="sidebar-item">
+              Start In‑Person Collab
+              <span>Pick a skater, spot, and time.</span>
+            </div>
+            <div class="sidebar-item">
+              Start Stitch Collab
+              <span>Upload your clip and invite another skater.</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="bottom-nav-btn" id="nav-collabs-back">Back</button>
+      <button class="bottom-nav-btn primary" id="nav-collabs-start-inperson">New In‑Person</button>
+      <button class="bottom-nav-btn" id="nav-collabs-start-stitch">New Stitch</button>
+    </nav>
+  </div>
+
+  <!-- JS later: load offers from /api/collabs, tab switching, accept/decline, navigation -->
+</body>
+</html>
