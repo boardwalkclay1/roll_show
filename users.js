@@ -5,8 +5,7 @@ export function cors() {
   return {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers":
-      "Content-Type, x-user-id, x-user-role"
+    "Access-Control-Allow-Headers": "Content-Type, x-user-id, x-user-role"
   };
 }
 
@@ -15,13 +14,11 @@ export function cors() {
 ============================================================ */
 export function logRequest(request, extra = {}) {
   const url = new URL(request.url);
-  console.log(
-    JSON.stringify({
-      path: url.pathname,
-      method: request.method,
-      ...extra
-    })
-  );
+  console.log(JSON.stringify({
+    path: url.pathname,
+    method: request.method,
+    ...extra
+  }));
 }
 
 /* ============================================================
@@ -30,21 +27,18 @@ export function logRequest(request, extra = {}) {
 export function apiJson(body, status = 200) {
   const success = status >= 200 && status < 300;
 
-  return new Response(
-    JSON.stringify({
-      success,
-      status,
-      data: success ? body : null,
-      error: success ? null : body
-    }),
-    {
-      status,
-      headers: {
-        "Content-Type": "application/json",
-        ...cors()
-      }
+  return new Response(JSON.stringify({
+    success,
+    status,
+    data: success ? body : null,
+    error: success ? null : body
+  }), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      ...cors()
     }
-  );
+  });
 }
 
 /* ============================================================
@@ -62,7 +56,7 @@ async function safeAuthJson(res) {
   const ct = res.headers.get("content-type") || "";
 
   if (!ct.toLowerCase().includes("json")) {
-    throw new Error("AUTH worker returned non‑JSON: " + ct);
+    throw new Error("AUTH worker returned non-JSON: " + ct);
   }
 
   try {
@@ -75,11 +69,11 @@ async function safeAuthJson(res) {
 /* ============================================================
    PASSWORD HASHING (AUTH WORKER)
 ============================================================ */
-export async function hash(str, env) {
-  const res = await env.AUTH.fetch("https://auth/hash", {
+export async function hash(password, env) {
+  const res = await env.AUTH.fetch("/hash", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password: str })
+    body: JSON.stringify({ password })
   });
 
   const data = await safeAuthJson(res);
@@ -94,11 +88,11 @@ export async function hash(str, env) {
 /* ============================================================
    PASSWORD VERIFY (AUTH WORKER)
 ============================================================ */
-export async function verify(str, hashed, env) {
-  const res = await env.AUTH.fetch("https://auth/verify", {
+export async function verify(password, hash, env) {
+  const res = await env.AUTH.fetch("/verify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password: str, hash: hashed })
+    body: JSON.stringify({ password, hash })
   });
 
   const data = await safeAuthJson(res);
