@@ -1,11 +1,10 @@
 // worker.js — FULL CLEAN REBUILD WITH AUTH PIPELINE + OWNER OVERRIDE + MIGRATIONS + MEDIA (R2 + KV)
 
-import bcrypt from "bcryptjs";
-
 import {
   cors,
   apiJson,
-  requireRole
+  requireRole,
+  login as userLogin
 } from "./users.js";
 
 import {
@@ -270,33 +269,10 @@ export default {
       }
 
       /* ============================================================
-         ⭐ FIXED LOGIN ROUTE (UNLOCKS OWNER)
+         LOGIN (USES users.js AUTH PIPELINE)
       ============================================================ */
       if (path === "/api/login" && method === "POST") {
-        const body = await request.clone().json();
-        const { email, password } = body;
-
-        const row = await env.DB_users
-          .prepare("SELECT id, email, role, password_hash FROM users WHERE email = ?")
-          .bind(email)
-          .first();
-
-        if (!row) return apiJson({ success: false }, 401);
-
-        const ok = await bcrypt.compare(password, row.password_hash);
-        if (!ok) return apiJson({ success: false }, 401);
-
-        const is_owner = row.role === "owner";
-
-        return apiJson({
-          success: true,
-          user: {
-            id: row.id,
-            email: row.email,
-            role: row.role,
-            is_owner
-          }
-        });
+        return userLogin(request.clone(), env);
       }
 
       /* ============================================================
