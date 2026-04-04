@@ -2,3 +2,8 @@ name = "rollshow-auth"
 main = "index.js"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "roll_show"
+database_id = "0d166ea1-00fb-4701-bf43-fe2a652b7ce2"
