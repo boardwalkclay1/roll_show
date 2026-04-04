@@ -1,0 +1,7 @@
+-- XP TABLE
+CREATE TABLE IF NOT EXISTS xp (
+  user_id TEXT PRIMARY KEY,
+  total INTEGER DEFAULT 0,
+
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
