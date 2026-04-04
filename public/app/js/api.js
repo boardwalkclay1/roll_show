@@ -1,4 +1,4 @@
-// js/api.js — FINAL UNIFIED API CLIENT WITH MEDIA SUPPORT
+// js/api.js — FINAL UNIFIED API CLIENT WITH MEDIA + AUTH HEADERS
 
 const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
 
@@ -99,11 +99,15 @@ const API = {
     return request("POST", path, formData, headers);
   },
 
-  // Attach user headers to any request
+  /* ------------------------------------------------------------
+     AUTH HEADERS (THE FIX)
+  ------------------------------------------------------------ */
   withUser(user) {
     if (!user) return {};
+
     return {
-      "x-user": JSON.stringify(user)
+      "x-user-id": user.id,
+      "x-user-role": user.role
     };
   },
 
