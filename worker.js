@@ -1,4 +1,4 @@
-// worker.js — FULL CLEAN REBUILD WITH AUTH PIPELINE + OWNER OVERRIDE + MIGRATIONS + MEDIA (R2 + KV)
+// worker.js — AUTH PIPELINE + OWNER OVERRIDE + MIGRATIONS + MEDIA (R2 + KV)
 
 import {
   cors,
@@ -269,7 +269,7 @@ export default {
       }
 
       /* ============================================================
-         LOGIN (USES users.js AUTH PIPELINE)
+         LOGIN (USES users.js + AUTH WORKER)
       ============================================================ */
       if (path === "/api/login" && method === "POST") {
         return userLogin(request.clone(), env);
