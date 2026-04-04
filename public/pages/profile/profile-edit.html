@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Edit Profile</title>
+  <link rel="icon" type="image/png" href="/assets/icons/rollshow-favicon.png" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/profile.css" />
+</head>
+<body class="profile-edit-page">
+  <div class="shell">
+    <header class="app-header">
+      <div class="brand-left">
+        <div class="brand-mark"></div>
+        <div>
+          <div class="brand-title">Roll Show</div>
+          <div class="brand-sub">Edit Profile</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section class="panel">
+        <form id="profile-edit-form" class="form-vertical">
+          <label>
+            <span>Handle</span>
+            <input type="text" name="handle" required />
+          </label>
+
+          <label>
+            <span>Discipline</span>
+            <input type="text" name="discipline" />
+          </label>
+
+          <label>
+            <span>Location</span>
+            <input type="text" name="location" />
+          </label>
+
+          <label>
+            <span>Bio</span>
+            <textarea name="bio" rows="3"></textarea>
+          </label>
+
+          <button type="submit" class="btn-primary">Save</button>
+        </form>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="bottom-nav-btn" id="nav-edit-cancel">Cancel</button>
+    </nav>
+  </div>
+
+  <script src="/assets/js/shared.js"></script>
+  <script src="/assets/js/profile.js"></script>
+</body>
+</html>
