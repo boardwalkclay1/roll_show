@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Profile</title>
+  <link rel="icon" type="image/png" href="/assets/icons/rollshow-favicon.png" />
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/profile.css" />
+</head>
+<body class="profile-view-page">
+  <div class="shell">
+    <header class="app-header">
+      <div class="brand-left">
+        <div class="brand-mark"></div>
+        <div>
+          <div class="brand-title">Roll Show</div>
+          <div class="brand-sub">Profile</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section class="panel">
+        <div class="profile-header">
+          <div class="avatar" id="profile-avatar"></div>
+          <div>
+            <div id="profile-handle" class="profile-handle">@handle</div>
+            <div id="profile-role" class="profile-role">Role</div>
+          </div>
+        </div>
+
+        <div class="profile-meta">
+          <div><span>Discipline:</span> <span id="profile-discipline"></span></div>
+          <div><span>Location:</span> <span id="profile-location"></span></div>
+        </div>
+
+        <div class="profile-bio" id="profile-bio"></div>
+
+        <button id="profile-edit-btn" class="btn-primary">Edit Profile</button>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="bottom-nav-btn" id="nav-profile-feed">Feed</button>
+      <button class="bottom-nav-btn" id="nav-profile-modules">Modules</button>
+      <button class="bottom-nav-btn" id="nav-profile-settings">Settings</button>
+    </nav>
+  </div>
+
+  <script src="/assets/js/shared.js"></script>
+  <script src="/assets/js/profile.js"></script>
+</body>
+</html>
