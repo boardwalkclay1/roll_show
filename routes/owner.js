@@ -136,7 +136,7 @@ export async function ownerContracts(request, env) {
 }
 
 /* ============================================================
-   OWNER: MUSIC LIBRARY (MEDIA)
+   OWNER: MUSIC LIBRARY
 ============================================================ */
 export async function ownerMusic(request, env) {
   return requireRole(request, env, ["owner"], async () => {
@@ -183,5 +183,73 @@ export async function ownerBusinessUpdateStatus(request, env) {
     ).bind(verified, businessId).run();
 
     return apiJson({ businessId, verified });
+  });
+}
+
+/* ============================================================
+   OWNER: SETTINGS — BRANDING
+============================================================ */
+export async function ownerSettingsBranding(request, env) {
+  return requireRole(request, env, ["owner"], async () => {
+    const branding = await env.DB_users.prepare(
+      "SELECT * FROM owner_branding LIMIT 1"
+    ).first();
+
+    return apiJson({ branding: branding || {} });
+  });
+}
+
+/* ============================================================
+   OWNER: SETTINGS — NOTES
+============================================================ */
+export async function ownerSettingsNotes(request, env) {
+  return requireRole(request, env, ["owner"], async () => {
+    const notes = await env.DB_users.prepare(
+      "SELECT * FROM owner_notes ORDER BY created_at DESC"
+    ).all();
+
+    return apiJson({ notes: notes.results || [] });
+  });
+}
+
+/* ============================================================
+   OWNER: ADS
+============================================================ */
+export async function ownerAds(request, env) {
+  return requireRole(request, env, ["owner"], async () => {
+    const { results } = await env.DB_users.prepare(
+      "SELECT * FROM ads ORDER BY created_at DESC"
+    ).all();
+
+    return apiJson({ ads: results || [] });
+  });
+}
+
+/* ============================================================
+   OWNER: UPDATE AD STATUS
+============================================================ */
+export async function ownerUpdateAdStatus(request, env) {
+  return requireRole(request, env, ["owner"], async (req) => {
+    const body = await req.json().catch(() => ({}));
+    const { adId, status } = body;
+
+    await env.DB_users.prepare(
+      "UPDATE ads SET status = ? WHERE id = ?"
+    ).bind(status, adId).run();
+
+    return apiJson({ adId, status });
+  });
+}
+
+/* ============================================================
+   OWNER: SPONSORSHIPS
+============================================================ */
+export async function ownerSponsorships(request, env) {
+  return requireRole(request, env, ["owner"], async () => {
+    const { results } = await env.DB_users.prepare(
+      "SELECT * FROM sponsorships ORDER BY created_at DESC"
+    ).all();
+
+    return apiJson({ sponsorships: results || [] });
   });
 }
