@@ -8,7 +8,7 @@ assets = { directory = "./public" }
 # D1 DATABASE
 # ============================================================
 [[d1_databases]]
-binding = "roll_show"
+binding = "DB_users"
 database_name = "roll_show"
 database_id = "0d166ea1-00fb-4701-bf43-fe2a652b7ce2"
 
