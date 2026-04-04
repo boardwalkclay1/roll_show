@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roll Show – Badges</title>
+
+  <link rel="icon" type="image/png" href="/assets/icons/rollshow-favicon.png" />
+
+  <link rel="stylesheet" href="/assets/css/dashboard.css" />
+  <link rel="stylesheet" href="/assets/css/badges.css" />
+
+  <style>
+    :root {
+      --badges-bg-image: url('/assets/backgrounds/badges-bg.jpg');
+    }
+
+    body.badges-page {
+      background-image: var(--badges-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .badges-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    .badges-main {
+      flex: 1;
+      padding: 1rem 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: rgba(10,10,15,0.9);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+    }
+
+    .badge-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 0.75rem;
+      text-align: center;
+      transition: 0.15s ease-out;
+    }
+
+    .badge-card.locked {
+      opacity: 0.4;
+      filter: grayscale(1);
+    }
+
+    .badge-card img {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .badge-desc {
+      font-size: 0.7rem;
+      opacity: 0.75;
+    }
+
+    .xp-box {
+      padding: 0.75rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      margin-bottom: 0.75rem;
+    }
+
+    .xp-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body class="badges-page">
+  <div class="badges-shell">
+
+    <header class="app-header">
+      <div class="brand-left">
+        <div class="brand-mark"></div>
+        <div>
+          <div class="brand-title">Roll Show</div>
+          <div class="brand-sub">Badges</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="badges-main">
+
+      <!-- LEFT: BADGES -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Your Badges</div>
+          <span class="pill">Progress</span>
+        </div>
+
+        <div id="badge-grid" class="badge-grid"></div>
+      </section>
+
+      <!-- RIGHT: XP + CATEGORIES -->
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">XP & Categories</div>
+          <span class="pill">Stats</span>
+        </div>
+
+        <div class="xp-box">
+          <div style="font-size:0.8rem; opacity:0.8;">Total XP</div>
+          <div id="xp-value" class="xp-value">0</div>
+        </div>
+
+        <div style="font-size:0.8rem; opacity:0.8; margin-bottom:0.5rem;">Categories</div>
+
+        <ul style="font-size:0.8rem; opacity:0.85; line-height:1.5;">
+          <li>Discipline Badges</li>
+          <li>Subclass Badges</li>
+          <li>Collab Badges</li>
+          <li>Event Badges</li>
+          <li>QR Badges</li>
+          <li>Achievement Badges</li>
+        </ul>
+      </aside>
+
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="bottom-nav-btn" id="nav-badges-back">Back</button>
+      <button class="bottom-nav-btn" id="nav-badges-modules">Modules</button>
+      <button class="bottom-nav-btn" id="nav-badges-profile">Profile</button>
+    </nav>
+
+  </div>
+
+  <script src="/assets/js/shared.js"></script>
+  <script src="/assets/js/badges.js"></script>
+</body>
+</html>
