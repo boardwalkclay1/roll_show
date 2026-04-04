@@ -1,0 +1,14 @@
+.badges-page .panel-title {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.badge-card {
+  cursor: pointer;
+  transition: 0.15s ease-out;
+}
+
+.badge-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.08);
+}
