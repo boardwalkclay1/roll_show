@@ -73,7 +73,7 @@ async function safeAuthJson(res) {
 }
 
 /* ============================================================
-   PASSWORD HASHING
+   PASSWORD HASHING (AUTH WORKER)
 ============================================================ */
 export async function hash(str, env) {
   const res = await env.AUTH.fetch("https://auth/hash", {
@@ -92,7 +92,7 @@ export async function hash(str, env) {
 }
 
 /* ============================================================
-   PASSWORD VERIFY
+   PASSWORD VERIFY (AUTH WORKER)
 ============================================================ */
 export async function verify(str, hashed, env) {
   const res = await env.AUTH.fetch("https://auth/verify", {
@@ -145,7 +145,7 @@ export async function signupBase(env, { name, email, password, role }) {
 }
 
 /* ============================================================
-   LOGIN (AUTH WORKER HASH + VERIFY)
+   LOGIN (USES AUTH WORKER VERIFY)
 ============================================================ */
 export async function login(request, env) {
   try {
