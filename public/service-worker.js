@@ -1,10 +1,10 @@
 /* ============================================================
-   ROLL SHOW — AUTO-UPDATING SERVICE WORKER
-   - HTML → network-first (always updates)
-   - JS/CSS → network-first with fallback
+   ROLL SHOW — AUTO-UPDATING SERVICE WORKER (FIXED)
+   - HTML → network-first
+   - JS/CSS → network-first
    - Images → cache-first
+   - NEVER caches POST/PUT/PATCH/DELETE
    - No precache list
-   - No version bumps needed
 ============================================================ */
 
 const CACHE_NAME = "rollshow-dynamic-cache";
@@ -27,9 +27,16 @@ self.addEventListener("activate", event => {
 /* FETCH */
 self.addEventListener("fetch", event => {
   const req = event.request;
+  const method = req.method;
   const accept = req.headers.get("accept") || "";
 
-  /* HTML → always network-first */
+  /* 🚫 NEVER CACHE NON-GET REQUESTS */
+  if (method !== "GET") {
+    event.respondWith(fetch(req));
+    return;
+  }
+
+  /* HTML → network-first */
   if (req.mode === "navigate" || accept.includes("text/html")) {
     event.respondWith(
       fetch(req)
@@ -43,7 +50,7 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  /* JS/CSS → network-first with fallback */
+  /* JS/CSS → network-first */
   if (req.url.endsWith(".js") || req.url.endsWith(".css")) {
     event.respondWith(
       fetch(req)
@@ -58,9 +65,7 @@ self.addEventListener("fetch", event => {
   }
 
   /* Images → cache-first */
-  if (
-    req.url.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/i)
-  ) {
+  if (req.url.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/i)) {
     event.respondWith(
       caches.match(req).then(cached => {
         return (
@@ -76,7 +81,7 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  /* Default → network-first fallback */
+  /* Default GET → network-first */
   event.respondWith(
     fetch(req)
       .then(res => {
