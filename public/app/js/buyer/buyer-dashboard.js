@@ -1,5 +1,5 @@
 // /app/js/buyer/buyer-dashboard.js
-import API from "/app/js/api.js";
+import API from "/js/api.js";
 
 /* ============================================================
    LOADER CONTROL
