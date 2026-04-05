@@ -1,81 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Roll Show – Login</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Page</title>
 
-  <!-- STYLES -->
-  <link rel="stylesheet" href="/app/styles/styles.css">
-
-  <!-- ICON -->
-  <link rel="icon" href="/app/images/icons/icon-192.png">
+  <link rel="stylesheet" href="/css/main.css" />
+  <script type="module" src="/js/api.js"></script>
 
   <style>
-    /* MOBILE SCALING FIX — MATCH SIGNUP SIZE */
-    @media (max-width: 600px) {
-      .login-box {
-        transform: scale(1.25);
-        transform-origin: top center;
-      }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      font-family: system-ui, sans-serif;
+    }
+
+    .page {
+      padding: 40px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    p {
+      font-size: 1.2rem;
+      opacity: 0.8;
     }
   </style>
 </head>
 
-<body style="background:black;">
-
-  <!-- FULL BACKGROUND IMAGE -->
-  <img 
-    src="/app/images/phat.jpg"
-    alt="Background"
-    style="
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      object-position: center 88%;
-      z-index: 0;
-    "
-  >
-
-  <!-- LOGIN CONTAINER -->
-  <main style="
-      position:relative;
-      z-index:5;
-      display:flex;
-      justify-content:center;
-      padding:120px 20px;
-    ">
-
-    <div class="login-box" style="
-        width:100%;
-        max-width:420px;
-        background:rgba(0,0,0,0.55);
-        padding:40px;
-        border-radius:12px;
-        backdrop-filter:blur(6px);
-        color:white;
-      ">
-
-      <h1 style="margin-bottom:20px;">Welcome Back</h1>
-
-      <!-- LOGIN FORM -->
-      <form id="auth-login-form" style="display:flex; flex-direction:column; gap:15px;">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit" class="btn-primary">Login</button>
-      </form>
-
-      <p style="margin-top:20px; text-align:center;">
-        Don’t have an account?
-        <a href="/pages/auth-signup.html" style="color:white; text-decoration:underline;">Create one</a>
-      </p>
-
-    </div>
-
-  </main>
-
-  <!-- LOGIN JS -->
-  <script type="module" src="/app/js/auth-login.js?v=9999"></script>
+<body>
+  <div class="page">
+    <h1>New Page</h1>
+    <p>This page is ready for content.</p>
+  </div>
 </body>
 </html>
