@@ -5,24 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login • Roll Show</title>
 
-  <!-- your global styles -->
-  <link rel="stylesheet" href="/app/styles/styles.css" />
+  <link rel="stylesheet" href="/css/style.css" />
 
-  <!-- correct JS path (matches console: auth-login.js?v=9999) -->
-  <script src="/app/js/auth-login.js" defer></script>
+  <!-- API client first -->
+  <script src="/js/api.js?v=9999"></script>
+  <!-- Login handler second -->
+  <script src="/js/auth-login.js?v=9999" defer></script>
 </head>
 
 <body>
   <div class="auth-page">
-
-    <!-- 🔥 BIG BACKGROUND IMAGE (you change the src to your real one) -->
+    <!-- 🔥 YOUR BIG BACKGROUND IMAGE — CHANGE src ONLY -->
     <img
       class="auth-bg-image"
-      src="/app/images/phat.jpg"
+      src="/img/login-bg-placeholder.jpg"
       alt="Login background"
     />
 
-    <!-- your login panel; style it in style.css -->
     <div class="auth-panel">
       <h1 class="auth-title">Login</h1>
 
