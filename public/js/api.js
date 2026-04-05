@@ -1,4 +1,4 @@
-// js/api.js — FINAL UNIFIED API CLIENT WITH MEDIA + AUTH HEADERS
+// js/api.js — FINAL, CORRECT, LOGIN-COMPATIBLE VERSION
 
 const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
 
@@ -14,7 +14,7 @@ async function safeJson(res) {
       success: false,
       status: res.status,
       data: null,
-      error: { message: "Server returned non‑JSON response" }
+      error: { message: "Non‑JSON response from server" }
     };
   }
 
@@ -48,7 +48,7 @@ async function request(method, path, payload = null, extraHeaders = {}) {
     options.body = payload;
   }
 
-  // Binary payload (file upload)
+  // Binary payload
   if (payload instanceof Blob) {
     options.body = payload;
   }
@@ -67,10 +67,11 @@ async function request(method, path, payload = null, extraHeaders = {}) {
 
   const body = await safeJson(res);
 
+  // 🔥 FINAL SHAPE — ALWAYS RETURN { success, data, error }
   return {
     success: body.success ?? res.ok,
-    status: body.status ?? res.status,
-    data: body.data ?? null,
+    status: res.status,
+    data: body.data ?? body.user ?? null,   // 🔥 LOGIN FIX
     error: body.error ?? (res.ok ? null : { message: "Request failed" })
   };
 }
@@ -104,7 +105,6 @@ const API = {
   ------------------------------------------------------------ */
   withUser(user) {
     if (!user) return {};
-
     return {
       "x-user-id": user.id,
       "x-user-role": user.role
@@ -125,17 +125,13 @@ const API = {
     }
 
     tick();
-
-    return () => {
-      stopped = true;
-    };
+    return () => (stopped = true);
   },
 
   /* ------------------------------------------------------------
      MEDIA API (R2 + KV)
   ------------------------------------------------------------ */
   media: {
-    // Step 1: Initialize upload (get media ID + upload path)
     initUpload(type, file, user) {
       return request(
         "POST",
@@ -150,8 +146,7 @@ const API = {
       );
     },
 
-    // Step 2: Upload file body (PUT binary)
-    async uploadFile(mediaId, file, user) {
+    uploadFile(mediaId, file, user) {
       return request(
         "PUT",
         `/api/media/upload/${mediaId}`,
@@ -163,7 +158,6 @@ const API = {
       );
     },
 
-    // Step 3: Get metadata
     getMeta(mediaId, user) {
       return request(
         "GET",
@@ -173,7 +167,6 @@ const API = {
       );
     },
 
-    // Step 4: Stream file (returns a real Response, not JSON)
     async getFile(mediaId, user) {
       const res = await fetch(API_BASE + `/api/media/file/${mediaId}`, {
         method: "GET",
@@ -188,7 +181,7 @@ const API = {
         };
       }
 
-      return res; // caller handles blob/stream
+      return res;
     }
   }
 };
