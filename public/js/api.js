@@ -1,12 +1,8 @@
-// js/api.js — ROLL SHOW STABLE VERSION (NO AUTO-LOGOUT)
+// /js/api.js — ROLL SHOW STABLE VERSION
 
-const API_BASE = "/api"; 
-// 🔥 This makes all calls go through your Pages → Worker routing
-// No CORS, no cross-origin, no silent failures.
+const API_BASE = "/api";
 
-/* ------------------------------------------------------------
-   SAFE JSON PARSER
------------------------------------------------------------- */
+/* ---------------- SAFE JSON PARSER ---------------- */
 async function safeJson(res) {
   const text = await res.text();
   const type = res.headers.get("content-type") || "";
@@ -15,8 +11,8 @@ async function safeJson(res) {
     return {
       success: false,
       status: res.status,
-      user: null,
-      error: { message: "Non‑JSON response" }
+      user: undefined,
+      error: { message: "Non-JSON response" }
     };
   }
 
@@ -26,15 +22,13 @@ async function safeJson(res) {
     return {
       success: false,
       status: res.status,
-      user: null,
+      user: undefined,
       error: { message: "Invalid JSON" }
     };
   }
 }
 
-/* ------------------------------------------------------------
-   INTERNAL REQUEST HANDLER
------------------------------------------------------------- */
+/* ---------------- INTERNAL REQUEST ---------------- */
 async function request(method, path, payload = null, extraHeaders = {}) {
   const headers = { ...extraHeaders };
   const options = { method, headers };
@@ -55,7 +49,7 @@ async function request(method, path, payload = null, extraHeaders = {}) {
     return {
       success: false,
       status: 0,
-      user: null,
+      user: undefined,
       error: { message: "Network error" }
     };
   }
@@ -63,16 +57,14 @@ async function request(method, path, payload = null, extraHeaders = {}) {
   const body = await safeJson(res);
 
   return {
-    success: body.success ?? res.ok,
+    success: body.success ?? res.ok ?? false,
     status: res.status,
-    user: body.user ?? body.data ?? null,   // 🔥 FIXED: dashboards expect user
+    user: body.user ?? body.data ?? undefined,
     error: body.error ?? (res.ok ? null : { message: "Request failed" })
   };
 }
 
-/* ------------------------------------------------------------
-   PUBLIC API
------------------------------------------------------------- */
+/* ---------------- PUBLIC API ---------------- */
 const API = {
   get(path, headers = {}) {
     return request("GET", path, null, headers);
@@ -99,4 +91,5 @@ const API = {
   }
 };
 
-export default API;
+// expose globally
+window.API = API;
