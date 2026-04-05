@@ -3,27 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login</title>
+  <title>Login • Roll Show</title>
 
-  <link rel="stylesheet" href="/app/styles/styles.css" />
-  <script type="module" src="/app/js/auth-login.js" defer></script>
+  <!-- your global styles -->
+  <link rel="stylesheet" href="/app/css/style.css" />
+
+  <!-- correct JS path (matches console: auth-login.js?v=9999) -->
+  <script src="/app/js/auth-login.js?v=9999" defer></script>
 </head>
 
 <body>
-  <div class="auth-container">
-    <h1>Login</h1>
+  <div class="auth-page">
 
-    <form id="auth-login-form">
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password" required />
+    <!-- 🔥 BIG BACKGROUND IMAGE (you change the src to your real one) -->
+    <img
+      class="auth-bg-image"
+      src="/img/login-bg-placeholder.jpg"
+      alt="Login background"
+    />
 
-      <button type="submit">Login</button>
-    </form>
+    <!-- your login panel; style it in style.css -->
+    <div class="auth-panel">
+      <h1 class="auth-title">Login</h1>
 
-    <p>
-      Don’t have an account?
-      <a href="/pages/auth-signup.html">Sign up</a>
-    </p>
+      <form id="auth-login-form">
+        <div class="auth-field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required />
+        </div>
+
+        <div class="auth-field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required />
+        </div>
+
+        <button type="submit" class="auth-button">Log in</button>
+      </form>
+
+      <p class="auth-footer">
+        Don’t have an account?
+        <a href="/pages/auth-signup.html">Sign up</a>
+      </p>
+    </div>
   </div>
 </body>
 </html>
