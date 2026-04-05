@@ -1,4 +1,4 @@
-import API from "/js/api.js";
+import API from "/app/js/api.js";
 
 function user() {
   return JSON.parse(localStorage.getItem("user") || "{}");
