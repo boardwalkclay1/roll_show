@@ -11,7 +11,7 @@ export async function signupBuyer(request, env) {
   const base = await signupBase(env, body);
   if (base.error) return apiJson({ message: base.error }, 400);
 
-  await env.DB_buyers.prepare(
+  await env.DB_users.prepare(
     `INSERT INTO buyers (id, user_id, phone, city, state, created_at)
      VALUES (?, ?, ?, ?, ?, ?)`
   )
@@ -32,7 +32,7 @@ export async function signupBuyer(request, env) {
    INTERNAL: GET BUYER RECORD
 ============================================================ */
 async function getBuyer(env, userId) {
-  return await env.DB_buyers.prepare(
+  return await env.DB_users.prepare(
     "SELECT id FROM buyers WHERE user_id = ?"
   )
     .bind(userId)
@@ -46,7 +46,7 @@ export async function listTickets(request, env, user) {
   const buyer = await getBuyer(env, user.id);
   if (!buyer) return apiJson({ message: "Buyer not found" }, 404);
 
-  const { results } = await env.DB_buyers.prepare(
+  const { results } = await env.DB_users.prepare(
     `SELECT 
         t.id,
         t.status,
@@ -73,7 +73,7 @@ export async function listPurchases(request, env, user) {
   const buyer = await getBuyer(env, user.id);
   if (!buyer) return apiJson({ message: "Buyer not found" }, 404);
 
-  const { results } = await env.DB_buyers.prepare(
+  const { results } = await env.DB_users.prepare(
     `SELECT 
         p.id,
         p.amount_cents,
@@ -105,7 +105,7 @@ export async function createTicket(request, env, user) {
   const qr = `ROLLSHOW-${id}`;
   const now = new Date().toISOString();
 
-  await env.DB_buyers.prepare(
+  await env.DB_users.prepare(
     `INSERT INTO tickets 
        (id, show_id, buyer_id, qr_code, stamp, status, created_at)
      VALUES (?, ?, ?, ?, 'unverified', 'pending', ?)`
@@ -126,7 +126,7 @@ export async function partnerWebhook(request, env) {
   // Only process paid events
   if (status !== "paid") return apiJson({ ok: true });
 
-  const ticket = await env.DB_buyers.prepare(
+  const ticket = await env.DB_users.prepare(
     "SELECT buyer_id FROM tickets WHERE id = ?"
   )
     .bind(ticketId)
@@ -135,7 +135,7 @@ export async function partnerWebhook(request, env) {
   if (!ticket) return apiJson({ message: "Ticket not found" }, 404);
 
   // Mark ticket as paid + verified
-  await env.DB_buyers.prepare(
+  await env.DB_users.prepare(
     "UPDATE tickets SET status = 'paid', stamp = 'verified' WHERE id = ?"
   )
     .bind(ticketId)
@@ -145,7 +145,7 @@ export async function partnerWebhook(request, env) {
   const purchaseId = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB_buyers.prepare(
+  await env.DB_users.prepare(
     `INSERT INTO purchases 
        (id, buyer_id, ticket_id, amount_cents, partner_transaction_id, created_at)
      VALUES (?, ?, ?, ?, ?, ?)`

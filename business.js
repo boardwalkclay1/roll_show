@@ -13,7 +13,7 @@ export async function signupBusiness(request, env) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB_business.prepare(
+  await env.DB_users.prepare(
     `INSERT INTO businesses (
        id, user_id, company_name, website, phone, address, ein,
        verified, review_status, review_notes, submitted_at, created_at
@@ -52,7 +52,7 @@ export async function signupBusiness(request, env) {
    BUSINESS DASHBOARD
 ============================================================ */
 export async function businessDashboard(request, env, user) {
-  const business = await env.DB_business.prepare(
+  const business = await env.DB_users.prepare(
     "SELECT * FROM businesses WHERE user_id = ?"
   )
     .bind(user.id)
@@ -76,7 +76,7 @@ export async function businessDashboard(request, env, user) {
   /* ------------------------------------------------------------
      REVENUE
   ------------------------------------------------------------ */
-  const revenueRow = await env.DB_business.prepare(
+  const revenueRow = await env.DB_users.prepare(
     `SELECT SUM(amount_cents) AS revenue_cents
      FROM contracts
      WHERE business_id = ? AND status = 'completed'`
@@ -89,7 +89,7 @@ export async function businessDashboard(request, env, user) {
   /* ------------------------------------------------------------
      OFFERS SENT TO SKATERS
   ------------------------------------------------------------ */
-  const { results: offers } = await env.DB_business.prepare(
+  const { results: offers } = await env.DB_users.prepare(
     `SELECT o.*, u.name AS skater_name
      FROM offers o
      JOIN users u ON o.to_user_id = u.id
@@ -103,7 +103,7 @@ export async function businessDashboard(request, env, user) {
   /* ------------------------------------------------------------
      CONTRACTS
   ------------------------------------------------------------ */
-  const { results: contracts } = await env.DB_business.prepare(
+  const { results: contracts } = await env.DB_users.prepare(
     `SELECT c.*, o.type, o.terms
      FROM contracts c
      JOIN offers o ON c.offer_id = o.id
@@ -116,7 +116,7 @@ export async function businessDashboard(request, env, user) {
   /* ------------------------------------------------------------
      ADS
   ------------------------------------------------------------ */
-  const { results: ads } = await env.DB_business.prepare(
+  const { results: ads } = await env.DB_users.prepare(
     `SELECT * FROM business_ads
      WHERE business_id = ?
      ORDER BY created_at DESC`
@@ -127,7 +127,7 @@ export async function businessDashboard(request, env, user) {
   /* ------------------------------------------------------------
      SPONSORSHIPS
   ------------------------------------------------------------ */
-  const { results: sponsorships } = await env.DB_business.prepare(
+  const { results: sponsorships } = await env.DB_users.prepare(
     `SELECT s.*, sk.discipline, sk.bio, u.name AS skater_name
      FROM sponsorships s
      JOIN skaters sk ON s.skater_id = sk.id
@@ -141,7 +141,7 @@ export async function businessDashboard(request, env, user) {
   /* ------------------------------------------------------------
      MESSAGE THREADS
   ------------------------------------------------------------ */
-  const { results: threads } = await env.DB_business.prepare(
+  const { results: threads } = await env.DB_users.prepare(
     `SELECT mt.*, s.discipline, b.company_name
      FROM message_threads mt
      LEFT JOIN skaters s ON mt.skater_id = s.id
@@ -154,7 +154,7 @@ export async function businessDashboard(request, env, user) {
   /* ------------------------------------------------------------
      EVENTS
   ------------------------------------------------------------ */
-  const { results: events } = await env.DB_business.prepare(
+  const { results: events } = await env.DB_users.prepare(
     `SELECT * FROM events
      WHERE created_by_business_id = ?
      ORDER BY start_at DESC`
@@ -165,7 +165,7 @@ export async function businessDashboard(request, env, user) {
   /* ------------------------------------------------------------
      SKATER OPPORTUNITIES
   ------------------------------------------------------------ */
-  const { results: skater_opportunities } = await env.DB_skaters.prepare(
+  const { results: skater_opportunities } = await env.DB_users.prepare(
     `SELECT s.id, s.bio, s.discipline, u.name
      FROM skaters s
      JOIN users u ON s.user_id = u.id
@@ -207,7 +207,7 @@ export async function createOffer(request, env, user) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB_business.prepare(
+  await env.DB_users.prepare(
     `INSERT INTO offers 
        (id, from_user_id, to_user_id, type, amount_cents, terms, status, created_at)
      VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`
@@ -222,7 +222,7 @@ export async function createOffer(request, env, user) {
    LIST BUSINESS OFFERS
 ============================================================ */
 export async function listBusinessOffers(request, env, user) {
-  const { results } = await env.DB_business.prepare(
+  const { results } = await env.DB_users.prepare(
     `SELECT o.*, u.name AS skater_name
      FROM offers o
      JOIN users u ON o.to_user_id = u.id
@@ -242,7 +242,7 @@ export async function listBusinessOffers(request, env, user) {
 export async function createContract(request, env, user) {
   const { offerId, details } = await request.json();
 
-  const offer = await env.DB_business.prepare(
+  const offer = await env.DB_users.prepare(
     `SELECT * FROM offers
      WHERE id = ? AND (from_user_id = ? OR to_user_id = ?)`
   )
@@ -266,14 +266,14 @@ export async function createContract(request, env, user) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB_business.prepare(
+  await env.DB_users.prepare(
     `INSERT INTO contracts (id, offer_id, details, status, created_at)
      VALUES (?, ?, ?, 'pending', ?)`
   )
     .bind(id, offerId, details, now)
     .run();
 
-  await env.DB_business.prepare(
+  await env.DB_users.prepare(
     `INSERT INTO contract_participants
      (id, contract_id, user_id, role_in_contract, percentage, signed)
      VALUES (?, ?, ?, 'business', NULL, 0)`
@@ -288,7 +288,7 @@ export async function createContract(request, env, user) {
    LIST CONTRACTS
 ============================================================ */
 export async function listContracts(request, env, user) {
-  const { results } = await env.DB_business.prepare(
+  const { results } = await env.DB_users.prepare(
     `SELECT c.*, o.type, o.terms
      FROM contracts c
      JOIN offers o ON c.offer_id = o.id
@@ -308,7 +308,7 @@ export async function businessCreateAd(request, env, user) {
   const body = await request.json();
   const { title, image_r2_key, target_url, start_at, end_at } = body;
 
-  const business = await env.DB_business.prepare(
+  const business = await env.DB_users.prepare(
     "SELECT id FROM businesses WHERE user_id = ?"
   )
     .bind(user.id)
@@ -319,7 +319,7 @@ export async function businessCreateAd(request, env, user) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB_business.prepare(
+  await env.DB_users.prepare(
     `INSERT INTO business_ads
      (id, business_id, title, image_r2_key, target_url, start_at, end_at, status, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)`
@@ -346,7 +346,7 @@ export async function businessCreateEvent(request, env, user) {
   const body = await request.json();
   const { title, description, location, lat, lng, start_at, end_at } = body;
 
-  const business = await env.DB_business.prepare(
+  const business = await env.DB_users.prepare(
     "SELECT id FROM businesses WHERE user_id = ?"
   )
     .bind(user.id)
@@ -357,7 +357,7 @@ export async function businessCreateEvent(request, env, user) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB_business.prepare(
+  await env.DB_users.prepare(
     `INSERT INTO events
      (id, type, title, description, location, lat, lng, start_at, end_at, created_by_business_id, created_at)
      VALUES (?, 'business', ?, ?, ?, ?, ?, ?, ?, ?, ?)`

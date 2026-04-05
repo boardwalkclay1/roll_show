@@ -11,7 +11,7 @@ export async function signupSkater(request, env) {
   const base = await signupBase(env, body);
   if (base.error) return apiJson({ message: base.error }, 400);
 
-  await env.DB_skaters
+  await env.DB_users
     .prepare(
       `INSERT INTO skaters (id, user_id, bio, discipline, profile_image, clip_url, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?)`
@@ -34,7 +34,7 @@ export async function signupSkater(request, env) {
    PUBLIC SHOW FEED
 ============================================================ */
 export async function listShows(env) {
-  const { results } = await env.DB_skaters
+  const { results } = await env.DB_users
     .prepare(
       `SELECT s.*, sk.discipline, sk.bio
        FROM shows s
@@ -50,7 +50,7 @@ export async function listShows(env) {
    GET SINGLE SHOW
 ============================================================ */
 export async function getShow(env, id) {
-  const row = await env.DB_skaters
+  const row = await env.DB_users
     .prepare(
       `SELECT s.*, sk.discipline, sk.bio
        FROM shows s
@@ -69,24 +69,24 @@ export async function getShow(env, id) {
    SKATER DASHBOARD
 ============================================================ */
 export async function skaterDashboard(request, env, user) {
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT * FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
 
   if (!skater) return apiJson({ message: "Skater profile not found" }, 404);
 
-  const { results: shows } = await env.DB_skaters
+  const { results: shows } = await env.DB_users
     .prepare("SELECT * FROM shows WHERE skater_id = ? ORDER BY created_at DESC")
     .bind(skater.id)
     .all();
 
-  const { results: lessons } = await env.DB_skaters
+  const { results: lessons } = await env.DB_users
     .prepare("SELECT * FROM lessons WHERE skater_id = ? ORDER BY created_at DESC")
     .bind(skater.id)
     .all();
 
-  const { results: lessonRequests } = await env.DB_skaters
+  const { results: lessonRequests } = await env.DB_users
     .prepare(
       `SELECT lr.*, l.title AS lesson_title, u.name AS buyer_name
        FROM lesson_requests lr
@@ -98,7 +98,7 @@ export async function skaterDashboard(request, env, user) {
     .bind(skater.id)
     .all();
 
-  const { results: offers } = await env.DB_business
+  const { results: offers } = await env.DB_users
     .prepare(
       `SELECT o.*, u.name AS sender_name
        FROM offers o
@@ -109,7 +109,7 @@ export async function skaterDashboard(request, env, user) {
     .bind(user.id, user.id)
     .all();
 
-  const { results: contracts } = await env.DB_business
+  const { results: contracts } = await env.DB_users
     .prepare(
       `SELECT c.*, o.type, o.terms
        FROM contracts c
@@ -120,7 +120,7 @@ export async function skaterDashboard(request, env, user) {
     .bind(user.id, user.id)
     .all();
 
-  const { results: participants } = await env.DB_business
+  const { results: participants } = await env.DB_users
     .prepare(
       `SELECT cp.*, u.name
        FROM contract_participants cp
@@ -130,7 +130,7 @@ export async function skaterDashboard(request, env, user) {
     .bind(user.id)
     .all();
 
-  const { results: licenses } = await env.DB_musicians
+  const { results: licenses } = await env.DB_users
     .prepare(
       `SELECT l.*, t.title
        FROM track_licenses l
@@ -157,14 +157,14 @@ export async function skaterDashboard(request, env, user) {
    LIST SKATER SHOWS
 ============================================================ */
 export async function listSkaterShows(request, env, user) {
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
 
   if (!skater) return apiJson({ message: "Skater not found" }, 404);
 
-  const { results } = await env.DB_skaters
+  const { results } = await env.DB_users
     .prepare("SELECT * FROM shows WHERE skater_id = ? ORDER BY created_at DESC")
     .bind(skater.id)
     .all();
@@ -187,7 +187,7 @@ export async function createShow(request, env, user) {
 
   if (!title) return apiJson({ message: "Missing title" }, 400);
 
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
@@ -197,7 +197,7 @@ export async function createShow(request, env, user) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB_skaters
+  await env.DB_users
     .prepare(
       `INSERT INTO shows (id, skater_id, title, description, price_cents, thumbnail, video_url, premiere_date, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -224,14 +224,14 @@ export async function createShow(request, env, user) {
 export async function updateSkaterProfile(request, env, user) {
   const { discipline, bio, profile_image, clip_url } = await request.json();
 
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
 
   if (!skater) return apiJson({ message: "Skater not found" }, 404);
 
-  await env.DB_skaters
+  await env.DB_users
     .prepare(
       `UPDATE skaters
        SET discipline = ?, bio = ?, profile_image = ?, clip_url = ?
@@ -257,7 +257,7 @@ export async function createLesson(request, env, user) {
 
   if (!title) return apiJson({ message: "Missing title" }, 400);
 
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
@@ -267,7 +267,7 @@ export async function createLesson(request, env, user) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  await env.DB_skaters
+  await env.DB_users
     .prepare(
       `INSERT INTO lessons (id, skater_id, title, description, price_cents, created_at)
        VALUES (?, ?, ?, ?, ?, ?)`
@@ -289,7 +289,7 @@ export async function respondLessonRequest(request, env, user) {
     return apiJson({ message: "Invalid status" }, 400);
   }
 
-  const row = await env.DB_skaters
+  const row = await env.DB_users
     .prepare(
       `SELECT lr.id
        FROM lesson_requests lr
@@ -304,7 +304,7 @@ export async function respondLessonRequest(request, env, user) {
     return apiJson({ message: "Unauthorized or request not found" }, 403);
   }
 
-  await env.DB_skaters
+  await env.DB_users
     .prepare("UPDATE lesson_requests SET status = ? WHERE id = ?")
     .bind(status, requestId)
     .run();
@@ -316,7 +316,7 @@ export async function respondLessonRequest(request, env, user) {
    SKATER: LIST BUSINESSES
 ============================================================ */
 export async function skaterBusinesses(request, env, user) {
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id, signed_to_label FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
@@ -328,7 +328,7 @@ export async function skaterBusinesses(request, env, user) {
     );
   }
 
-  const { results: businesses } = await env.DB_business
+  const { results: businesses } = await env.DB_users
     .prepare(
       `SELECT b.id, b.company_name, b.website, b.verified
        FROM businesses b
@@ -337,7 +337,7 @@ export async function skaterBusinesses(request, env, user) {
     )
     .all();
 
-  const { results: sponsorships } = await env.DB_business
+  const { results: sponsorships } = await env.DB_users
     .prepare(
       `SELECT s.*, b.company_name
        FROM sponsorships s
@@ -359,7 +359,7 @@ export async function skaterBusinesses(request, env, user) {
 export async function skaterContactBusiness(request, env, user) {
   const { businessId, message } = await request.json();
 
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id, signed_to_label FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
@@ -371,14 +371,14 @@ export async function skaterContactBusiness(request, env, user) {
     );
   }
 
-  const business = await env.DB_business
+  const business = await env.DB_users
     .prepare("SELECT id FROM businesses WHERE id = ? AND verified = 1")
     .bind(businessId)
     .first();
 
   if (!business) return apiJson({ message: "Business not found." }, 404);
 
-  let thread = await env.DB_business
+  let thread = await env.DB_users
     .prepare(
       `SELECT * FROM message_threads
        WHERE skater_id = ? AND business_id = ?`
@@ -390,7 +390,7 @@ export async function skaterContactBusiness(request, env, user) {
 
   if (!thread) {
     const threadId = crypto.randomUUID();
-    await env.DB_business
+    await env.DB_users
       .prepare(
         `INSERT INTO message_threads (id, skater_id, business_id, sponsorship_id, created_at)
          VALUES (?, ?, ?, NULL, ?)`
@@ -403,7 +403,7 @@ export async function skaterContactBusiness(request, env, user) {
 
   const msgId = crypto.randomUUID();
 
-  await env.DB_business
+  await env.DB_users
     .prepare(
       `INSERT INTO messages (id, thread_id, from_user_id, to_user_id, body, created_at)
        VALUES (?, ?, ?, ?, ?, ?)`
@@ -425,14 +425,14 @@ export async function skaterContactBusiness(request, env, user) {
    SKATER OFFERINGS (LESSONS)
 ============================================================ */
 export async function listSkaterOfferings(request, env, user) {
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
 
   if (!skater) return apiJson({ message: "Skater not found" }, 404);
 
-  const { results } = await env.DB_skaters
+  const { results } = await env.DB_users
     .prepare(
       `SELECT id, title, description, price_cents, created_at
        FROM lessons
@@ -449,14 +449,14 @@ export async function listSkaterOfferings(request, env, user) {
    SKATER CALENDAR (SHOWS + LESSONS)
 ============================================================ */
 export async function skaterCalendar(request, env, user) {
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
 
   if (!skater) return apiJson({ message: "Skater not found" }, 404);
 
-  const { results: shows } = await env.DB_skaters
+  const { results: shows } = await env.DB_users
     .prepare(
       `SELECT id, title, premiere_date AS date, 'show' AS type
        FROM shows
@@ -466,7 +466,7 @@ export async function skaterCalendar(request, env, user) {
     .bind(skater.id)
     .all();
 
-  const { results: lessons } = await env.DB_skaters
+  const { results: lessons } = await env.DB_users
     .prepare(
       `SELECT id, title, created_at AS date, 'lesson' AS type
        FROM lessons
@@ -483,14 +483,14 @@ export async function skaterCalendar(request, env, user) {
    SKATER CAMPAIGNS (SPONSORSHIPS)
 ============================================================ */
 export async function skaterCampaigns(request, env, user) {
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
 
   if (!skater) return apiJson({ message: "Skater not found" }, 404);
 
-  const { results } = await env.DB_business
+  const { results } = await env.DB_users
     .prepare(
       `SELECT s.*, b.company_name
        FROM sponsorships s
@@ -508,7 +508,7 @@ export async function skaterCampaigns(request, env, user) {
    SKATER CARDS (CONTRACTS AS CARDS)
 ============================================================ */
 export async function skaterCards(request, env, user) {
-  const { results } = await env.DB_business
+  const { results } = await env.DB_users
     .prepare(
       `SELECT c.id, c.status, c.created_at, o.type, o.terms
        FROM contracts c
@@ -526,14 +526,14 @@ export async function skaterCards(request, env, user) {
    SKATER MUSIC (LICENSED TRACKS)
 ============================================================ */
 export async function skaterMusic(request, env, user) {
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
 
   if (!skater) return apiJson({ message: "Skater not found" }, 404);
 
-  const { results } = await env.DB_musicians
+  const { results } = await env.DB_users
     .prepare(
       `SELECT l.id, l.created_at, t.title, t.artist_name
        FROM track_licenses l
@@ -551,7 +551,7 @@ export async function skaterMusic(request, env, user) {
    SKATER BRANDING ASSETS (PROFILE + CLIP)
 ============================================================ */
 export async function skaterBrandingAssets(request, env, user) {
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare(
       "SELECT profile_image, clip_url, discipline, bio FROM skaters WHERE user_id = ?"
     )
@@ -590,7 +590,7 @@ export async function skaterAnalytics(request, env, user) {
   const url = new URL(request.url);
   const range = parseInt(url.searchParams.get("range") || "7", 10);
 
-  const skater = await env.DB_skaters
+  const skater = await env.DB_users
     .prepare("SELECT id FROM skaters WHERE user_id = ?")
     .bind(user.id)
     .first();
@@ -599,7 +599,7 @@ export async function skaterAnalytics(request, env, user) {
 
   const since = new Date(Date.now() - range * 24 * 60 * 60 * 1000).toISOString();
 
-  const { results: shows } = await env.DB_skaters
+  const { results: shows } = await env.DB_users
     .prepare(
       `SELECT * FROM shows
        WHERE skater_id = ? AND created_at >= ?
@@ -608,7 +608,7 @@ export async function skaterAnalytics(request, env, user) {
     .bind(skater.id, since)
     .all();
 
-  const { results: lessons } = await env.DB_skaters
+  const { results: lessons } = await env.DB_users
     .prepare(
       `SELECT * FROM lessons
        WHERE skater_id = ? AND created_at >= ?
@@ -617,7 +617,7 @@ export async function skaterAnalytics(request, env, user) {
     .bind(skater.id, since)
     .all();
 
-  const { results: lessonRequests } = await env.DB_skaters
+  const { results: lessonRequests } = await env.DB_users
     .prepare(
       `SELECT lr.*
        FROM lesson_requests lr
@@ -628,7 +628,7 @@ export async function skaterAnalytics(request, env, user) {
     .bind(skater.id, since)
     .all();
 
-  const { results: licenses } = await env.DB_musicians
+  const { results: licenses } = await env.DB_users
     .prepare(
       `SELECT l.*, t.title
        FROM track_licenses l
