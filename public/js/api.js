@@ -1,8 +1,10 @@
-// /js/api.js — ROLL SHOW STABLE VERSION
+// /js/api.js — ROLL SHOW STABLE VERSION (WORKER DOMAIN)
 
-const API_BASE = "/api";
+const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
 
-/* ---------------- SAFE JSON PARSER ---------------- */
+/* ------------------------------------------------------------
+   SAFE JSON PARSER
+------------------------------------------------------------ */
 async function safeJson(res) {
   const text = await res.text();
   const type = res.headers.get("content-type") || "";
@@ -28,7 +30,9 @@ async function safeJson(res) {
   }
 }
 
-/* ---------------- INTERNAL REQUEST ---------------- */
+/* ------------------------------------------------------------
+   INTERNAL REQUEST HANDLER
+------------------------------------------------------------ */
 async function request(method, path, payload = null, extraHeaders = {}) {
   const headers = { ...extraHeaders };
   const options = { method, headers };
@@ -64,7 +68,9 @@ async function request(method, path, payload = null, extraHeaders = {}) {
   };
 }
 
-/* ---------------- PUBLIC API ---------------- */
+/* ------------------------------------------------------------
+   PUBLIC API
+------------------------------------------------------------ */
 const API = {
   get(path, headers = {}) {
     return request("GET", path, null, headers);
@@ -91,5 +97,4 @@ const API = {
   }
 };
 
-// expose globally
 window.API = API;
