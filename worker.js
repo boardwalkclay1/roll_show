@@ -1,4 +1,4 @@
-// worker.js — AUTH PIPELINE + OWNER OVERRIDE + MIGRATIONS + MEDIA (R2 + KV)
+// worker.js — CLEANED, FIXED, OWNER ROUTES WORKING
 
 import {
   cors,
@@ -122,33 +122,7 @@ async function withOwnerOverride(request, env, allowedRoles, handler) {
 }
 
 /* ============================================================
-   MIGRATIONS
-============================================================ */
-async function runAllMigrations(request, env, user) {
-  const base = new URL(request.url);
-  const listUrl = new URL("/migrations/", base).toString();
-
-  const indexHtml = await fetch(listUrl).then(r => r.text());
-
-  const files = [...indexHtml.matchAll(/>(\d+[^<]+\.sql)</g)]
-    .map(m => m[1])
-    .sort();
-
-  const results = [];
-
-  for (const file of files) {
-    const sqlUrl = new URL(`/migrations/${file}`, base).toString();
-    const sql = await fetch(sqlUrl).then(r => r.text());
-
-    await env.DB_users.exec(sql);
-    results.push({ file, status: "executed" });
-  }
-
-  return apiJson({ success: true, ran: results });
-}
-
-/* ============================================================
-   MEDIA HELPERS (R2 + KV)
+   MEDIA HELPERS
 ============================================================ */
 async function saveMediaMeta(env, id, meta) {
   await env.KV.put(`media:${id}`, JSON.stringify(meta));
@@ -263,21 +237,16 @@ export default {
 
       logRequest(request);
 
-      /* CORS */
       if (method === "OPTIONS") {
         return new Response(null, { status: 204, headers: cors() });
       }
 
-      /* ============================================================
-         LOGIN (USES users.js + AUTH WORKER)
-      ============================================================ */
+      /* LOGIN */
       if (path === "/api/login" && method === "POST") {
         return userLogin(request.clone(), env);
       }
 
-      /* ============================================================
-         SIGNUP
-      ============================================================ */
+      /* SIGNUP */
       const signupRoutes = {
         "/api/buyer/signup": signupBuyer,
         "/api/skater/signup": signupSkater,
@@ -289,9 +258,7 @@ export default {
         return signupRoutes[path](request.clone(), env);
       }
 
-      /* ============================================================
-         PUBLIC SHOWS
-      ============================================================ */
+      /* PUBLIC SHOWS */
       if (path === "/api/shows" && method === "GET") {
         return listShows(env);
       }
@@ -301,9 +268,7 @@ export default {
         return getShow(env, id);
       }
 
-      /* ============================================================
-         MEDIA
-      ============================================================ */
+      /* MEDIA */
       if (path === "/api/media/init-upload" && method === "POST") {
         return requireRole(
           request.clone(),
@@ -343,9 +308,7 @@ export default {
         );
       }
 
-      /* ============================================================
-         SKATER
-      ============================================================ */
+      /* SKATER */
       if (path === "/api/skater/dashboard" && method === "GET") {
         return requireRole(request.clone(), env, ["skater"], skaterDashboard);
       }
@@ -370,9 +333,7 @@ export default {
         return requireRole(request.clone(), env, ["skater"], skaterContactBusiness);
       }
 
-      /* ============================================================
-         MUSICIAN
-      ============================================================ */
+      /* MUSICIAN */
       if (path === "/api/musician/dashboard" && method === "GET") {
         return requireRole(request.clone(), env, ["musician"], musicianDashboard);
       }
@@ -389,9 +350,7 @@ export default {
         return requireRole(request.clone(), env, ["musician"], licenseTrack);
       }
 
-      /* ============================================================
-         BUSINESS
-      ============================================================ */
+      /* BUSINESS */
       if (path === "/api/business/dashboard" && method === "GET") {
         return requireRole(request.clone(), env, ["business"], businessDashboard);
       }
@@ -420,13 +379,7 @@ export default {
         return requireRole(request.clone(), env, ["business"], businessCreateEvent);
       }
 
-      /* ============================================================
-         OWNER
-      ============================================================ */
-      if (path === "/api/owner/run-migrations" && method === "POST") {
-        return withOwnerOverride(request.clone(), env, ["owner"], runAllMigrations);
-      }
-
+      /* OWNER */
       if (path === "/api/owner/overview" && method === "GET") {
         return withOwnerOverride(request.clone(), env, ["owner"], ownerOverview);
       }
@@ -463,7 +416,15 @@ export default {
         return withOwnerOverride(request.clone(), env, ["owner"], ownerSettingsBranding);
       }
 
+      if (path === "/api/owner/settings/branding" && method === "POST") {
+        return withOwnerOverride(request.clone(), env, ["owner"], ownerSettingsBranding);
+      }
+
       if (path === "/api/owner/settings/notes" && method === "GET") {
+        return withOwnerOverride(request.clone(), env, ["owner"], ownerSettingsNotes);
+      }
+
+      if (path === "/api/owner/settings/notes" && method === "POST") {
         return withOwnerOverride(request.clone(), env, ["owner"], ownerSettingsNotes);
       }
 
@@ -487,32 +448,7 @@ export default {
         return withOwnerOverride(request.clone(), env, ["owner"], ownerSponsorships);
       }
 
-      /* ============================================================
-         SYSTEM STUBS
-      ============================================================ */
-      if (path === "/api/messages" && method === "GET") {
-        return apiJson({ data: [], success: true });
-      }
-
-      if (path === "/api/notifications" && method === "GET") {
-        return apiJson({ data: [], success: true });
-      }
-
-      if (path === "/api/search" && method === "GET") {
-        return apiJson({ data: [], success: true });
-      }
-
-      if (path === "/api/map" && method === "GET") {
-        return apiJson({ data: [], success: true });
-      }
-
-      if (path === "/api/settings" && method === "GET") {
-        return apiJson({ data: {}, success: true });
-      }
-
-      /* ============================================================
-         FALLBACK
-      ============================================================ */
+      /* FALLBACK */
       return apiJson({ message: "Not found" }, 404);
 
     } catch (err) {
