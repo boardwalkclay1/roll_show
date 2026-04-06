@@ -1,4 +1,4 @@
-// /js/api.js — ROLL SHOW STABLE VERSION (WORKER DOMAIN)
+// /app/js/api.js — ROLL SHOW STABLE VERSION (WORKER DOMAIN)
 
 const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
 
@@ -9,10 +9,11 @@ async function safeJson(res) {
   const text = await res.text();
   const type = res.headers.get("content-type") || "";
 
-  if (!type.includes("application/json")) {
+  if (!type.toLowerCase().includes("application/json")) {
     return {
       success: false,
       status: res.status,
+      data: null,
       user: undefined,
       error: { message: "Non-JSON response" }
     };
@@ -24,6 +25,7 @@ async function safeJson(res) {
     return {
       success: false,
       status: res.status,
+      data: null,
       user: undefined,
       error: { message: "Invalid JSON" }
     };
@@ -37,11 +39,13 @@ async function request(method, path, payload = null, extraHeaders = {}) {
   const headers = { ...extraHeaders };
   const options = { method, headers };
 
+  // JSON payload
   if (payload && !(payload instanceof FormData) && !(payload instanceof Blob)) {
     headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(payload);
   }
 
+  // FormData / Blob payload
   if (payload instanceof FormData || payload instanceof Blob) {
     options.body = payload;
   }
@@ -53,6 +57,7 @@ async function request(method, path, payload = null, extraHeaders = {}) {
     return {
       success: false,
       status: 0,
+      data: null,
       user: undefined,
       error: { message: "Network error" }
     };
@@ -63,7 +68,8 @@ async function request(method, path, payload = null, extraHeaders = {}) {
   return {
     success: body.success ?? res.ok ?? false,
     status: res.status,
-    user: body.user ?? body.data ?? undefined,
+    data: body.data ?? null,
+    user: body.user ?? (body.data && body.data.user) ?? undefined,
     error: body.error ?? (res.ok ? null : { message: "Request failed" })
   };
 }
