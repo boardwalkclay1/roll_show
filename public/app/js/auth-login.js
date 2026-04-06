@@ -1,4 +1,4 @@
-// /js/auth-login.js — NO IMPORTS, USES GLOBAL API
+// /js/auth-login.js — FIXED VERSION (correct /api/login route)
 
 const form = document.getElementById("auth-login-form");
 
@@ -13,7 +13,8 @@ if (form) {
       password: fd.get("password")
     };
 
-    const res = await API.post("/login", payload);
+    // 🔥 FIXED: Correct backend route
+    const res = await API.post("/api/login", payload);
 
     if (!res || !res.success || !res.user) {
       alert(res?.error?.message || "Login failed. Check your email and password.");
