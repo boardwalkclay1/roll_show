@@ -34,7 +34,7 @@ if (form) {
     let target = "/";
 
     if (session.is_owner) {
-      target = "/pages/owner/owner-dashboard.htmll";
+      target = "/pages/owner/owner-dashboard.html";
     } else {
       switch (session.role) {
         case "skater":
