@@ -5,5 +5,5 @@ compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "DB_users"
-database_name = "roll_show"
-database_id = "0d166ea1-00fb-4701-bf43-fe2a652b7ce2"
+database_name = "DB_users"
+database_id = "4688d694-1a33-4055-b2a4-6f5c2231a356"
