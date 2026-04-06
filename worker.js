@@ -1,4 +1,4 @@
-// worker.js — CLEANED, FIXED, OWNER ROUTES WORKING
+// worker.js — EXPANDED, ROUTES CONSOLIDATED, OWNER OVERRIDE INTACT
 
 import {
   cors,
@@ -63,6 +63,21 @@ import {
   ownerUpdateAdStatus,
   ownerSponsorships
 } from "./routes/owner.js";
+
+/* ===== NEW ENGINES (IMPLEMENT LATER IN SEPARATE FILES) ==================== */
+
+import * as Contracts from "./contracts.js";      // /api/contracts/*
+import * as Tickets from "./tickets.js";          // /api/tickets/*
+import * as Merch from "./merch.js";              // /api/merch/*
+import * as Music from "./music.js";              // /api/music/*
+import * as Skatecards from "./skatecards.js";    // /api/skatecards/*
+import * as Branding from "./branding.js";        // /api/branding/*
+import * as Feed from "./feed.js";                // /api/feed/*
+import * as Events from "./events.js";            // /api/events/*
+import * as Affiliates from "./affiliates.js";    // /api/affiliate/*
+import * as Discounts from "./discounts.js";      // /api/discount/*
+import * as Staff from "./staff.js";              // /api/business/staff/*
+import * as Library from "./library.js";          // /api/library/*
 
 /* ============================================================
    LOGGING
@@ -308,7 +323,9 @@ export default {
         );
       }
 
-      /* SKATER */
+      /* ========================================================
+         SKATER
+      ========================================================= */
       if (path === "/api/skater/dashboard" && method === "GET") {
         return requireRole(request.clone(), env, ["skater"], skaterDashboard);
       }
@@ -333,7 +350,9 @@ export default {
         return requireRole(request.clone(), env, ["skater"], skaterContactBusiness);
       }
 
-      /* MUSICIAN */
+      /* ========================================================
+         MUSICIAN
+      ========================================================= */
       if (path === "/api/musician/dashboard" && method === "GET") {
         return requireRole(request.clone(), env, ["musician"], musicianDashboard);
       }
@@ -350,7 +369,9 @@ export default {
         return requireRole(request.clone(), env, ["musician"], licenseTrack);
       }
 
-      /* BUSINESS */
+      /* ========================================================
+         BUSINESS
+      ========================================================= */
       if (path === "/api/business/dashboard" && method === "GET") {
         return requireRole(request.clone(), env, ["business"], businessDashboard);
       }
@@ -379,7 +400,535 @@ export default {
         return requireRole(request.clone(), env, ["business"], businessCreateEvent);
       }
 
-      /* OWNER */
+      /* ========================================================
+         BUYER (EXISTING BUYER API HOOKS)
+      ========================================================= */
+      if (path === "/api/buyer/tickets" && method === "GET") {
+        return requireRole(request.clone(), env, ["buyer"], listTickets);
+      }
+
+      if (path === "/api/buyer/purchases" && method === "GET") {
+        return requireRole(request.clone(), env, ["buyer"], listPurchases);
+      }
+
+      if (path === "/api/buyer/tickets" && method === "POST") {
+        return requireRole(request.clone(), env, ["buyer"], createTicket);
+      }
+
+      if (path === "/api/buyer/partner-webhook" && method === "POST") {
+        // no role check: external webhook
+        return partnerWebhook(request.clone(), env);
+      }
+
+      /* ========================================================
+         CONTRACT ENGINE (GLOBAL)
+      ========================================================= */
+      if (path === "/api/contracts" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "business", "owner"],
+          Contracts.createContract
+        );
+      }
+
+      if (path === "/api/contracts/counter" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "business", "owner"],
+          Contracts.counterContract
+        );
+      }
+
+      if (path === "/api/contracts/approve" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "business", "owner"],
+          Contracts.approveContract
+        );
+      }
+
+      if (path === "/api/contracts/reject" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "business", "owner"],
+          Contracts.rejectContract
+        );
+      }
+
+      if (path === "/api/contracts" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "business", "owner"],
+          Contracts.listContracts
+        );
+      }
+
+      if (path.startsWith("/api/contracts/") && method === "GET") {
+        const id = path.split("/").pop();
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "business", "owner"],
+          (req, envInner, user) => Contracts.getContract(req, envInner, user, id)
+        );
+      }
+
+      /* ========================================================
+         TICKET ENGINE (GLOBAL)
+      ========================================================= */
+      if (path === "/api/tickets/create" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["owner", "skater", "business"],
+          Tickets.createTicketType
+        );
+      }
+
+      if (path === "/api/tickets/purchase" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["buyer", "business"],
+          Tickets.purchaseTicket
+        );
+      }
+
+      if (path.startsWith("/api/tickets/qr/") && method === "GET") {
+        const id = path.split("/").pop();
+        return requireRole(
+          request.clone(),
+          env,
+          ["buyer", "business", "owner", "skater"],
+          (req, envInner, user) => Tickets.getTicketQr(req, envInner, user, id)
+        );
+      }
+
+      if (path === "/api/tickets/scan" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business", "owner"],
+          Tickets.scanTicket
+        );
+      }
+
+      if (path === "/api/tickets" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["buyer", "skater", "business", "owner"],
+          Tickets.listUserTickets
+        );
+      }
+
+      if (path === "/api/tickets/validate" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business", "owner"],
+          Tickets.validateTicket
+        );
+      }
+
+      /* ========================================================
+         MERCH ENGINE
+      ========================================================= */
+      if (path === "/api/merch" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "business", "owner"],
+          Merch.createMerch
+        );
+      }
+
+      if (path === "/api/merch" && method === "PUT") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "business", "owner"],
+          Merch.updateMerch
+        );
+      }
+
+      if (path === "/api/merch" && method === "GET") {
+        return Merch.listMerch(request.clone(), env);
+      }
+
+      if (path === "/api/merch/purchase" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["buyer", "business"],
+          Merch.purchaseMerch
+        );
+      }
+
+      if (path.startsWith("/api/merch/qr/") && method === "GET") {
+        const id = path.split("/").pop();
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "business", "owner"],
+          (req, envInner, user) => Merch.getMerchQr(req, envInner, user, id)
+        );
+      }
+
+      /* ========================================================
+         MUSIC ENGINE
+      ========================================================= */
+      if (path === "/api/music/upload" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["musician"],
+          Music.uploadTrack
+        );
+      }
+
+      if (path === "/api/music" && method === "GET") {
+        return Music.listAllMusic(request.clone(), env);
+      }
+
+      if (path === "/api/music/purchase" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["buyer"],
+          Music.purchaseTrack
+        );
+      }
+
+      if (path === "/api/music/license" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "owner"],
+          Music.requestLicense
+        );
+      }
+
+      if (path === "/api/music/approve" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["musician", "owner"],
+          Music.approveLicense
+        );
+      }
+
+      /* ========================================================
+         SKATE CARDS ENGINE
+      ========================================================= */
+      if (path === "/api/skatecards" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater"],
+          Skatecards.createSkatecard
+        );
+      }
+
+      if (path === "/api/skatecards" && method === "PUT") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "owner"],
+          Skatecards.updateSkatecard
+        );
+      }
+
+      if (path === "/api/skatecards" && method === "GET") {
+        return Skatecards.listSkatecards(request.clone(), env);
+      }
+
+      if (path === "/api/skatecards/purchase" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["buyer", "skater", "musician", "business"],
+          Skatecards.purchaseSkatecard
+        );
+      }
+
+      /* ========================================================
+         BRANDING ENGINE
+      ========================================================= */
+      if (path === "/api/branding/skater" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater"],
+          Branding.getSkaterBranding
+        );
+      }
+
+      if (path === "/api/branding/skater" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater"],
+          Branding.updateSkaterBranding
+        );
+      }
+
+      if (path === "/api/branding/business" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business"],
+          Branding.getBusinessBranding
+        );
+      }
+
+      if (path === "/api/branding/business" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business"],
+          Branding.updateBusinessBranding
+        );
+      }
+
+      if (path === "/api/branding/ticket" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "owner"],
+          Branding.updateTicketBranding
+        );
+      }
+
+      if (path === "/api/branding/skatecard" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "owner"],
+          Branding.updateSkatecardBranding
+        );
+      }
+
+      /* ========================================================
+         FEED ENGINE
+      ========================================================= */
+      if (path === "/api/feed/skater" && method === "GET") {
+        return Feed.getSkaterFeed(request.clone(), env);
+      }
+
+      if (path === "/api/feed/events" && method === "GET") {
+        return Feed.getEventsFeed(request.clone(), env);
+      }
+
+      if (path === "/api/feed/business" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater"],
+          Feed.getBusinessFeed
+        );
+      }
+
+      if (path === "/api/feed/post" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater"],
+          Feed.createPost
+        );
+      }
+
+      if (path === "/api/feed/like" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "buyer"],
+          Feed.likePost
+        );
+      }
+
+      if (path === "/api/feed/comment" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "buyer"],
+          Feed.commentOnPost
+        );
+      }
+
+      if (path === "/api/feed/share" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["skater", "musician", "buyer"],
+          Feed.sharePost
+        );
+      }
+
+      /* ========================================================
+         EVENTS ENGINE
+      ========================================================= */
+      if (path === "/api/events" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business", "owner", "skater"],
+          Events.createEvent
+        );
+      }
+
+      if (path === "/api/events/approve" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["owner"],
+          Events.approveEvent
+        );
+      }
+
+      if (path === "/api/events" && method === "GET") {
+        return Events.listEvents(request.clone(), env);
+      }
+
+      if (path.startsWith("/api/events/") && method === "GET") {
+        const id = path.split("/").pop();
+        return Events.getEvent(request.clone(), env, id);
+      }
+
+      /* ========================================================
+         AFFILIATE + DISCOUNT ENGINES
+      ========================================================= */
+      if (path === "/api/affiliate" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business"],
+          Affiliates.createAffiliateCampaign
+        );
+      }
+
+      if (path === "/api/affiliate/approve" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["owner"],
+          Affiliates.approveAffiliateCampaign
+        );
+      }
+
+      if (path === "/api/affiliate" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business", "owner"],
+          Affiliates.listAffiliateCampaigns
+        );
+      }
+
+      if (path === "/api/discount" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business"],
+          Discounts.createDiscount
+        );
+      }
+
+      if (path === "/api/discount/approve" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["owner"],
+          Discounts.approveDiscount
+        );
+      }
+
+      if (path === "/api/discount" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business", "owner"],
+          Discounts.listDiscounts
+        );
+      }
+
+      /* ========================================================
+         BUSINESS STAFF PERMISSIONS
+      ========================================================= */
+      if (path === "/api/business/staff" && method === "POST") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business"],
+          Staff.addStaff
+        );
+      }
+
+      if (path === "/api/business/staff" && method === "DELETE") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business"],
+          Staff.removeStaff
+        );
+      }
+
+      if (path === "/api/business/staff" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["business"],
+          Staff.listStaff
+        );
+      }
+
+      /* ========================================================
+         LIBRARY ROUTES (MUSIC / MERCH / SKATECARDS / TICKETS)
+      ========================================================= */
+      if (path === "/api/library/music" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["buyer", "skater", "musician"],
+          Library.getMusicLibrary
+        );
+      }
+
+      if (path === "/api/library/merch" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["buyer", "skater", "musician"],
+          Library.getMerchLibrary
+        );
+      }
+
+      if (path === "/api/library/skatecards" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["buyer", "skater", "musician", "business"],
+          Library.getSkatecardLibrary
+        );
+      }
+
+      if (path === "/api/library/tickets" && method === "GET") {
+        return requireRole(
+          request.clone(),
+          env,
+          ["buyer", "skater", "business"],
+          Library.getTicketLibrary
+        );
+      }
+
+      /* ========================================================
+         OWNER
+      ========================================================= */
       if (path === "/api/owner/overview" && method === "GET") {
         return withOwnerOverride(request.clone(), env, ["owner"], ownerOverview);
       }
