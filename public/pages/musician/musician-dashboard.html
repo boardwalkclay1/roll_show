@@ -212,10 +212,10 @@
 
   <!-- TOP NAV -->
   <nav class="rs-top-nav">
-    <a href="/musician/musician-dashboard.html" class="rs-active">Dashboard</a>
-    <a href="/musician/musician-profile.html">Profile</a>
-    <a href="/musician/musician-feed.html">Feed</a>
-    <a href="/musician/music-library.html">Library</a>
+    <a href="/pages/musician/musician-dashboard.html" class="rs-active">Dashboard</a>
+    <a href="/pages/musician/musician-profile.html">Profile</a>
+    <a href="/pages/musician/musician-feed.html">Feed</a>
+    <a href="/pages/musician/music-library.html">Library</a>
   </nav>
 
   <!-- DASHBOARD SHELL -->
@@ -270,21 +270,29 @@
     <!-- FULL ACTION GRID -->
     <div class="rs-dash-actions">
 
-      <div class="rs-dash-action" onclick="location.href='/musician/upload-track.html'">Upload Track</div>
-      <div class="rs-dash-action" onclick="location.href='/musician/tracks.html'">Tracks</div>
-      <div class="rs-dash-action" onclick="location.href='/musician/music-library.html'">Music Library</div>
-      <div class="rs-dash-action" onclick="location.href='/musician/branding-studio.html'">Branding Studio</div>
-      <div class="rs-dash-action" onclick="location.href='/musician/musician-collabs.html'">Collabs</div>
-      <div class="rs-dash-action" onclick="location.href='/musician/musician-analytics.html'">Analytics</div>
-      <div class="rs-dash-action" onclick="location.href='/musician/musician-albulms.html'">Albums</div>
-      <div class="rs-dash-action" onclick="location.href='/musician/musician-feed.html'">Feed</div>
-      <div class="rs-dash-action" onclick="location.href='/musician/musician-profile.html'">Profile</div>
+      <div class="rs-dash-action" onclick="location.href='/pages/musician/upload-track.html'">Upload Track</div>
+      <div class="rs-dash-action" onclick="location.href='/pages/musician/tracks.html'">Tracks</div>
+      <div class="rs-dash-action" onclick="location.href='/pages/musician/music-library.html'">Music Library</div>
+      <div class="rs-dash-action" onclick="location.href='/pages/musician/branding-studio.html'">Branding Studio</div>
+      <div class="rs-dash-action" onclick="location.href='/pages/musician/musician-collabs.html'">Collabs</div>
+      <div class="rs-dash-action" onclick="location.href='/pages/musician/musician-analytics.html'">Analytics</div>
+      <div class="rs-dash-action" onclick="location.href='/pages/musician/musician-albulms.html'">Albums</div>
+      <div class="rs-dash-action" onclick="location.href='/pages/musician/musician-feed.html'">Feed</div>
+      <div class="rs-dash-action" onclick="location.href='/pages/musician/musician-profile.html'">Profile</div>
 
     </div>
 
   </div>
 
-  <!-- JS -->
+  <!-- UNIFIED ENGINE -->
+  <script src="/app/js/app.js"></script>
+
+  <!-- MUSICIAN GUARD -->
+  <script>
+    requireUser(["musician"]);
+  </script>
+
+  <!-- PAGE MODULE -->
   <script type="module" src="/app/js/musician/musician-dashboard.js"></script>
 
 </body>
