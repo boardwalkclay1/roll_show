@@ -1,10 +1,15 @@
 // /app/js/owner-dashboard.js
-import API from "/js/api.js";
+import {
+  getUser,
+  authedGet,
+  authedPost,
+  authedDelete
+} from "/app/js/app.js";
 
 /* ============================================================
-   GLOBALS
+   GLOBAL USER
 ============================================================ */
-let user = JSON.parse(localStorage.getItem("user") || "{}");
+const user = getUser();
 
 /* ============================================================
    SECTION SWITCHING
@@ -42,7 +47,7 @@ const btnUploadBrandAssets = document.getElementById("btn-upload-brand-assets");
 
 /* Load branding settings */
 async function loadBranding() {
-  const res = await API.get("/api/owner/settings/branding", API.withUser(user));
+  const res = await authedGet("/api/owner/settings/branding");
   if (!res.success) return;
 
   const b = res.data;
@@ -62,7 +67,7 @@ btnSaveBranding.addEventListener("click", async () => {
     theme_mode: brandTheme.value
   };
 
-  const res = await API.post("/api/owner/settings/branding", payload, API.withUser(user));
+  const res = await authedPost("/api/owner/settings/branding", payload);
   alert(res.success ? "Branding saved" : "Error saving branding");
 });
 
@@ -80,7 +85,12 @@ btnUploadBrandAssets.addEventListener("click", async () => {
     const file = f.el.files[0];
 
     // Step 1: init upload
-    const init = await API.media.initUpload("photo", file, user);
+    const init = await authedPost("/api/media/init", {
+      type: "photo",
+      filename: file.name,
+      size: file.size
+    });
+
     if (!init.success) {
       alert("Upload init failed");
       return;
@@ -89,16 +99,20 @@ btnUploadBrandAssets.addEventListener("click", async () => {
     const mediaId = init.data.media.id;
 
     // Step 2: upload file
-    const up = await API.media.uploadFile(mediaId, file, user);
-    if (!up.success) {
+    const uploadRes = await fetch(init.data.upload_url, {
+      method: "PUT",
+      body: file
+    });
+
+    if (!uploadRes.ok) {
       alert("Upload failed");
       return;
     }
 
     // Step 3: save reference
-    await API.post("/api/owner/settings/branding", {
+    await authedPost("/api/owner/settings/branding", {
       [`${f.key}_media_id`]: mediaId
-    }, API.withUser(user));
+    });
   }
 
   alert("Brand assets updated");
@@ -112,7 +126,7 @@ const noteText = document.getElementById("note-text");
 const btnAddNote = document.getElementById("btn-add-note");
 
 async function loadNotes() {
-  const res = await API.get("/api/owner/settings/notes", API.withUser(user));
+  const res = await authedGet("/api/owner/settings/notes");
   if (!res.success) return;
 
   const notes = res.data.notes || [];
@@ -130,7 +144,7 @@ async function loadNotes() {
   document.querySelectorAll(".note-delete").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
-      await API.delete(`/api/owner/settings/notes?id=${id}`, API.withUser(user));
+      await authedDelete(`/api/owner/settings/notes?id=${id}`);
       loadNotes();
     });
   });
@@ -140,7 +154,7 @@ btnAddNote.addEventListener("click", async () => {
   const text = noteText.value.trim();
   if (!text) return;
 
-  await API.post("/api/owner/settings/notes", { note: text }, API.withUser(user));
+  await authedPost("/api/owner/settings/notes", { note: text });
   noteText.value = "";
   loadNotes();
 });
@@ -151,7 +165,7 @@ btnAddNote.addEventListener("click", async () => {
 const adsTable = document.querySelector("#ads-table tbody");
 
 async function loadAds() {
-  const res = await API.get("/api/owner/ads", API.withUser(user));
+  const res = await authedGet("/api/owner/ads");
   if (!res.success) return;
 
   const ads = res.data.ads || [];
@@ -177,7 +191,7 @@ async function loadAds() {
   document.querySelectorAll(".btn-approve").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
-      await API.post("/api/owner/ads", { adId: id, status: "approved" }, API.withUser(user));
+      await authedPost("/api/owner/ads", { adId: id, status: "approved" });
       loadAds();
     });
   });
@@ -185,7 +199,7 @@ async function loadAds() {
   document.querySelectorAll(".btn-reject").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
-      await API.post("/api/owner/ads", { adId: id, status: "rejected" }, API.withUser(user));
+      await authedPost("/api/owner/ads", { adId: id, status: "rejected" });
       loadAds();
     });
   });
@@ -197,7 +211,7 @@ async function loadAds() {
 const sponsorshipsTable = document.querySelector("#sponsorships-table tbody");
 
 async function loadSponsorships() {
-  const res = await API.get("/api/owner/sponsorships", API.withUser(user));
+  const res = await authedGet("/api/owner/sponsorships");
   if (!res.success) return;
 
   const rows = res.data.sponsorships || [];
