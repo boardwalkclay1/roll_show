@@ -1,11 +1,11 @@
-// ===============================
+// ============================================================
 // CONFIG
-// ===============================
+// ============================================================
 const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
 
-// ===============================
-// SIMPLE API HELPER
-// ===============================
+// ============================================================
+// API CLIENT
+// ============================================================
 const API = {
   async get(path) {
     const res = await fetch(`${API_BASE}${path}`, {
@@ -25,18 +25,16 @@ const API = {
   }
 };
 
-// ===============================
-// USER STORAGE (UNIFIED)
-// ===============================
+// ============================================================
+// USER SESSION STORAGE
+// ============================================================
 function saveUser(user) {
   localStorage.setItem("user", JSON.stringify(user));
 }
 
 function getUser() {
-  const raw = localStorage.getItem("user");
-  if (!raw) return null;
   try {
-    return JSON.parse(raw);
+    return JSON.parse(localStorage.getItem("user"));
   } catch {
     return null;
   }
@@ -47,26 +45,35 @@ function logout() {
   window.location.href = "/pages/auth-login.html";
 }
 
-// ===============================
-// ROLE GUARD
-// ===============================
+// ============================================================
+// ROLE GUARD (NEW, CLEAN, OWNER-SAFE)
+// ============================================================
 function requireUser(roles = null) {
   const user = getUser();
+
+  // No session → login
   if (!user) {
     window.location.href = "/pages/auth-login.html";
     return null;
   }
+
+  // OWNER BYPASS — owner can access everything
+  if (user.role === "owner" || user.is_owner === true) {
+    return user;
+  }
+
+  // Normal role check
   if (roles && !roles.includes(user.role)) {
-    alert("You do not have access to this page.");
     window.location.href = "/index.html";
     return null;
   }
+
   return user;
 }
 
-// ===============================
-// GLOBAL: ATTACH LOGOUT BUTTONS
-// ===============================
+// ============================================================
+// ATTACH LOGOUT BUTTONS
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".logout-btn").forEach(btn => {
     btn.addEventListener("click", e => {
@@ -76,9 +83,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ===============================
-// AUTH LOGIN HANDLER
-// ===============================
+// ============================================================
+// LOGIN HANDLER
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("auth-login-form");
   if (!form) return;
@@ -95,18 +102,19 @@ document.addEventListener("DOMContentLoaded", () => {
     let res;
     try {
       res = await API.post("/api/login", payload);
-    } catch (err) {
+    } catch {
       alert("Network error. Try again.");
       return;
     }
 
     if (!res || !res.success || !res.user) {
-      alert(res?.error?.message || "Login failed. Check your email and password.");
+      alert(res?.error?.message || "Login failed.");
       return;
     }
 
     const user = res.user;
 
+    // Clean session object
     const session = {
       id: user.id,
       role: user.role,
@@ -115,34 +123,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     saveUser(session);
 
-    let target = "/";
-
+    // Redirect logic
     if (session.is_owner) {
-      target = "/pages/owner/owner-dashboard.html";
-    } else {
-      switch (session.role) {
-        case "skater":
-          target = "/pages/skater/skater-dashboard.html";
-          break;
-        case "musician":
-          target = "/pages/musician/musician-dashboard.html";
-          break;
-        case "business":
-          target = "/pages/business/business-dashboard.html";
-          break;
-        case "buyer":
-          target = "/pages/buyer/buyer-dashboard.html";
-          break;
-      }
+      window.location.href = "/pages/owner/owner-dashboard.html";
+      return;
     }
 
-    window.location.href = target;
+    switch (session.role) {
+      case "skater":
+        window.location.href = "/pages/skater/skater-dashboard.html";
+        break;
+      case "musician":
+        window.location.href = "/pages/musician/musician-dashboard.html";
+        break;
+      case "business":
+        window.location.href = "/pages/business/business-dashboard.html";
+        break;
+      case "buyer":
+        window.location.href = "/pages/buyer/buyer-dashboard.html";
+        break;
+      default:
+        window.location.href = "/";
+    }
   });
 });
 
-// ===============================
+// ============================================================
 // HOMEPAGE SHOWS
-// ===============================
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   const featured = document.getElementById("featuredShows");
   const grid = document.getElementById("showGrid");
@@ -158,17 +166,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (featured) {
-        featured.innerHTML = "";
-        shows.slice(0, 3).forEach(show => {
-          featured.innerHTML += showCard(show);
-        });
+        featured.innerHTML = shows.slice(0, 3).map(showCard).join("");
       }
 
       if (grid) {
-        grid.innerHTML = "";
-        shows.forEach(show => {
-          grid.innerHTML += showCard(show);
-        });
+        grid.innerHTML = shows.map(showCard).join("");
       }
     })
     .catch(() => {
@@ -192,9 +194,9 @@ function viewShow(id) {
   window.location.href = `/pages/show.html?id=${encodeURIComponent(id)}`;
 }
 
-// ===============================
+// ============================================================
 // SHOW PAGE
-// ===============================
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   const header = document.getElementById("showHeader");
   const preview = document.getElementById("showVideoPreview");
@@ -220,9 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (preview) {
-        preview.innerHTML = `
-          <img src="${show.thumbnail}" class="video-thumb">
-        `;
+        preview.innerHTML = `<img src="${show.thumbnail}" class="video-thumb">`;
       }
 
       if (priceDisplay) {
@@ -260,9 +260,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ===============================
+// ============================================================
 // TICKET WALLET
-// ===============================
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   const wallet = document.getElementById("ticketWalletList");
   if (!wallet) return;
@@ -280,17 +280,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      wallet.innerHTML = "";
-      tickets.forEach(t => {
-        wallet.innerHTML += `
-          <div class="ticket-card">
-            <h3>${t.title}</h3>
-            <p>Premiere: ${t.premiere_date}</p>
-            <p>QR: ${t.qr_code}</p>
-            <button onclick="viewTicket('${t.id}')">View Ticket</button>
-          </div>
-        `;
-      });
+      wallet.innerHTML = tickets.map(t => `
+        <div class="ticket-card">
+          <h3>${t.title}</h3>
+          <p>Premiere: ${t.premiere_date}</p>
+          <p>QR: ${t.qr_code}</p>
+          <button onclick="viewTicket('${t.id}')">View Ticket</button>
+        </div>
+      `).join("");
     })
     .catch(() => {
       wallet.innerHTML = "<p>Error loading tickets.</p>";
@@ -301,9 +298,9 @@ function viewTicket(id) {
   window.location.href = `/pages/ticket-view.html?id=${encodeURIComponent(id)}`;
 }
 
-// ===============================
+// ============================================================
 // PURCHASE HISTORY
-// ===============================
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   const history = document.getElementById("purchaseHistoryList");
   if (!history) return;
@@ -321,17 +318,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      history.innerHTML = "";
-      rows.forEach(p => {
-        history.innerHTML += `
-          <div class="purchase-item">
-            <h3>${p.title}</h3>
-            <p>Amount: $${(p.amount_cents / 100).toFixed(2)}</p>
-            <p>Date: ${new Date(p.created_at).toLocaleString()}</p>
-            <p>Transaction: ${p.partner_transaction_id}</p>
-          </div>
-        `;
-      });
+      history.innerHTML = rows.map(p => `
+        <div class="purchase-item">
+          <h3>${p.title}</h3>
+          <p>Amount: $${(p.amount_cents / 100).toFixed(2)}</p>
+          <p>Date: ${new Date(p.created_at).toLocaleString()}</p>
+          <p>Transaction: ${p.partner_transaction_id}</p>
+        </div>
+      `).join("");
     })
     .catch(() => {
       history.innerHTML = "<p>Error loading purchases.</p>";
