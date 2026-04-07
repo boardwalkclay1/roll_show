@@ -11,54 +11,70 @@ export async function signupBuyer(request, env) {
   const base = await signupBase(env, body);
   if (base.error) return apiJson({ message: base.error }, 400);
 
+  const id = crypto.randomUUID();
+  const now = base.created_at || new Date().toISOString();
+
   await env.DB_users.prepare(
-    `INSERT INTO buyers (id, user_id, phone, city, state, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`
+    `INSERT INTO buyer_profiles (
+       id, user_id, name, phone, city, state,
+       default_payment_method, preferred_rink, profile_weather_snapshot_json,
+       created_at
+     )
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
     .bind(
-      crypto.randomUUID(),
+      id,
       base.id,
+      body.name || null,
       body.phone || null,
       body.city || null,
       body.state || null,
-      base.created_at
+      body.default_payment_method || null,
+      body.preferred_rink || null,
+      null, // weather snapshot
+      now
     )
     .run();
 
-  return apiJson({ user: base });
+  return apiJson({ user: base, buyer_profile_id: id });
 }
 
 /* ============================================================
-   INTERNAL: GET BUYER RECORD
+   INTERNAL: GET BUYER PROFILE
 ============================================================ */
-async function getBuyer(env, userId) {
+async function getBuyerProfile(env, userId) {
   return await env.DB_users.prepare(
-    "SELECT id FROM buyers WHERE user_id = ?"
+    "SELECT * FROM buyer_profiles WHERE user_id = ?"
   )
     .bind(userId)
     .first();
 }
 
 /* ============================================================
-   LIST TICKETS (PAID ONLY)
+   LIST BUYER TICKETS
 ============================================================ */
 export async function listTickets(request, env, user) {
-  const buyer = await getBuyer(env, user.id);
-  if (!buyer) return apiJson({ message: "Buyer not found" }, 404);
+  const buyer = await getBuyerProfile(env, user.id);
+  if (!buyer) return apiJson({ message: "Buyer profile not found" }, 404);
 
   const { results } = await env.DB_users.prepare(
     `SELECT 
-        t.id,
+        t.id AS ticket_id,
+        t.ticket_type,
+        t.price_cents,
         t.status,
-        t.qr_code,
-        t.created_at,
+        t.purchased_at,
+        t.qr_code_url,
+        t.checkin_status,
         s.title AS show_title,
-        s.premiere_date AS date
+        s.start_time,
+        s.end_time,
+        s.city,
+        s.state
      FROM tickets t
-     JOIN shows s ON t.show_id = s.id
-     WHERE t.buyer_id = ? 
-       AND t.status = 'paid'
-     ORDER BY t.created_at DESC`
+     JOIN shows s ON s.id = t.show_id
+     WHERE t.buyer_profile_id = ?
+     ORDER BY t.purchased_at DESC`
   )
     .bind(buyer.id)
     .all();
@@ -67,98 +83,163 @@ export async function listTickets(request, env, user) {
 }
 
 /* ============================================================
-   LIST PURCHASES
-============================================================ */
-export async function listPurchases(request, env, user) {
-  const buyer = await getBuyer(env, user.id);
-  if (!buyer) return apiJson({ message: "Buyer not found" }, 404);
-
-  const { results } = await env.DB_users.prepare(
-    `SELECT 
-        p.id,
-        p.amount_cents,
-        p.created_at,
-        s.title AS show_title
-     FROM purchases p
-     JOIN tickets t ON p.ticket_id = t.id
-     JOIN shows s ON t.show_id = s.id
-     WHERE p.buyer_id = ?
-     ORDER BY p.created_at DESC`
-  )
-    .bind(buyer.id)
-    .all();
-
-  return apiJson({ purchases: results });
-}
-
-/* ============================================================
-   CREATE TICKET (PENDING)
+   CREATE TICKET (RESERVED)
 ============================================================ */
 export async function createTicket(request, env, user) {
-  const { showId } = await request.json();
-  if (!showId) return apiJson({ message: "Missing showId" }, 400);
+  const { show_id, ticket_type = "standard" } = await request.json();
 
-  const buyer = await getBuyer(env, user.id);
-  if (!buyer) return apiJson({ message: "Buyer not found" }, 404);
+  if (!show_id) return apiJson({ message: "Missing show_id" }, 400);
+
+  const buyer = await getBuyerProfile(env, user.id);
+  if (!buyer) return apiJson({ message: "Buyer profile not found" }, 404);
+
+  // Fetch show to determine price
+  const show = await env.DB_users.prepare(
+    "SELECT * FROM shows WHERE id = ?"
+  )
+    .bind(show_id)
+    .first();
+
+  if (!show) return apiJson({ message: "Show not found" }, 404);
 
   const id = crypto.randomUUID();
-  const qr = `ROLLSHOW-${id}`;
   const now = new Date().toISOString();
 
+  // Base price + booking fee
+  const price_cents = (show.base_price_cents || 0) + (show.booking_fee_cents || 0);
+
+  // Generate QR link (placeholder, real QR created by QR engine)
+  const qr_code_url = `/qr/ticket/${id}`;
+
   await env.DB_users.prepare(
-    `INSERT INTO tickets 
-       (id, show_id, buyer_id, qr_code, stamp, status, created_at)
-     VALUES (?, ?, ?, ?, 'unverified', 'pending', ?)`
+    `INSERT INTO tickets (
+       id,
+       show_id,
+       buyer_profile_id,
+       purchaser_user_id,
+       ticket_type,
+       price_cents,
+       status,
+       purchased_at,
+       funding_applied,
+       checkin_status,
+       checkin_at,
+       qr_code_url
+     )
+     VALUES (?, ?, ?, ?, ?, ?, 'reserved', ?, 0, 'none', NULL, ?)`
   )
-    .bind(id, showId, buyer.id, qr, now)
+    .bind(
+      id,
+      show_id,
+      buyer.id,
+      user.id,
+      ticket_type,
+      price_cents,
+      now,
+      qr_code_url
+    )
     .run();
 
-  return apiJson({ ticketId: id, status: "pending" });
+  return apiJson({
+    ticket_id: id,
+    status: "reserved",
+    price_cents,
+    qr_code_url
+  });
 }
 
 /* ============================================================
-   PARTNER WEBHOOK (MARK PAID)
+   PARTNER WEBHOOK (MARK TICKET CHARGED)
 ============================================================ */
 export async function partnerWebhook(request, env) {
   const body = await request.json();
-  const { ticketId, amount_cents, partner_transaction_id, status } = body;
+  const { ticket_id, amount_cents, partner_transaction_id, status } = body;
 
-  // Only process paid events
-  if (status !== "paid") return apiJson({ ok: true });
+  // Only process successful charges
+  if (status !== "charged") return apiJson({ ok: true });
 
   const ticket = await env.DB_users.prepare(
-    "SELECT buyer_id FROM tickets WHERE id = ?"
+    "SELECT * FROM tickets WHERE id = ?"
   )
-    .bind(ticketId)
+    .bind(ticket_id)
     .first();
 
   if (!ticket) return apiJson({ message: "Ticket not found" }, 404);
 
-  // Mark ticket as paid + verified
+  // Mark ticket as charged
   await env.DB_users.prepare(
-    "UPDATE tickets SET status = 'paid', stamp = 'verified' WHERE id = ?"
+    `UPDATE tickets
+     SET status = 'charged',
+         purchased_at = ?
+     WHERE id = ?`
   )
-    .bind(ticketId)
+    .bind(new Date().toISOString(), ticket_id)
     .run();
 
-  // Create purchase record
-  const purchaseId = crypto.randomUUID();
+  // OPTIONAL: Insert into payouts or revenue logs
+  // (We will build this in skaters.js / musicians.js / owner.js)
+
+  return apiJson({ ok: true });
+}
+
+/* ============================================================
+   CHECK IN TICKET
+============================================================ */
+export async function checkInTicket(request, env, user) {
+  const { ticket_id } = await request.json();
+  if (!ticket_id) return apiJson({ message: "Missing ticket_id" }, 400);
+
+  const ticket = await env.DB_users.prepare(
+    "SELECT * FROM tickets WHERE id = ?"
+  )
+    .bind(ticket_id)
+    .first();
+
+  if (!ticket) return apiJson({ message: "Ticket not found" }, 404);
+
   const now = new Date().toISOString();
 
   await env.DB_users.prepare(
-    `INSERT INTO purchases 
-       (id, buyer_id, ticket_id, amount_cents, partner_transaction_id, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`
+    `UPDATE tickets
+     SET checkin_status = 'there',
+         checkin_at = ?
+     WHERE id = ?`
   )
-    .bind(
-      purchaseId,
-      ticket.buyer_id,
-      ticketId,
-      amount_cents,
-      partner_transaction_id,
-      now
-    )
+    .bind(now, ticket_id)
     .run();
 
-  return apiJson({ ok: true });
+  return apiJson({ ok: true, checkin_at: now });
+}
+
+/* ============================================================
+   BUYER DASHBOARD (TICKETS + UPCOMING SHOWS)
+============================================================ */
+export async function buyerDashboard(request, env, user) {
+  const buyer = await getBuyerProfile(env, user.id);
+  if (!buyer) return apiJson({ message: "Buyer profile not found" }, 404);
+
+  const { results: tickets } = await env.DB_users.prepare(
+    `SELECT 
+        t.id AS ticket_id,
+        t.ticket_type,
+        t.status,
+        t.price_cents,
+        t.purchased_at,
+        t.qr_code_url,
+        s.title AS show_title,
+        s.start_time,
+        s.city,
+        s.state
+     FROM tickets t
+     JOIN shows s ON s.id = t.show_id
+     WHERE t.buyer_profile_id = ?
+     ORDER BY t.purchased_at DESC`
+  )
+    .bind(buyer.id)
+    .all();
+
+  return apiJson({
+    buyer,
+    tickets
+  });
 }
