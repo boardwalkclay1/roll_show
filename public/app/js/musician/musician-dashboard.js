@@ -1,138 +1,27 @@
-// /app/js/musician/musician-dashboard.js
 import API from "/js/api.js";
 
-/* ============================================================
-   DOM HELPERS
-============================================================ */
-function $(id) {
-  return document.getElementById(id);
+const musicianState = {
+  user: null,
+  musician: null,
+  analyticsChips: [],
+  actions: [],
+  tracks: [],
+  shows: [],
+  earnings: 0
+};
+
+const $m = (id) => document.getElementById(id);
+
+async function apiGet(path, user) {
+  return API.get(path, user);
 }
 
-function setText(id, value) {
-  const el = $(id);
-  if (el) el.textContent = value ?? "";
-}
-
-function setHtml(id, value) {
-  const el = $(id);
-  if (el) el.innerHTML = value ?? "";
-}
-
-/* ============================================================
-   LOADER CONTROL
-============================================================ */
 function hideMusicianLoader() {
-  const loader = document.getElementById("musician-loading");
+  const loader = $m("musician-loading");
   if (loader) loader.classList.add("rs-hidden");
 }
 
-/* Failsafe: hide loader after full window load regardless */
-window.addEventListener("load", () => {
-  setTimeout(hideMusicianLoader, 800);
-});
-
-/* ============================================================
-   RENDERERS
-============================================================ */
-function renderTracks(tracks) {
-  const ul = $("artist-tracks") || $("musician-tracks");
-  if (!ul) return;
-
-  ul.innerHTML = "";
-  if (!Array.isArray(tracks) || tracks.length === 0) {
-    ul.innerHTML = "<li>No tracks yet. Upload your first track.</li>";
-    return;
-  }
-
-  tracks.forEach((t) => {
-    const li = document.createElement("li");
-    const title = t.title || "Untitled";
-    const length = t.length || t.duration || "";
-    li.textContent = length ? `${title} — ${length}s` : title;
-    ul.appendChild(li);
-  });
-}
-
-function renderLicenses(licenses) {
-  const ul = $("artist-licenses") || $("musician-licenses");
-  if (!ul) return;
-
-  ul.innerHTML = "";
-  if (!Array.isArray(licenses) || licenses.length === 0) {
-    ul.innerHTML = "<li>No active licenses yet.</li>";
-    return;
-  }
-
-  licenses.forEach((lic) => {
-    const li = document.createElement("li");
-    const track = lic.track_title || "Track";
-    const status = lic.status || "active";
-    li.textContent = `${track} — ${status}`;
-    ul.appendChild(li);
-  });
-}
-
-function renderCollabs(collabs) {
-  const ul = $("musician-collabs");
-  if (!ul) return;
-
-  ul.innerHTML = "";
-  if (!Array.isArray(collabs) || collabs.length === 0) {
-    ul.innerHTML = "<li>No collaborations yet.</li>";
-    return;
-  }
-
-  collabs.forEach((c) => {
-    const li = document.createElement("li");
-    const name = c.with_name || c.partner_name || "Collaborator";
-    const status = c.status || "pending";
-    li.textContent = `${name} — ${status}`;
-    ul.appendChild(li);
-  });
-}
-
-function renderMessages(msgs) {
-  const ul = $("musician-messages");
-  if (!ul) return;
-
-  ul.innerHTML = "";
-  if (!Array.isArray(msgs) || msgs.length === 0) {
-    ul.innerHTML = "<li>No new messages.</li>";
-    return;
-  }
-
-  msgs.forEach((m) => {
-    const li = document.createElement("li");
-    const sender = m.sender_name || "Unknown";
-    const content = m.content || "";
-    li.textContent = `${sender}: ${content}`;
-    ul.appendChild(li);
-  });
-}
-
-function renderProfile(profile) {
-  if (!profile) return;
-
-  if (profile.display_name || profile.stage_name) {
-    setText("artist-name", profile.display_name || profile.stage_name);
-  }
-
-  if (typeof profile.earnings === "number") {
-    setText("artist-earnings", `$${profile.earnings.toFixed(2)}`);
-  }
-
-  const statusEl = $("artist-status");
-  if (statusEl) {
-    statusEl.textContent =
-      profile.status_message ||
-      "Your artist tools, tracks, and contracts are ready.";
-  }
-}
-
-/* ============================================================
-   MAIN DASHBOARD LOAD
-============================================================ */
-async function loadMusicianDashboard() {
+async function initMusicianDashboard() {
   try {
     const userRaw = localStorage.getItem("user");
     if (!userRaw) {
@@ -140,57 +29,202 @@ async function loadMusicianDashboard() {
       return;
     }
 
-    const user = JSON.parse(userRaw);
+    musicianState.user = JSON.parse(userRaw);
 
-    const me = await apiGet("/api/auth/me", user);
-    if (!me || me.role !== "musician") {
-      window.location.href = "/login.html";
-      return;
-    }
+    await loadMusicianDashboard(musicianState.user);
 
-    setText("artist-name", me.name || me.email || "Artist");
-
-    const [profileRes, tracksRes, collabsRes, messagesRes, licensesRes] =
-      await Promise.allSettled([
-        apiGet("/api/musician/profile", user),
-        apiGet("/api/musician/tracks", user),
-        apiGet("/api/musician/collabs", user),
-        apiGet("/api/musician/messages", user),
-        apiGet("/api/musician/licenses", user),
-      ]);
-
-    const profile =
-      profileRes.status === "fulfilled" ? profileRes.value?.data || profileRes.value : null;
-    const tracks =
-      tracksRes.status === "fulfilled" ? tracksRes.value?.data || tracksRes.value : [];
-    const collabs =
-      collabsRes.status === "fulfilled" ? collabsRes.value?.data || collabsRes.value : [];
-    const messages =
-      messagesRes.status === "fulfilled" ? messagesRes.value?.data || messagesRes.value : [];
-    const licenses =
-      licensesRes.status === "fulfilled" ? licensesRes.value?.data || licensesRes.value : [];
-
-    renderProfile(profile);
-    renderTracks(tracks);
-    renderLicenses(licenses);
-    renderCollabs(collabs);
-    renderMessages(messages);
-
+    renderMusicianHero();
+    renderMusicianChips();
+    renderMusicianGhostActions();
+    renderMusicianCards();
+    renderMusicianBurgerMenu();
   } catch (err) {
-    console.error("Musician Dashboard Error:", err);
-    const statusEl = $("artist-status");
-    if (statusEl) {
-      statusEl.textContent =
-        "There was a problem loading your dashboard. Please refresh or try again shortly.";
-    }
+    console.error("Musician dashboard init failed", err);
   } finally {
     hideMusicianLoader();
   }
 }
 
-/* ============================================================
-   BOOTSTRAP
-============================================================ */
-window.addEventListener("DOMContentLoaded", () => {
-  loadMusicianDashboard();
+async function loadMusicianDashboard(user) {
+  try {
+    const res = await apiGet("/api/musician/dashboard", user);
+    if (!res?.success) {
+      console.error("Musician dashboard load failed", res?.error);
+      return;
+    }
+
+    const data = res.data || {};
+
+    musicianState.musician = data.musician || null;
+    musicianState.earnings = data.earnings || 0;
+    musicianState.tracks = Array.isArray(data.tracks) ? data.tracks : [];
+    musicianState.shows = Array.isArray(data.shows) ? data.shows : [];
+
+    musicianState.analyticsChips = [
+      { label: "Tracks", value: musicianState.tracks.length, link: "#mus-tracks" },
+      { label: "Shows", value: musicianState.shows.length, link: "#mus-shows" },
+      { label: "Earnings", value: `$${Number(musicianState.earnings || 0).toFixed(2)}`, link: "#mus-earnings" }
+    ];
+
+    musicianState.actions = [
+      { id: "upload-track", label: "Upload Track", icon: "🎵" },
+      { id: "view-library", label: "Library", icon: "🎧" },
+      { id: "edit-profile", label: "Edit Profile", icon: "🖊️" }
+    ];
+  } catch (err) {
+    console.error("Musician dashboard load error", err);
+  }
+}
+
+function renderMusicianHero() {
+  const nameEl = $m("musician-hero-name");
+  const subtitleEl = $m("musician-hero-subtitle");
+  const earningsEl = $m("musician-hero-earnings");
+
+  if (nameEl) {
+    nameEl.textContent =
+      musicianState.musician?.display_name ||
+      musicianState.musician?.name ||
+      "Musician";
+  }
+
+  if (subtitleEl) {
+    subtitleEl.textContent = musicianState.musician?.genre || "Roll Show Music";
+  }
+
+  if (earningsEl) {
+    earningsEl.textContent = `$${Number(musicianState.earnings || 0).toFixed(2)}`;
+  }
+}
+
+function renderMusicianChips() {
+  const container = $m("musician-analytics-chips");
+  if (!container) return;
+
+  container.innerHTML = "";
+  musicianState.analyticsChips.forEach((chip) => {
+    const btn = document.createElement("button");
+    btn.className = "rs-chip rs-chip-ghost";
+    btn.textContent = `${chip.label}: ${chip.value}`;
+    btn.addEventListener("click", () => {
+      if (chip.link.startsWith("#")) {
+        const target = document.querySelector(chip.link);
+        if (target) target.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.location.href = chip.link;
+      }
+    });
+    container.appendChild(btn);
+  });
+}
+
+function renderMusicianGhostActions() {
+  const container = $m("musician-ghost-actions");
+  if (!container) return;
+
+  container.innerHTML = "";
+  musicianState.actions.forEach((action) => {
+    const btn = document.createElement("button");
+    btn.className = "rs-ghost-button";
+    btn.dataset.actionId = action.id;
+    btn.innerHTML = `<span class="rs-ghost-icon">${action.icon}</span><span>${action.label}</span>`;
+    btn.addEventListener("click", () => handleMusicianAction(action.id));
+    container.appendChild(btn);
+  });
+}
+
+function renderMusicianCards() {
+  renderMusicianTracks();
+  renderMusicianShows();
+}
+
+function renderMusicianTracks() {
+  const container = $m("musician-tracks-cards");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (!musicianState.tracks.length) {
+    container.innerHTML = `<div class="rs-card rs-card-empty">No tracks yet.</div>`;
+    return;
+  }
+
+  musicianState.tracks.forEach((t) => {
+    const card = document.createElement("div");
+    card.className = "rs-card rs-card-track";
+    card.innerHTML = `
+      <div class="rs-card-title">${t.title || "Track"}</div>
+      <div class="rs-card-meta">
+        <span>${t.length_seconds || 0}s</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderMusicianShows() {
+  const container = $m("musician-shows-cards");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (!musicianState.shows.length) {
+    container.innerHTML = `<div class="rs-card rs-card-empty">No shows yet.</div>`;
+    return;
+  }
+
+  musicianState.shows.forEach((show) => {
+    const card = document.createElement("div");
+    card.className = "rs-card rs-card-show";
+    card.innerHTML = `
+      <div class="rs-card-title">${show.title || "Show"}</div>
+      <div class="rs-card-meta">
+        <span>${show.venue_name || ""}</span>
+        <span>${show.date || ""}</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderMusicianBurgerMenu() {
+  const menu = $m("rs-burger-menu");
+  if (!menu) return;
+
+  const items = [
+    { label: "Owner Dashboard", link: "/owner.html" },
+    { label: "Skater Dashboard", link: "/skater.html" },
+    { label: "Business Dashboard", link: "/business.html" },
+    { label: "Musician Dashboard", link: "/musician.html" },
+    { label: "Buyer Dashboard", link: "/buyer.html" }
+  ];
+
+  menu.innerHTML = "";
+  items.forEach((item) => {
+    const li = document.createElement("button");
+    li.className = "rs-burger-item";
+    li.textContent = item.label;
+    li.addEventListener("click", () => {
+      window.location.href = item.link;
+    });
+    menu.appendChild(li);
+  });
+}
+
+function handleMusicianAction(id) {
+  switch (id) {
+    case "upload-track":
+      window.location.href = "/musician-upload.html";
+      break;
+    case "view-library":
+      window.location.href = "/musician-library.html";
+      break;
+    case "edit-profile":
+      window.location.href = "/musician-profile.html";
+      break;
+    default:
+      console.log("Unhandled musician action:", id);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initMusicianDashboard();
 });
