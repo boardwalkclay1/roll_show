@@ -1,146 +1,232 @@
 /* ============================================================
-   DASHBOARD SHELL (transparent cinematic container)
+   GLOBAL RESET + BASE
 ============================================================ */
-.rs-dash-shell {
-  position: relative;
-  z-index: 10;
-  max-width: 960px;
-  margin: 4rem auto;
-  padding: 2rem;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  /* FIXED: lighter transparency so background shows */
-  background: rgba(0, 0, 0, 0.30);
-  backdrop-filter: blur(10px);
-
-  border-radius: 18px;
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: system-ui, sans-serif;
   color: #fff;
+  overflow-x: hidden;
+}
+
+/* Smooth scroll for chip navigation */
+html {
+  scroll-behavior: smooth;
 }
 
 /* ============================================================
-   HEADER
+   BACKGROUND (fullscreen, locked)
 ============================================================ */
-.rs-dash-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 1.5rem;
+body {
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-.rs-dash-title {
-  font-size: 2rem;
+/* ============================================================
+   HERO SECTION
+============================================================ */
+.rs-hero {
+  text-align: center;
+  padding: 3rem 1.5rem 2rem;
+  backdrop-filter: blur(6px);
+}
+
+.rs-hero h1 {
+  font-size: 2.4rem;
   font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
-.rs-dash-sub {
-  font-size: 1rem;
+.rs-hero p {
+  font-size: 1.1rem;
   opacity: 0.85;
 }
 
-.rs-dash-stat {
+.rs-hero-earnings {
+  margin-top: 0.75rem;
   font-size: 1.4rem;
+  font-weight: 600;
+  color: #ffd36b;
+}
+
+/* ============================================================
+   CHIP SCROLL (YouTube style)
+============================================================ */
+.rs-chip-scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding: 1rem 1rem 0.5rem;
+  scrollbar-width: none;
+}
+
+.rs-chip-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.rs-chip {
+  flex-shrink: 0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.rs-chip-ghost {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(6px);
+}
+
+/* ============================================================
+   GHOST BUTTON GRID
+============================================================ */
+.rs-ghost-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.rs-ghost-button {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.rs-ghost-button:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+.rs-ghost-icon {
+  display: block;
+  font-size: 1.4rem;
+  margin-bottom: 0.4rem;
+}
+
+/* ============================================================
+   CARD GRID
+============================================================ */
+.rs-section {
+  padding: 1rem 1.5rem;
+}
+
+.rs-section h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
   font-weight: 600;
 }
 
-/* ============================================================
-   NAVIGATION
-============================================================ */
-.rs-dash-nav {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-}
-
-.rs-dash-nav a {
-  color: rgba(255, 255, 255, 0.85);
-  text-decoration: none;
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-}
-
-.rs-dash-nav a:hover {
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.rs-dash-nav a.rs-dash-nav-active {
-  border-color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* ============================================================
-   GRID + CARDS
-============================================================ */
-.rs-dash-grid {
+.rs-card-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
 }
 
-.rs-dash-card {
-  /* FIXED: lighter transparency */
-  background: rgba(0, 0, 0, 0.25);
+.rs-card {
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.18);
   backdrop-filter: blur(8px);
-
   border-radius: 14px;
-  padding: 1.25rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  padding: 1rem;
+  min-height: 90px;
 }
 
-.rs-dash-card h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.75rem;
+.rs-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
 }
 
-/* ============================================================
-   LISTS
-============================================================ */
-.rs-dash-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.rs-dash-list li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 0.95rem;
-}
-
-.rs-dash-list li:last-child {
-  border-bottom: none;
-}
-
-/* ============================================================
-   PILLS
-============================================================ */
-.rs-dash-pill {
-  display: inline-block;
-  padding: 0.15rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  margin-right: 0.4rem;
-  margin-top: 0.4rem;
-}
-
-/* ============================================================
-   STATUS TEXT
-============================================================ */
-.rs-dash-status {
-  margin-top: 1rem;
-  font-size: 0.9rem;
+.rs-card-meta {
+  font-size: 0.85rem;
   opacity: 0.85;
 }
 
+.rs-card-empty {
+  text-align: center;
+  opacity: 0.75;
+}
+
 /* ============================================================
-   ROLE COLOR HINTS
+   LISTS (Owner + Buyer feed)
 ============================================================ */
-.rs-dash-skater h3 { color: #7cf5ff; }
-.rs-dash-business h3 { color: #ffd36b; }
-.rs-dash-musician h3 { color: #ff8cf5; }
-.rs-dash-buyer h3 { color: #9dff8c; }
+.rs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rs-list-row {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(6px);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   BURGER MENU
+============================================================ */
+.rs-burger-menu {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rs-burger-item {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(8px);
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  width: 160px;
+  transition: 0.2s ease;
+}
+
+.rs-burger-item:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+/* ============================================================
+   MOBILE TWEAKS
+============================================================ */
+@media (max-width: 480px) {
+  .rs-hero h1 {
+    font-size: 2rem;
+  }
+
+  .rs-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .rs-ghost-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
