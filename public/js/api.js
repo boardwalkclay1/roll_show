@@ -2,9 +2,7 @@
 
 const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
 
-/* ------------------------------------------------------------
-   SAFE JSON PARSER
------------------------------------------------------------- */
+/* SAFE JSON PARSER */
 async function safeJson(res) {
   const text = await res.text();
   const type = res.headers.get("content-type") || "";
@@ -32,20 +30,16 @@ async function safeJson(res) {
   }
 }
 
-/* ------------------------------------------------------------
-   INTERNAL REQUEST HANDLER
------------------------------------------------------------- */
+/* INTERNAL REQUEST HANDLER */
 async function request(method, path, payload = null, extraHeaders = {}) {
   const headers = { ...extraHeaders };
   const options = { method, headers };
 
-  // JSON payload
   if (payload && !(payload instanceof FormData) && !(payload instanceof Blob)) {
     headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(payload);
   }
 
-  // FormData / Blob payload
   if (payload instanceof FormData || payload instanceof Blob) {
     options.body = payload;
   }
@@ -74,9 +68,7 @@ async function request(method, path, payload = null, extraHeaders = {}) {
   };
 }
 
-/* ------------------------------------------------------------
-   PUBLIC API
------------------------------------------------------------- */
+/* PUBLIC API */
 const API = {
   get(path, headers = {}) {
     return request("GET", path, null, headers);
@@ -103,4 +95,5 @@ const API = {
   }
 };
 
+// IMPORTANT: global API object for dashboards
 window.API = API;
