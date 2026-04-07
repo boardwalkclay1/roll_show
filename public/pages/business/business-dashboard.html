@@ -2,49 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Business Dashboard</title>
 
+  <!-- Favicon -->
   <link rel="icon" href="/img/favicon.png" />
+
+  <!-- Dashboard Styles -->
   <link rel="stylesheet" href="/css/dashboard.css" />
+
+  <style>
+    /* Fullscreen, locked background */
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: url('/img/dashboard-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* iPhone safe area */
+    body {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  </style>
 </head>
 
-<body style="background-image: url('/img/dashboard-bg.jpg');">
+<body>
 
   <!-- BURGER MENU -->
   <nav id="rs-burger-menu" class="rs-burger-menu"></nav>
 
-  <!-- HERO -->
+  <!-- HERO SECTION -->
   <header class="rs-hero">
     <h1 id="business-hero-name"></h1>
     <p id="business-hero-subtitle"></p>
     <div id="business-hero-earnings" class="rs-hero-earnings"></div>
   </header>
 
-  <!-- ANALYTICS CHIPS -->
+  <!-- ANALYTICS CHIPS (HORIZONTAL SCROLL) -->
   <section id="business-analytics-chips" class="rs-chip-scroll"></section>
 
   <!-- GHOST ACTION BUTTONS -->
   <section id="business-ghost-actions" class="rs-ghost-grid"></section>
 
-  <!-- SHOWS -->
+  <!-- SHOWS SECTION -->
   <section class="rs-section">
     <h2>Shows</h2>
     <div id="business-shows-cards" class="rs-card-grid"></div>
   </section>
 
-  <!-- CAMPAIGNS -->
+  <!-- CAMPAIGNS SECTION -->
   <section class="rs-section">
     <h2>Campaigns</h2>
     <div id="business-campaigns-cards" class="rs-card-grid"></div>
   </section>
 
-  <!-- SPONSORSHIPS -->
+  <!-- SPONSORSHIPS SECTION -->
   <section class="rs-section">
     <h2>Sponsorships</h2>
     <div id="business-sponsorships-cards" class="rs-card-grid"></div>
   </section>
 
+  <!-- JS -->
   <script src="/app/js/business/business-dashboard.js"></script>
+
 </body>
 </html>
