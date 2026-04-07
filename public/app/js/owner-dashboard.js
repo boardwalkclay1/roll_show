@@ -1,14 +1,13 @@
 // ============================================================
-// OWNER DASHBOARD JS (FULL REBUILD — NO IMPORTS)
+// OWNER DASHBOARD JS — CLEAN, MODERN, MATCHES REAL API
 // ============================================================
 
-// app.js is global — API_BASE, requireUser, getUser, logout, API are all available
-
-// ============================================================
-// AUTHED HELPERS (OWNER-AWARE)
-// ============================================================
+// app.js provides: API_BASE, requireUser, getUser, logout, API
 const owner = requireUser(["owner"]);
 
+// ============================================================
+// AUTHED HELPERS
+// ============================================================
 async function authedGet(path) {
   const res = await fetch(`${API_BASE}${path}`, {
     method: "GET",
@@ -79,23 +78,23 @@ const btnUploadBrandAssets = document.getElementById("btn-upload-brand-assets");
 
 async function loadBranding() {
   const res = await authedGet("/api/owner/settings/branding");
-  if (!res.success) return;
+  if (!res || !res.data) return;
 
   const b = res.data;
 
-  if (brandPrimary) brandPrimary.value = b.primary_color || "#ff4b8b";
-  if (brandSecondary) brandSecondary.value = b.secondary_color || "#ffb347";
-  if (brandAccent) brandAccent.value = b.accent_color || "#ffffff";
-  if (brandTheme) brandTheme.value = b.theme_mode || "cinematic";
+  brandPrimary.value = b.primary_color || "#ff4b8b";
+  brandSecondary.value = b.secondary_color || "#ffb347";
+  brandAccent.value = b.accent_color || "#ffffff";
+  brandTheme.value = b.theme_mode || "cinematic";
 }
 
 if (btnSaveBranding) {
   btnSaveBranding.addEventListener("click", async () => {
     const payload = {
-      primary_color: brandPrimary?.value,
-      secondary_color: brandSecondary?.value,
-      accent_color: brandAccent?.value,
-      theme_mode: brandTheme?.value
+      primary_color: brandPrimary.value,
+      secondary_color: brandSecondary.value,
+      accent_color: brandAccent.value,
+      theme_mode: brandTheme.value
     };
 
     const res = await authedPost("/api/owner/settings/branding", payload);
@@ -112,26 +111,25 @@ if (btnUploadBrandAssets) {
     ];
 
     for (const f of files) {
-      if (!f.el || !f.el.files || !f.el.files.length) continue;
+      if (!f.el?.files?.length) continue;
 
       const file = f.el.files[0];
 
       // Step 1: init upload
-      const init = await authedPost("/api/media/init", {
+      const init = await authedPost("/api/media/init-upload", {
         type: "photo",
         filename: file.name,
+        contentType: file.type,
         size: file.size
       });
 
-      if (!init.success) {
+      if (!init.media || !init.uploadPath) {
         alert("Upload init failed");
         return;
       }
 
-      const mediaId = init.data.media.id;
-
       // Step 2: upload file
-      const uploadRes = await fetch(init.data.upload_url, {
+      const uploadRes = await fetch(init.uploadPath, {
         method: "PUT",
         body: file
       });
@@ -143,7 +141,7 @@ if (btnUploadBrandAssets) {
 
       // Step 3: save reference
       await authedPost("/api/owner/settings/branding", {
-        [`${f.key}_media_id`]: mediaId
+        [`${f.key}_media_id`]: init.media.id
       });
     }
 
@@ -160,7 +158,7 @@ const btnAddNote = document.getElementById("btn-add-note");
 
 async function loadNotes() {
   const res = await authedGet("/api/owner/settings/notes");
-  if (!res.success || !notesList) return;
+  if (!res.data || !notesList) return;
 
   const notes = res.data.notes || [];
 
@@ -176,8 +174,7 @@ async function loadNotes() {
 
   notesList.querySelectorAll(".note-delete").forEach(btn => {
     btn.addEventListener("click", async () => {
-      const id = btn.dataset.id;
-      await authedDelete(`/api/owner/settings/notes?id=${id}`);
+      await authedDelete(`/api/owner/settings/notes?id=${btn.dataset.id}`);
       loadNotes();
     });
   });
@@ -185,11 +182,11 @@ async function loadNotes() {
 
 if (btnAddNote) {
   btnAddNote.addEventListener("click", async () => {
-    const text = noteText?.value.trim();
+    const text = noteText.value.trim();
     if (!text) return;
 
     await authedPost("/api/owner/settings/notes", { note: text });
-    if (noteText) noteText.value = "";
+    noteText.value = "";
     loadNotes();
   });
 }
@@ -201,7 +198,7 @@ const adsTableBody = document.querySelector("#ads-table tbody");
 
 async function loadAds() {
   const res = await authedGet("/api/owner/ads");
-  if (!res.success || !adsTableBody) return;
+  if (!res.data || !adsTableBody) return;
 
   const ads = res.data.ads || [];
 
@@ -247,7 +244,7 @@ const sponsorshipsTableBody = document.querySelector("#sponsorships-table tbody"
 
 async function loadSponsorships() {
   const res = await authedGet("/api/owner/sponsorships");
-  if (!res.success || !sponsorshipsTableBody) return;
+  if (!res.data || !sponsorshipsTableBody) return;
 
   const rows = res.data.sponsorships || [];
 
