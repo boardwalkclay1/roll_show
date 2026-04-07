@@ -7,7 +7,6 @@
 //   import { makeSkatersApi } from './skaters.js';
 //   const api = makeSkatersApi(env.DB_users);
 
-
 // ---------- helpers ----------
 
 function nowIso() {
@@ -93,21 +92,23 @@ export function makeSkatersApi(db) {
 
   // ---------- SKATER IDENTITY ----------
 
-  async function createSkaterProfile(userId, {
-    display_name,
-    bio,
-    discipline,
-    subclass,
-    avatar_url,
-    city,
-    state,
-    booking_fee_cents = 0,
-    home_rink = null,
-  }) {
-    const id = randomUUID();
+  async function createSkaterProfile(
+    userId,
+    {
+      display_name,
+      bio,
+      discipline,
+      subclass,
+      avatar_url,
+      city,
+      state,
+      booking_fee_cents = 0,
+      home_rink = null,
+    },
+  ) {
+    const id = crypto.randomUUID();
     const created_at = nowIso();
 
-    // discipline/subclass are free at signup
     await run(
       db,
       `
@@ -137,15 +138,18 @@ export function makeSkatersApi(db) {
     return await getSkaterProfileById(id);
   }
 
-  async function updateSkaterProfile(skaterId, {
-    display_name,
-    bio,
-    avatar_url,
-    city,
-    state,
-    booking_fee_cents,
-    home_rink,
-  }) {
+  async function updateSkaterProfile(
+    skaterId,
+    {
+      display_name,
+      bio,
+      avatar_url,
+      city,
+      state,
+      booking_fee_cents,
+      home_rink,
+    },
+  ) {
     const profile = await getSkaterProfileById(skaterId);
     assert(profile, 'Skater profile not found');
 
@@ -192,13 +196,14 @@ export function makeSkatersApi(db) {
     );
   }
 
-  // Discipline/subclass change: use contracts as a generic approval record.
-  // template_slug = 'discipline_change', role = 'skater', profile_id = skater_profiles.id
-  async function requestDisciplineChange(skaterId, { new_discipline, new_subclass, terms_json }) {
+  async function requestDisciplineChange(
+    skaterId,
+    { new_discipline, new_subclass, terms_json },
+  ) {
     const profile = await getSkaterProfileById(skaterId);
     assert(profile, 'Skater profile not found');
 
-    const id = randomUUID();
+    const id = crypto.randomUUID();
     const created_at = nowIso();
 
     await run(
@@ -269,10 +274,13 @@ export function makeSkatersApi(db) {
     return { contract_id: contractId, status: 'approved' };
   }
 
-  // ---------- GROUPS (FULL MODE) ----------
+  // ---------- GROUPS ----------
 
-  async function createSkaterGroup(created_by_skater_id, { name, description, avatar_url, visibility = 'public' }) {
-    const id = randomUUID();
+  async function createSkaterGroup(
+    created_by_skater_id,
+    { name, description, avatar_url, visibility = 'public' },
+  ) {
+    const id = crypto.randomUUID();
     const created_at = nowIso();
 
     await run(
@@ -292,8 +300,7 @@ export function makeSkatersApi(db) {
       created_at,
     );
 
-    // auto-add creator as leader
-    const memberId = randomUUID();
+    const memberId = crypto.randomUUID();
     await run(
       db,
       `
@@ -313,7 +320,7 @@ export function makeSkatersApi(db) {
 
   async function addSkaterToGroup(group_id, skater_id, role = 'member') {
     const joined_at = nowIso();
-    const id = randomUUID();
+    const id = crypto.randomUUID();
 
     await run(
       db,
@@ -368,17 +375,20 @@ export function makeSkatersApi(db) {
     );
   }
 
-  // ---------- OFFERINGS (LESSONS, ETC.) ----------
+  // ---------- OFFERINGS ----------
 
-  async function createSkaterOffering(skater_id, {
-    offering_type,
-    title,
-    description,
-    base_price_cents,
-    duration_minutes,
-    is_active = 1,
-  }) {
-    const id = randomUUID();
+  async function createSkaterOffering(
+    skater_id,
+    {
+      offering_type,
+      title,
+      description,
+      base_price_cents,
+      duration_minutes,
+      is_active = 1,
+    },
+  ) {
+    const id = crypto.randomUUID();
     const created_at = nowIso();
 
     await run(
@@ -404,13 +414,16 @@ export function makeSkatersApi(db) {
     return await one(db, `SELECT * FROM skater_offerings WHERE id = ?`, id);
   }
 
-  async function updateSkaterOffering(offering_id, {
-    title,
-    description,
-    base_price_cents,
-    duration_minutes,
-    is_active,
-  }) {
+  async function updateSkaterOffering(
+    offering_id,
+    {
+      title,
+      description,
+      base_price_cents,
+      duration_minutes,
+      is_active,
+    },
+  ) {
     await run(
       db,
       `
@@ -442,26 +455,26 @@ export function makeSkatersApi(db) {
     );
   }
 
-  // ---------- MUSIC (SKATER SIDE) ----------
+  // ---------- MUSIC ----------
 
-  // NOTE: tracks.musician_id references musician_profiles.id.
-  // For skater self‑music, the caller must pass a musician_id that belongs to them
-  // (e.g., a linked musician profile). This keeps schema honest.
-  async function uploadTrackForSkater(musician_id, {
-    title,
-    description,
-    genre,
-    bpm,
-    duration_seconds,
-    r2_key,
-    artwork_r2_key,
-    isrc,
-    visibility = 'public',
-    price_cents = 100,
-    license_to_rollshow = 0,
-    royalty_split_json = null,
-  }) {
-    const id = randomUUID();
+  async function uploadTrackForSkater(
+    musician_id,
+    {
+      title,
+      description,
+      genre,
+      bpm,
+      duration_seconds,
+      r2_key,
+      artwork_r2_key,
+      isrc,
+      visibility = 'public',
+      price_cents = 100,
+      license_to_rollshow = 0,
+      royalty_split_json = null,
+    },
+  ) {
+    const id = crypto.randomUUID();
     const created_at = nowIso();
 
     await run(
@@ -496,7 +509,7 @@ export function makeSkatersApi(db) {
   }
 
   async function addTrackToSkaterLibrary(skater_id, track_id) {
-    const id = randomUUID();
+    const id = crypto.randomUUID();
     const added_at = nowIso();
 
     await run(
@@ -544,14 +557,14 @@ export function makeSkatersApi(db) {
     );
   }
 
-  // ---------- SHOWS (HOSTED BY SKATER OR GROUP) ----------
+  // ---------- SHOWS ----------
 
   async function createShowForSkaterOrGroup({
-    host_type,          // 'skater' | 'group'
-    host_id,            // skater_profiles.id or skater_groups.id
+    host_type,
+    host_id,
     title,
     description,
-    show_type,          // public | private | virtual | premier | roll_show | ...
+    show_type,
     location_name,
     address,
     city,
@@ -568,7 +581,7 @@ export function makeSkatersApi(db) {
   }) {
     assert(host_type === 'skater' || host_type === 'group', 'Invalid host_type');
 
-    const id = randomUUID();
+    const id = crypto.randomUUID();
     const created_at = nowIso();
 
     await run(
@@ -615,25 +628,28 @@ export function makeSkatersApi(db) {
     return await one(db, `SELECT * FROM shows WHERE id = ?`, id);
   }
 
-  async function updateShow(show_id, {
-    title,
-    description,
-    show_type,
-    location_name,
-    address,
-    city,
-    state,
-    country,
-    latitude,
-    longitude,
-    virtual_link,
-    start_time,
-    end_time,
-    base_price_cents,
-    booking_fee_cents,
-    funding_goal_cents,
-    status,
-  }) {
+  async function updateShow(
+    show_id,
+    {
+      title,
+      description,
+      show_type,
+      location_name,
+      address,
+      city,
+      state,
+      country,
+      latitude,
+      longitude,
+      virtual_link,
+      start_time,
+      end_time,
+      base_price_cents,
+      booking_fee_cents,
+      funding_goal_cents,
+      status,
+    },
+  ) {
     await run(
       db,
       `
@@ -708,23 +724,14 @@ export function makeSkatersApi(db) {
     );
   }
 
-  // NOTE: Your current schema does NOT have a show_collaborators table.
-  // Multi‑skater collab shows + per‑show splits must be represented via:
-  //   - collabs / collab_results (for creative collab)
-  //   - royalty_accounts / royalty_events (for money)
-  // If you want explicit show‑level collaborator rows, we’ll need a new table.
-
   // ---------- COLLABS ----------
 
-  async function sendCollabRequest(from_user_id, to_user_id, {
-    type,      // inperson | stitch
-    message,
-    spot,
-    date,
-    time,
-    deadline,
-  }) {
-    const id = randomUUID();
+  async function sendCollabRequest(
+    from_user_id,
+    to_user_id,
+    { type, message, spot, date, time, deadline },
+  ) {
+    const id = crypto.randomUUID();
     const created_at = nowIso();
 
     await run(
@@ -764,7 +771,7 @@ export function makeSkatersApi(db) {
       collab_id,
     );
 
-    const historyId = randomUUID();
+    const historyId = crypto.randomUUID();
     const created_at = nowIso();
 
     await run(
@@ -786,7 +793,7 @@ export function makeSkatersApi(db) {
   }
 
   async function postCollabChatMessage(collab_id, user_id, text) {
-    const id = randomUUID();
+    const id = crypto.randomUUID();
     const timestamp = nowIso();
 
     await run(
@@ -837,13 +844,11 @@ export function makeSkatersApi(db) {
 
   // ---------- MERCH ----------
 
-  async function createMerchItem(skater_id, {
-    title,
-    description,
-    price_cents,
-    image_url,
-  }) {
-    const id = randomUUID();
+  async function createMerchItem(
+    skater_id,
+    { title, description, price_cents, image_url },
+  ) {
+    const id = crypto.randomUUID();
     const created_at = nowIso();
 
     await run(
@@ -866,12 +871,10 @@ export function makeSkatersApi(db) {
     return await one(db, `SELECT * FROM merch_items WHERE id = ?`, id);
   }
 
-  async function updateMerchItem(merch_id, {
-    title,
-    description,
-    price_cents,
-    image_url,
-  }) {
+  async function updateMerchItem(
+    merch_id,
+    { title, description, price_cents, image_url },
+  ) {
     await run(
       db,
       `
@@ -907,17 +910,20 @@ export function makeSkatersApi(db) {
 
   // ---------- SKATE CARDS ----------
 
-  async function createSkateCard(skater_id, {
-    title,
-    description,
-    image_url,
-    rarity,
-    edition_size,
-    price_cents,
-    card_type = 'standard',
-    qr_code_url,
-  }) {
-    const id = randomUUID();
+  async function createSkateCard(
+    skater_id,
+    {
+      title,
+      description,
+      image_url,
+      rarity,
+      edition_size,
+      price_cents,
+      card_type = 'standard',
+      qr_code_url,
+    },
+  ) {
+    const id = crypto.randomUUID();
     const created_at = nowIso();
 
     await run(
@@ -961,9 +967,6 @@ export function makeSkatersApi(db) {
 
   // ---------- MESSAGING ----------
 
-  // NOTE: You asked for separate buyer/musician/skater inboxes.
-  // We implement that by filtering on sender_role / receiver_role.
-
   async function sendMessage({
     sender_user_id,
     receiver_user_id,
@@ -976,7 +979,7 @@ export function makeSkatersApi(db) {
     is_request = 0,
     request_type,
   }) {
-    const id = randomUUID();
+    const id = crypto.randomUUID();
     const created_at = nowIso();
 
     await run(
@@ -1011,7 +1014,6 @@ export function makeSkatersApi(db) {
   }
 
   async function listMessagesForUserByRole(user_id, roleFilter) {
-    // roleFilter: 'buyer' | 'musician' | 'skater' etc.
     return await all(
       db,
       `
@@ -1026,17 +1028,9 @@ export function makeSkatersApi(db) {
     );
   }
 
-  // ---------- ANALYTICS (CONTRACTS, ROYALTIES, SPLITS, REVENUE) ----------
-
-  // This aggregates:
-  // - royalty_accounts / royalty_events
-  // - tickets (show revenue)
-  // - merch_orders (merch revenue)
-  // - skate_card_sales (card revenue)
-  // for a given skater_profile.id
+  // ---------- ANALYTICS ----------
 
   async function getSkaterFinancialAnalytics(skater_id) {
-    // 1) royalty account for this skater
     const royaltyAccount = await one(
       db,
       `
@@ -1063,7 +1057,6 @@ export function makeSkatersApi(db) {
       );
     }
 
-    // 2) show revenue via tickets
     const showRevenueRows = await all(
       db,
       `
@@ -1087,7 +1080,6 @@ export function makeSkatersApi(db) {
       0,
     );
 
-    // 3) merch revenue
     const merchRevenueRows = await all(
       db,
       `
@@ -1110,7 +1102,6 @@ export function makeSkatersApi(db) {
       0,
     );
 
-    // 4) skate card revenue
     const cardRevenueRows = await all(
       db,
       `
@@ -1150,8 +1141,6 @@ export function makeSkatersApi(db) {
         total_cents: totalCardCents,
         by_card: cardRevenueRows,
       },
-      // NOTE: per‑show splits between multiple skaters/musicians
-      // must be modeled via royalty_events and/or a future show_splits table.
     };
   }
 }
