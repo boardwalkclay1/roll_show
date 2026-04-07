@@ -1,41 +1,41 @@
-// worker.js — EXPANDED, ROUTES CONSOLIDATED, OWNER OVERRIDE INTACT
+// worker.js — CLEAN IMPORTS USING ONLY REAL EXPORTS
 
 import {
   cors,
   apiJson,
   requireRole,
-  login as userLogin
+  login as userLogin,
+  hash,
+  verify,
+  signupBase
 } from "./users.js";
 
 import {
   signupBuyer,
   listTickets,
-  listPurchases,
   createTicket,
-  partnerWebhook
+  partnerWebhook,
+  checkInTicket,
+  buyerDashboard
 } from "./buyers.js";
 
-import {
-  signupSkater,
-  listShows,
-  getShow,
-  skaterDashboard,
-  listSkaterShows,
-  createShow,
-  updateSkaterProfile,
-  skaterBusinesses,
-  skaterContactBusiness
-} from "./skaters.js";
+// SKATERS — you now use makeSkatersApi, NOT named exports
+import { makeSkatersApi } from "./skaters.js";
 
 import {
   signupBusiness,
   businessDashboard,
-  createOffer,
-  listBusinessOffers,
-  createContract,
-  listContracts,
-  businessCreateAd,
-  businessCreateEvent
+  businessSubmitOffer,
+  businessSubmitEvent,
+  businessSubmitAd,
+  businessSubmitVenue,
+  businessSubmitSponsorship,
+  businessSubmitAffiliate,
+  businessSubmitDiscount,
+  businessAddStaff,
+  businessRemoveStaff,
+  businessListStaff,
+  businessScanTicket
 } from "./business.js";
 
 import {
@@ -43,11 +43,13 @@ import {
   musicianDashboard,
   uploadTrack,
   listMusic,
-  licenseTrack
+  licenseTrack,
+  musicianCreateOffer,
+  listMusicianOffers
 } from "./musicians.js";
 
 import {
-  ownerOverview,
+  ownerDashboard,
   ownerUsers,
   ownerSkaters,
   ownerBusinesses,
@@ -64,20 +66,20 @@ import {
   ownerSponsorships
 } from "./routes/owner.js";
 
-/* ===== NEW ENGINES (IMPLEMENT LATER IN SEPARATE FILES) ==================== */
+/* ===== ENGINES =========================================================== */
 
-import * as Contracts from "./contracts.js";      // /api/contracts/*
-import * as Tickets from "./tickets.js";          // /api/tickets/*
-import * as Merch from "./merch.js";              // /api/merch/*
-import * as Music from "./music.js";              // /api/music/*
-import * as Skatecards from "./skatecards.js";    // /api/skatecards/*
-import * as Branding from "./branding.js";        // /api/branding/*
-import * as Feed from "./feed.js";                // /api/feed/*
-import * as Events from "./events.js";            // /api/events/*
-import * as Affiliates from "./affiliates.js";    // /api/affiliate/*
-import * as Discounts from "./discounts.js";      // /api/discount/*
-import * as Staff from "./staff.js";              // /api/business/staff/*
-import * as Library from "./library.js";          // /api/library/*
+import * as Contracts from "./contracts.js";
+import * as Tickets from "./tickets.js";
+import * as Merch from "./merch.js";
+import * as Music from "./music.js";
+import * as Skatecards from "./skatecards.js";
+import * as Branding from "./branding.js";
+import * as Feed from "./feed.js";
+import * as Events from "./events.js";
+import * as Affiliates from "./affiliates.js";
+import * as Discounts from "./discounts.js";
+import * as Staff from "./staff.js";
+import * as Library from "./library.js";
 
 /* ============================================================
    LOGGING
