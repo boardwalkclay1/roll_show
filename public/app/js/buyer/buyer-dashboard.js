@@ -1,113 +1,249 @@
-// /app/js/buyer/buyer-dashboard.js
 import API from "/js/api.js";
 
-/* ============================================================
-   LOADER CONTROL
-============================================================ */
+const buyerState = {
+  user: null,
+  buyer: null,
+  analyticsChips: [],
+  actions: [],
+  tickets: [],
+  favorites: [],
+  feedItems: []
+};
+
+const $bu = (id) => document.getElementById(id);
+
+async function apiGet(path, user) {
+  return API.get(path, user);
+}
+
 function hideBuyerLoader() {
-  const loader = document.getElementById("buyer-loading");
+  const loader = $bu("buyer-loading");
   if (loader) loader.classList.add("rs-hidden");
 }
 
-/* ============================================================
-   MAIN DASHBOARD LOAD
-============================================================ */
-async function loadBuyerDashboard() {
+async function initBuyerDashboard() {
   try {
     const userRaw = localStorage.getItem("user");
     if (!userRaw) {
-      console.error("No user found");
       window.location.href = "/login.html";
       return;
     }
 
-    const user = JSON.parse(userRaw);
+    buyerState.user = JSON.parse(userRaw);
 
-    // AUTH CHECK
-    const me = await apiGet("/api/auth/me", user);
-    if (!me || me.role !== "buyer") {
-      window.location.href = "/login.html";
-      return;
-    }
+    await loadBuyerDashboard(buyerState.user);
 
-    // NAME
-    const nameEl = document.getElementById("buyer-name");
-    if (nameEl) nameEl.textContent = me.name || "Buyer";
-
-    // PARALLEL LOADS
-    const [profileRes, ticketsRes, recsRes] = await Promise.allSettled([
-      apiGet("/api/buyer/profile", user),
-      apiGet("/api/buyer/tickets", user),
-      apiGet("/api/buyer/recommended-skaters", user)
-    ]);
-
-    const profile =
-      profileRes.status === "fulfilled"
-        ? profileRes.value?.data || profileRes.value
-        : null;
-
-    const tickets =
-      ticketsRes.status === "fulfilled"
-        ? ticketsRes.value?.data || ticketsRes.value
-        : [];
-
-    const recs =
-      recsRes.status === "fulfilled"
-        ? recsRes.value?.data || recsRes.value
-        : [];
-
-    renderTickets(tickets);
-    renderRecommended(recs);
-
+    renderBuyerHero();
+    renderBuyerChips();
+    renderBuyerGhostActions();
+    renderBuyerCards();
+    renderBuyerBurgerMenu();
   } catch (err) {
-    console.error("Buyer Dashboard Error:", err);
+    console.error("Buyer dashboard init failed", err);
   } finally {
     hideBuyerLoader();
   }
 }
 
-/* ============================================================
-   RENDERERS (SAFE)
-============================================================ */
-function renderTickets(tickets) {
-  const ul = document.getElementById("buyer-tickets");
-  if (!ul) return;
+async function loadBuyerDashboard(user) {
+  try {
+    const res = await apiGet("/api/buyer/dashboard", user);
+    if (!res?.success) {
+      console.error("Buyer dashboard load failed", res?.error);
+      return;
+    }
 
-  ul.innerHTML = "";
+    const data = res.data || {};
 
-  if (!Array.isArray(tickets) || tickets.length === 0) {
-    ul.innerHTML = "<li>No tickets yet.</li>";
-    return;
+    buyerState.buyer = data.buyer || null;
+    buyerState.tickets = Array.isArray(data.tickets) ? data.tickets : [];
+    buyerState.favorites = Array.isArray(data.favorites) ? data.favorites : [];
+    buyerState.feedItems = Array.isArray(data.feed) ? data.feed : [];
+
+    buyerState.analyticsChips = [
+      { label: "Tickets", value: buyerState.tickets.length, link: "#buyer-tickets" },
+      { label: "Favorites", value: buyerState.favorites.length, link: "#buyer-favorites" },
+      { label: "Feed", value: buyerState.feedItems.length, link: "#buyer-feed" }
+    ];
+
+    buyerState.actions = [
+      { id: "browse-shows", label: "Browse Shows", icon: "🎟️" },
+      { id: "open-feed", label: "Open Feed", icon: "📺" },
+      { id: "edit-profile", label: "Edit Profile", icon: "🖊️" }
+    ];
+  } catch (err) {
+    console.error("Buyer dashboard load error", err);
+  }
+}
+
+function renderBuyerHero() {
+  const nameEl = $bu("buyer-hero-name");
+  const subtitleEl = $bu("buyer-hero-subtitle");
+
+  if (nameEl) {
+    nameEl.textContent =
+      buyerState.buyer?.display_name ||
+      buyerState.buyer?.name ||
+      "Buyer";
   }
 
-  tickets.forEach(t => {
-    const li = document.createElement("li");
-    li.textContent = `${t.show_name || "Show"} — ${t.status || "unknown"}`;
-    ul.appendChild(li);
+  if (subtitleEl) {
+    subtitleEl.textContent = "Roll Show Audience";
+  }
+}
+
+function renderBuyerChips() {
+  const container = $bu("buyer-analytics-chips");
+  if (!container) return;
+
+  container.innerHTML = "";
+  buyerState.analyticsChips.forEach((chip) => {
+    const btn = document.createElement("button");
+    btn.className = "rs-chip rs-chip-ghost";
+    btn.textContent = `${chip.label}: ${chip.value}`;
+    btn.addEventListener("click", () => {
+      if (chip.link.startsWith("#")) {
+        const target = document.querySelector(chip.link);
+        if (target) target.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.location.href = chip.link;
+      }
+    });
+    container.appendChild(btn);
   });
 }
 
-function renderRecommended(list) {
-  const ul = document.getElementById("recommended-skaters");
-  if (!ul) return;
+function renderBuyerGhostActions() {
+  const container = $bu("buyer-ghost-actions");
+  if (!container) return;
 
-  ul.innerHTML = "";
-
-  if (!Array.isArray(list) || list.length === 0) {
-    ul.innerHTML = "<li>No recommendations yet.</li>";
-    return;
-  }
-
-  list.forEach(s => {
-    const li = document.createElement("li");
-    li.textContent = s.display_name || "Skater";
-    ul.appendChild(li);
+  container.innerHTML = "";
+  buyerState.actions.forEach((action) => {
+    const btn = document.createElement("button");
+    btn.className = "rs-ghost-button";
+    btn.dataset.actionId = action.id;
+    btn.innerHTML = `<span class="rs-ghost-icon">${action.icon}</span><span>${action.label}</span>`;
+    btn.addEventListener("click", () => handleBuyerAction(action.id));
+    container.appendChild(btn);
   });
 }
 
-/* ============================================================
-   BOOTSTRAP
-============================================================ */
+function renderBuyerCards() {
+  renderBuyerTickets();
+  renderBuyerFavorites();
+  renderBuyerFeed();
+}
+
+function renderBuyerTickets() {
+  const container = $bu("buyer-tickets-cards");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (!buyerState.tickets.length) {
+    container.innerHTML = `<div class="rs-card rs-card-empty">No tickets yet.</div>`;
+    return;
+  }
+
+  buyerState.tickets.forEach((t) => {
+    const card = document.createElement("div");
+    card.className = "rs-card rs-card-ticket";
+    card.innerHTML = `
+      <div class="rs-card-title">${t.show_title || "Ticket"}</div>
+      <div class="rs-card-meta">
+        <span>${t.date || ""}</span>
+        <span>${t.venue_name || ""}</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderBuyerFavorites() {
+  const container = $bu("buyer-favorites-cards");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (!buyerState.favorites.length) {
+    container.innerHTML = `<div class="rs-card rs-card-empty">No favorites yet.</div>`;
+    return;
+  }
+
+  buyerState.favorites.forEach((f) => {
+    const card = document.createElement("div");
+    card.className = "rs-card rs-card-favorite";
+    card.innerHTML = `
+      <div class="rs-card-title">${f.title || "Favorite"}</div>
+      <div class="rs-card-meta">
+        <span>${f.type || ""}</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderBuyerFeed() {
+  const container = $bu("buyer-feed-cards");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (!buyerState.feedItems.length) {
+    container.innerHTML = `<div class="rs-card rs-card-empty">Your feed is quiet. Follow more skaters and shows.</div>`;
+    return;
+  }
+
+  buyerState.feedItems.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = "rs-card rs-card-feed";
+    card.innerHTML = `
+      <div class="rs-card-title">${item.author_name || "Post"}</div>
+      <div class="rs-card-meta">
+        <span>${item.content || ""}</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderBuyerBurgerMenu() {
+  const menu = $bu("rs-burger-menu");
+  if (!menu) return;
+
+  const items = [
+    { label: "Owner Dashboard", link: "/owner.html" },
+    { label: "Skater Dashboard", link: "/skater.html" },
+    { label: "Business Dashboard", link: "/business.html" },
+    { label: "Musician Dashboard", link: "/musician.html" },
+    { label: "Buyer Dashboard", link: "/buyer.html" }
+  ];
+
+  menu.innerHTML = "";
+  items.forEach((item) => {
+    const li = document.createElement("button");
+    li.className = "rs-burger-item";
+    li.textContent = item.label;
+    li.addEventListener("click", () => {
+      window.location.href = item.link;
+    });
+    menu.appendChild(li);
+  });
+}
+
+function handleBuyerAction(id) {
+  switch (id) {
+    case "browse-shows":
+      window.location.href = "/shows.html";
+      break;
+    case "open-feed":
+      window.location.href = "/feed.html";
+      break;
+    case "edit-profile":
+      window.location.href = "/buyer-profile.html";
+      break;
+    default:
+      console.log("Unhandled buyer action:", id);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  loadBuyerDashboard();
+  initBuyerDashboard();
 });
