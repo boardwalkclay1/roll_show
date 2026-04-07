@@ -2,306 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Roll Show — Skater Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skater Dashboard</title>
 
-  <!-- FAVICON -->
-  <link rel="icon" href="/app/images/favicon.png">
-  <link rel="apple-touch-icon" href="/app/images/favicon.png">
-  <link rel="manifest" href="/manifest.webmanifest">
-
-  <!-- PLATFORM CSS -->
-  <link rel="stylesheet" href="/app/styles/styles.css">
-  <link rel="stylesheet" href="/app/styles/dashboard.css">
-
-  <!-- BRAND FONT -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
-
-  <style>
-    /* BACKGROUND */
-    .bg-landing {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      object-position: center;
-      filter: brightness(0.35);
-      z-index: -2;
-      pointer-events: none;
-    }
-
-    body.rs-body {
-      margin: 0;
-      color: #fff;
-      background: #000;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    /* TOP NAV */
-    .rs-top-nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: center;
-      gap: 18px;
-      z-index: 20;
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(255,255,255,0.18);
-    }
-
-    .rs-top-nav a {
-      color: #fff;
-      font-family: "Dancing Script", cursive;
-      font-size: 22px;
-      text-decoration: none;
-      padding: 4px 10px;
-      transition: 0.2s;
-    }
-
-    .rs-top-nav a:hover {
-      color: #ffe6ff;
-      transform: translateY(-2px);
-    }
-
-    .rs-top-nav a.rs-active {
-      color: #ffd2ff;
-      text-decoration: underline;
-      text-underline-offset: 4px;
-    }
-
-    /* MAIN SHELL */
-    .rs-dash-shell {
-      max-width: 1320px;
-      margin: 90px auto 40px;
-      padding: 0 20px 40px;
-      box-sizing: border-box;
-    }
-
-    /* GLASS CARDS */
-    .rs-dash-skater .rs-dash-header,
-    .rs-dash-skater .rs-dash-card,
-    .rs-dash-skater .rs-dash-panel {
-      background: rgba(0, 0, 0, 0.28);
-      border: 1px solid rgba(255,255,255,0.18);
-      backdrop-filter: blur(10px);
-      border-radius: 14px;
-    }
-
-    /* HEADER */
-    .rs-dash-header {
-      padding: 18px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .rs-dash-title {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #ffe6ff;
-    }
-
-    .rs-dash-sub {
-      font-size: 14px;
-      color: #f7d0ff;
-      margin-top: 4px;
-    }
-
-    .rs-dash-stat {
-      font-size: 22px;
-      font-weight: 700;
-      color: #ffd2ff;
-    }
-
-    /* GRID */
-    .rs-dash-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr);
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .rs-dash-card {
-      padding: 16px 16px 14px;
-    }
-
-    .rs-dash-card h3 {
-      margin: 0 0 8px;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .rs-dash-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      font-size: 13px;
-    }
-
-    .rs-dash-list li {
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    /* PANEL */
-    .rs-dash-panel {
-      padding: 14px 16px;
-      font-size: 13px;
-    }
-
-    .rs-dash-panel h3 {
-      margin: 0 0 8px;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    /* QUICK ACTION GRID */
-    .rs-dash-actions {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 14px;
-      margin-top: 20px;
-    }
-
-    .rs-dash-action {
-      padding: 14px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.18);
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .rs-dash-action:hover {
-      background: rgba(255,255,255,0.16);
-      border-color: rgba(255,255,255,0.6);
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
-      .rs-dash-shell { margin-top: 80px; }
-      .rs-dash-grid { grid-template-columns: minmax(0, 1fr); }
-    }
-  </style>
+  <link rel="icon" href="/img/favicon.png" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
 </head>
 
-<body class="rs-body">
+<body style="background-image: url('/img/dashboard-bg.jpg');">
 
-  <!-- BACKGROUND -->
-  <img src="/app/images/backs/roll-show-purple.jpg" class="bg-landing" alt="Background">
+  <!-- BURGER MENU -->
+  <nav id="rs-burger-menu" class="rs-burger-menu"></nav>
 
-  <!-- TOP NAV -->
-  <nav class="rs-top-nav">
-    <a href="/pages/skater/skater-dashboard.html" class="rs-active">Dashboard</a>
-    <a href="/pages/skater/skater-shows.html">Shows</a>
-    <a href="/pages/skater/skater-profile.html">Profile</a>
-    <a href="/pages/skater/skater-feed.html">Feed</a>
-  </nav>
+  <!-- HERO -->
+  <header class="rs-hero">
+    <h1 id="skater-hero-name"></h1>
+    <p id="skater-hero-subtitle"></p>
+    <div id="skater-hero-earnings" class="rs-hero-earnings"></div>
+  </header>
 
-  <!-- DASHBOARD SHELL -->
-  <div class="rs-dash-shell rs-dash-skater">
+  <!-- ANALYTICS CHIPS -->
+  <section id="skater-analytics-chips" class="rs-chip-scroll"></section>
 
-    <!-- HEADER -->
-    <header class="rs-dash-header">
-      <div>
-        <div class="rs-dash-title" id="skater-name">Skater</div>
-        <div class="rs-dash-sub">Your Roll Show performance hub</div>
-      </div>
-      <div class="rs-dash-stat">
-        <span id="skater-earnings">$0.00</span>
-      </div>
-    </header>
+  <!-- GHOST ACTION BUTTONS -->
+  <section id="skater-ghost-actions" class="rs-ghost-grid"></section>
 
-    <!-- MAIN GRID -->
-    <div class="rs-dash-grid">
+  <!-- SHOWS -->
+  <section class="rs-section">
+    <h2>Shows</h2>
+    <div id="skater-shows-cards" class="rs-card-grid"></div>
+  </section>
 
-      <!-- SHOWS -->
-      <div class="rs-dash-card">
-        <h3>Your Shows</h3>
-        <ul class="rs-dash-list" id="skater-shows"></ul>
-      </div>
+  <!-- CONTRACTS -->
+  <section class="rs-section">
+    <h2>Contracts</h2>
+    <div id="skater-contracts-cards" class="rs-card-grid"></div>
+  </section>
 
-      <!-- STATUS -->
-      <div class="rs-dash-panel">
-        <h3>Status</h3>
-        <p id="skater-status">Loading…</p>
-      </div>
+  <!-- BADGES -->
+  <section class="rs-section">
+    <h2>Badges</h2>
+    <div id="skater-badges-cards" class="rs-card-grid"></div>
+  </section>
 
-    </div>
-
-    <!-- CONTRACTS -->
-    <div class="rs-dash-card">
-      <h3>Contracts</h3>
-      <p id="skater-contract-status">Loading…</p>
-    </div>
-
-    <!-- SECONDARY TALENT -->
-    <div class="rs-dash-card">
-      <h3>Secondary Talent</h3>
-      <p id="secondary-talent-text">Loading…</p>
-    </div>
-
-    <!-- FULL ACTION GRID -->
-    <div class="rs-dash-actions">
-
-      <div class="rs-dash-action" id="create-show-link">Create Show</div>
-      <div class="rs-dash-action" id="tickets-link">Tickets</div>
-      <div class="rs-dash-action" id="golden-ticket-link">Golden Tickets</div>
-      <div class="rs-dash-action" id="view-contracts-link">Contracts</div>
-      <div class="rs-dash-action" id="pro-tier-link">Pro Tier</div>
-      <div class="rs-dash-action" id="edit-secondary-talent-link">Secondary Talent</div>
-      <div class="rs-dash-action" id="art-store-link">Art Store</div>
-      <div class="rs-dash-action" id="edit-profile-link">Edit Profile</div>
-      <div class="rs-dash-action" id="ticket-branding-link">Ticket Branding</div>
-      <div class="rs-dash-action" id="feed-link">Feed</div>
-      <div class="rs-dash-action" id="followers-link">Followers</div>
-
-      <!-- EXPANSION MODULES -->
-      <div class="rs-dash-action" onclick="location.href='/pages/skater/skater-analytic.html'">Analytics</div>
-      <div class="rs-dash-action" onclick="location.href='/pages/skater/skater-bookings.html'">Bookings</div>
-      <div class="rs-dash-action" onclick="location.href='/pages/skater/skater-branding.html'">Branding</div>
-      <div class="rs-dash-action" onclick="location.href='/pages/skater/skater-calendar.html'">Calendar</div>
-      <div class="rs-dash-action" onclick="location.href='/pages/skater/skater-campaigns.html'">Campaigns</div>
-      <div class="rs-dash-action" onclick="location.href='/pages/skater/skater-cards.html'">Cards</div>
-      <div class="rs-dash-action" onclick="location.href='/pages/skater/skater-group.html'">Group</div>
-      <div class="rs-dash-action" onclick="location.href='/pages/skater/skater-groups.html'">Groups</div>
-      <div class="rs-dash-action" onclick="location.href='/pages/skater/skater-music.html'">Music</div>
-      <div class="rs-dash-action" onclick="location.href='/pages/skater/skater-offerings.html'">Offerings</div>
-
-    </div>
-
-  </div>
-
-  <!-- UNIFIED ENGINE -->
-  <script src="/app/js/app.js"></script>
-
-  <!-- SKATER GUARD -->
-  <script>
-    requireUser(["skater"]);
-  </script>
-
-  <!-- PAGE MODULE -->
-  <script type="module" src="/app/js/skater/skater-dashboard.js"></script>
-
+  <script src="/app/js/skater/skater-dashboard.js"></script>
 </body>
 </html>
