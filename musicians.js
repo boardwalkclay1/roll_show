@@ -11,17 +11,27 @@ export async function signupMusician(request, env) {
   const base = await signupBase(env, body);
   if (base.error) return apiJson({ message: base.error }, 400);
 
+  const id = crypto.randomUUID();
+  const created_at = base.created_at || new Date().toISOString();
+
   await env.DB_users.prepare(
-    `INSERT INTO musicians (id, user_id, bio, created_at)
-     VALUES (?, ?, ?, ?)`
+    `INSERT INTO musician_profiles (
+       id, user_id, name, bio, genre, avatar_url, city, state, created_at
+     )
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
-    crypto.randomUUID(),
+    id,
     base.id,
+    body.name || null,
     body.bio || null,
-    base.created_at
+    body.genre || null,
+    body.avatar_url || null,
+    body.city || null,
+    body.state || null,
+    created_at
   ).run();
 
-  return apiJson({ user: base });
+  return apiJson({ user: base, musician_profile_id: id });
 }
 
 /* ============================================================
@@ -29,20 +39,25 @@ export async function signupMusician(request, env) {
 ============================================================ */
 export async function musicianDashboard(request, env, user) {
   const musician = await env.DB_users.prepare(
-    "SELECT * FROM musicians WHERE user_id = ?"
+    "SELECT * FROM musician_profiles WHERE user_id = ?"
   ).bind(user.id).first();
 
-  if (!musician) return apiJson({ message: "Musician profile not found" }, 404);
+  if (!musician) {
+    return apiJson({ message: "Musician profile not found" }, 404);
+  }
 
   const { results: tracks } = await env.DB_users.prepare(
-    "SELECT * FROM tracks WHERE artist_id = ? ORDER BY created_at DESC"
+    `SELECT *
+     FROM tracks
+     WHERE musician_id = ?
+     ORDER BY created_at DESC`
   ).bind(musician.id).all();
 
   const { results: licenses } = await env.DB_users.prepare(
     `SELECT l.*, t.title
      FROM track_licenses l
      JOIN tracks t ON l.track_id = t.id
-     WHERE t.artist_id = ?
+     WHERE l.musician_id = ?
      ORDER BY l.created_at DESC`
   ).bind(musician.id).all();
 
@@ -57,25 +72,61 @@ export async function musicianDashboard(request, env, user) {
    UPLOAD TRACK (R2 STORAGE)
 ============================================================ */
 export async function uploadTrack(request, env, user) {
-  const { title, r2_key, artwork_r2_key } = await request.json();
+  const {
+    title,
+    description,
+    genre,
+    bpm,
+    duration_seconds,
+    r2_key,
+    artwork_r2_key,
+    isrc,
+    visibility = "public",
+    price_cents = 100,
+    license_to_rollshow = 0,
+    royalty_split_json
+  } = await request.json();
 
   if (!r2_key) {
     return apiJson({ message: "Missing R2 key for uploaded file." }, 400);
   }
 
   const musician = await env.DB_users.prepare(
-    "SELECT id FROM musicians WHERE user_id = ?"
+    "SELECT id FROM musician_profiles WHERE user_id = ?"
   ).bind(user.id).first();
 
-  if (!musician) return apiJson({ message: "Musician not found" }, 404);
+  if (!musician) {
+    return apiJson({ message: "Musician profile not found" }, 404);
+  }
 
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
   await env.DB_users.prepare(
-    `INSERT INTO tracks (id, artist_id, title, r2_key, artwork_r2_key, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`
-  ).bind(id, musician.id, title, r2_key, artwork_r2_key || null, now).run();
+    `INSERT INTO tracks (
+       id, musician_id, title, description, genre, bpm, duration_seconds,
+       r2_key, artwork_r2_key, isrc, visibility,
+       price_cents, license_to_rollshow, royalty_split_json,
+       status, created_at
+     )
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`
+  ).bind(
+    id,
+    musician.id,
+    title,
+    description || null,
+    genre || null,
+    bpm || null,
+    duration_seconds || null,
+    r2_key,
+    artwork_r2_key || null,
+    isrc || null,
+    visibility,
+    price_cents,
+    license_to_rollshow ? 1 : 0,
+    royalty_split_json ? JSON.stringify(royalty_split_json) : null,
+    now
+  ).run();
 
   return apiJson({ trackId: id });
 }
@@ -85,8 +136,16 @@ export async function uploadTrack(request, env, user) {
 ============================================================ */
 export async function listMusic(env) {
   const { results } = await env.DB_users.prepare(
-    `SELECT id, artist_id, title, artwork_r2_key, created_at
+    `SELECT
+       id,
+       musician_id,
+       title,
+       genre,
+       artwork_r2_key,
+       visibility,
+       created_at
      FROM tracks
+     WHERE visibility = 'public'
      ORDER BY created_at DESC`
   ).all();
 
@@ -97,10 +156,12 @@ export async function listMusic(env) {
    LICENSE TRACK (SKATER → MUSICIAN)
 ============================================================ */
 export async function licenseTrack(request, env, user) {
-  const { trackId, amount_cents } = await request.json();
+  const { trackId, amount_cents, license_type = "sync", terms_json } =
+    await request.json();
 
+  // Resolve skater profile for this user
   const skater = await env.DB_users.prepare(
-    "SELECT id FROM skaters WHERE user_id = ?"
+    "SELECT id FROM skater_profiles WHERE user_id = ?"
   ).bind(user.id).first();
 
   if (!skater) {
@@ -119,9 +180,29 @@ export async function licenseTrack(request, env, user) {
   const now = new Date().toISOString();
 
   await env.DB_users.prepare(
-    `INSERT INTO track_licenses (id, track_id, skater_id, amount_cents, created_at)
-     VALUES (?, ?, ?, ?, ?)`
-  ).bind(id, trackId, skater.id, amount_cents || 1000, now).run();
+    `INSERT INTO track_licenses (
+       id,
+       track_id,
+       musician_id,
+       granted_to_role,
+       granted_to_profile_id,
+       license_type,
+       amount_cents,
+       terms_json,
+       approved_by_owner,
+       created_at
+     )
+     VALUES (?, ?, ?, 'skater', ?, ?, ?, ?, 0, ?)`
+  ).bind(
+    id,
+    trackId,
+    track.musician_id,
+    skater.id,
+    license_type,
+    amount_cents || 1000,
+    terms_json ? JSON.stringify(terms_json) : null,
+    now
+  ).run();
 
   return apiJson({ licenseId: id });
 }
@@ -130,13 +211,14 @@ export async function licenseTrack(request, env, user) {
    CREATE OFFER (MUSICIAN → SKATER)
 ============================================================ */
 export async function musicianCreateOffer(request, env, user) {
-  const { skaterId, type, terms, amount_cents } = await request.json();
+  const { skaterUserId, type, terms, amount_cents } = await request.json();
 
-  const target = await env.DB_users.prepare(
-    "SELECT role FROM users WHERE id = ?"
-  ).bind(skaterId).first();
+  // Ensure target is a skater by checking skater_profiles
+  const skaterProfile = await env.DB_users.prepare(
+    "SELECT id FROM skater_profiles WHERE user_id = ?"
+  ).bind(skaterUserId).first();
 
-  if (!target || target.role !== "skater") {
+  if (!skaterProfile) {
     return apiJson({ message: "Musicians may only send offers to skaters." }, 403);
   }
 
@@ -144,9 +226,26 @@ export async function musicianCreateOffer(request, env, user) {
   const now = new Date().toISOString();
 
   await env.DB_users.prepare(
-    `INSERT INTO offers (id, from_user_id, to_user_id, type, amount_cents, terms, status, created_at)
+    `INSERT INTO offers (
+       id,
+       from_user_id,
+       to_user_id,
+       type,
+       amount_cents,
+       terms,
+       status,
+       created_at
+     )
      VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`
-  ).bind(id, user.id, skaterId, type, amount_cents, terms, now).run();
+  ).bind(
+    id,
+    user.id,
+    skaterUserId,
+    type,
+    amount_cents || 0,
+    terms || null,
+    now
+  ).run();
 
   return apiJson({ offerId: id });
 }
@@ -156,11 +255,12 @@ export async function musicianCreateOffer(request, env, user) {
 ============================================================ */
 export async function listMusicianOffers(request, env, user) {
   const { results } = await env.DB_users.prepare(
-    `SELECT o.*, u.name AS skater_name
+    `SELECT
+       o.*,
+       u.name AS skater_name
      FROM offers o
      JOIN users u ON o.to_user_id = u.id
      WHERE o.from_user_id = ?
-       AND u.role = 'skater'
      ORDER BY o.created_at DESC`
   ).bind(user.id).all();
 
