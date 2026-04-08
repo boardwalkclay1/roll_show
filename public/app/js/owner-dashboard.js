@@ -1,9 +1,18 @@
 // ============================================================
-// OWNER DASHBOARD JS — CLEAN, MODERN, MATCHES REAL API
+// OWNER DASHBOARD JS — CLEAN, STABLE, NO EARLY CRASHES
 // ============================================================
 
-// app.js provides: API_BASE, requireUser, getUser, logout, API
-const owner = requireUser(["owner"]);
+// Pull globals from app.js (already loaded in HTML)
+const API = window.API;
+const API_BASE = window.API_BASE;
+
+let owner = null;
+
+// Wait until DOM + app.js are ready
+window.addEventListener("DOMContentLoaded", () => {
+  owner = requireUser(["owner"]);
+  initOwnerDashboard();
+});
 
 // ============================================================
 // AUTHED HELPERS
@@ -115,7 +124,6 @@ if (btnUploadBrandAssets) {
 
       const file = f.el.files[0];
 
-      // Step 1: init upload
       const init = await authedPost("/api/media/init-upload", {
         type: "photo",
         filename: file.name,
@@ -128,7 +136,6 @@ if (btnUploadBrandAssets) {
         return;
       }
 
-      // Step 2: upload file
       const uploadRes = await fetch(init.uploadPath, {
         method: "PUT",
         body: file
@@ -139,7 +146,6 @@ if (btnUploadBrandAssets) {
         return;
       }
 
-      // Step 3: save reference
       await authedPost("/api/owner/settings/branding", {
         [`${f.key}_media_id`]: init.media.id
       });
@@ -269,5 +275,3 @@ async function initOwnerDashboard() {
   await loadAds();
   await loadSponsorships();
 }
-
-initOwnerDashboard();
