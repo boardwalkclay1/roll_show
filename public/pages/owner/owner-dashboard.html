@@ -60,9 +60,14 @@
     <div id="owner-recent-errors" class="rs-list"></div>
   </section>
 
-  <!-- FIXED: correct JS path -->
+  <!-- REQUIRED: load app.js first -->
+  <script src="/app/js/app.js"></script>
+
+  <!-- REQUIRED: load API next -->
   <script src="/app/js/api.js"></script>
-  <script type="module" src="/app/js/owner-dashboard.js"></script>
+
+  <!-- Your dashboard script (path unchanged) -->
+  <script type="module" src="/app/js/owner/owner-dashboard.js"></script>
 
 </body>
 </html>
