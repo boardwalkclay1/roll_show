@@ -1,5 +1,7 @@
 // public/app/js/owner/owner-dashboard.js
-import API from "/js/api.js";
+
+// Use global API injected by /js/api.js
+const API = window.API;
 
 /* ============================================================
    STATE
