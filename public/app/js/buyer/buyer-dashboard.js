@@ -1,4 +1,9 @@
-import API from "/js/api.js";
+// ============================================================
+// BUYER DASHBOARD — CLEAN, STABLE, NO IMPORTS, NO CRASHES
+// ============================================================
+
+// Pull API from global (loaded in HTML)
+const API = window.API;
 
 const buyerState = {
   user: null,
@@ -12,15 +17,24 @@ const buyerState = {
 
 const $bu = (id) => document.getElementById(id);
 
+// ============================================================
+// API WRAPPER
+// ============================================================
 async function apiGet(path, user) {
   return API.get(path, user);
 }
 
+// ============================================================
+// LOADER
+// ============================================================
 function hideBuyerLoader() {
   const loader = $bu("buyer-loading");
   if (loader) loader.classList.add("rs-hidden");
 }
 
+// ============================================================
+// INIT
+// ============================================================
 async function initBuyerDashboard() {
   try {
     const userRaw = localStorage.getItem("user");
@@ -45,6 +59,9 @@ async function initBuyerDashboard() {
   }
 }
 
+// ============================================================
+// LOAD DASHBOARD DATA
+// ============================================================
 async function loadBuyerDashboard(user) {
   try {
     const res = await apiGet("/api/buyer/dashboard", user);
@@ -76,6 +93,9 @@ async function loadBuyerDashboard(user) {
   }
 }
 
+// ============================================================
+// RENDER HERO
+// ============================================================
 function renderBuyerHero() {
   const nameEl = $bu("buyer-hero-name");
   const subtitleEl = $bu("buyer-hero-subtitle");
@@ -92,6 +112,9 @@ function renderBuyerHero() {
   }
 }
 
+// ============================================================
+// RENDER CHIPS
+// ============================================================
 function renderBuyerChips() {
   const container = $bu("buyer-analytics-chips");
   if (!container) return;
@@ -113,6 +136,9 @@ function renderBuyerChips() {
   });
 }
 
+// ============================================================
+// RENDER GHOST ACTIONS
+// ============================================================
 function renderBuyerGhostActions() {
   const container = $bu("buyer-ghost-actions");
   if (!container) return;
@@ -122,18 +148,27 @@ function renderBuyerGhostActions() {
     const btn = document.createElement("button");
     btn.className = "rs-ghost-button";
     btn.dataset.actionId = action.id;
-    btn.innerHTML = `<span class="rs-ghost-icon">${action.icon}</span><span>${action.label}</span>`;
+    btn.innerHTML = `
+      <span class="rs-ghost-icon">${action.icon}</span>
+      <span>${action.label}</span>
+    `;
     btn.addEventListener("click", () => handleBuyerAction(action.id));
     container.appendChild(btn);
   });
 }
 
+// ============================================================
+// RENDER CARDS
+// ============================================================
 function renderBuyerCards() {
   renderBuyerTickets();
   renderBuyerFavorites();
   renderBuyerFeed();
 }
 
+// ============================================================
+// TICKETS
+// ============================================================
 function renderBuyerTickets() {
   const container = $bu("buyer-tickets-cards");
   if (!container) return;
@@ -158,6 +193,9 @@ function renderBuyerTickets() {
   });
 }
 
+// ============================================================
+// FAVORITES
+// ============================================================
 function renderBuyerFavorites() {
   const container = $bu("buyer-favorites-cards");
   if (!container) return;
@@ -181,6 +219,9 @@ function renderBuyerFavorites() {
   });
 }
 
+// ============================================================
+// FEED
+// ============================================================
 function renderBuyerFeed() {
   const container = $bu("buyer-feed-cards");
   if (!container) return;
@@ -204,6 +245,9 @@ function renderBuyerFeed() {
   });
 }
 
+// ============================================================
+// BURGER MENU
+// ============================================================
 function renderBuyerBurgerMenu() {
   const menu = $bu("rs-burger-menu");
   if (!menu) return;
@@ -228,6 +272,9 @@ function renderBuyerBurgerMenu() {
   });
 }
 
+// ============================================================
+// ACTION HANDLER
+// ============================================================
 function handleBuyerAction(id) {
   switch (id) {
     case "browse-shows":
@@ -244,6 +291,9 @@ function handleBuyerAction(id) {
   }
 }
 
+// ============================================================
+// DOM READY
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   initBuyerDashboard();
 });
