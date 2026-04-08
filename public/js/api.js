@@ -1,6 +1,7 @@
-// /app/js/api.js — ROLL SHOW STABLE VERSION (WORKER DOMAIN)
+// ROLL SHOW — GLOBAL SAFE API CLIENT (WORKER DOMAIN)
 
-const API_BASE = "https://rollshow.boardwalkclay1.workers.dev";
+// Prevent duplicate loads from throwing errors
+window.API_BASE = window.API_BASE || "https://rollshow.boardwalkclay1.workers.dev";
 
 /* SAFE JSON PARSER */
 async function safeJson(res) {
@@ -46,7 +47,7 @@ async function request(method, path, payload = null, extraHeaders = {}) {
 
   let res;
   try {
-    res = await fetch(API_BASE + path, options);
+    res = await fetch(window.API_BASE + path, options);
   } catch {
     return {
       success: false,
@@ -68,32 +69,31 @@ async function request(method, path, payload = null, extraHeaders = {}) {
   };
 }
 
-/* PUBLIC API */
-const API = {
-  get(path, headers = {}) {
-    return request("GET", path, null, headers);
-  },
+/* PUBLIC API — SAFE AGAINST DUPLICATE LOADS */
+if (!window.API) {
+  window.API = {
+    get(path, headers = {}) {
+      return request("GET", path, null, headers);
+    },
 
-  post(path, payload, headers = {}) {
-    return request("POST", path, payload, headers);
-  },
+    post(path, payload, headers = {}) {
+      return request("POST", path, payload, headers);
+    },
 
-  put(path, payload, headers = {}) {
-    return request("PUT", path, payload, headers);
-  },
+    put(path, payload, headers = {}) {
+      return request("PUT", path, payload, headers);
+    },
 
-  delete(path, headers = {}) {
-    return request("DELETE", path, null, headers);
-  },
+    delete(path, headers = {}) {
+      return request("DELETE", path, null, headers);
+    },
 
-  withUser(user) {
-    if (!user) return {};
-    return {
-      "x-user-id": user.id,
-      "x-user-role": user.role
-    };
-  }
-};
-
-// IMPORTANT: global API object for dashboards
-window.API = API;
+    withUser(user) {
+      if (!user) return {};
+      return {
+        "x-user-id": user.id,
+        "x-user-role": user.role
+      };
+    }
+  };
+}
