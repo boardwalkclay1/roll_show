@@ -1,6 +1,4 @@
-// public/app/js/owner/owner-dashboard.js
 
-// Use global API injected by /js/api.js
 const API = window.API;
 
 /* ============================================================
