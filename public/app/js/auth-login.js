@@ -1,4 +1,4 @@
-// /js/auth-login.js — FINAL CORRECT VERSION (matches Worker: /api/login)
+// /app/js/auth-login.js — FINAL CLEAN VERSION
 
 const form = document.getElementById("auth-login-form");
 
@@ -13,7 +13,7 @@ if (form) {
       password: fd.get("password")
     };
 
-    // 🔥 CORRECT: Worker route is /api/login (NOT /login)
+    // Worker route: /api/login
     const res = await API.post("/api/login", payload);
 
     if (!res || !res.success || !res.user) {
