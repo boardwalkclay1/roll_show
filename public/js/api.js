@@ -1,9 +1,12 @@
-// ROLL SHOW — GLOBAL SAFE API CLIENT (PAGES-FIRST, WORKER-COMPATIBLE)
+// ROLL SHOW — GLOBAL SAFE API CLIENT (FULL REBUILD)
 
-// 1. Prefer Pages domain (no CORS), fallback to Worker if needed
-window.API_BASE = window.API_BASE || "https://roll-show.pages.dev";
+// Always prefer Pages domain (no CORS), fallback to Worker for API routes
+window.API_BASE_PAGES  = "https://roll-show.pages.dev";
+window.API_BASE_WORKER = "https://rollshow.boardwalkclay1.workers.dev";
 
-/* SAFE JSON PARSER */
+/* -------------------------------------------------------
+   SAFE JSON PARSER
+------------------------------------------------------- */
 async function safeJson(res) {
   const text = await res.text();
   const type = res.headers.get("content-type") || "";
@@ -31,16 +34,20 @@ async function safeJson(res) {
   }
 }
 
-/* INTERNAL REQUEST HANDLER */
+/* -------------------------------------------------------
+   INTERNAL REQUEST HANDLER (FULLY FIXED)
+------------------------------------------------------- */
 async function request(method, path, payload = null, extraHeaders = {}) {
   const headers = { ...extraHeaders };
   const options = { method, headers };
 
+  // JSON payload
   if (payload && !(payload instanceof FormData) && !(payload instanceof Blob)) {
     headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(payload);
   }
 
+  // FormData / Blob payload
   if (payload instanceof FormData || payload instanceof Blob) {
     options.body = payload;
   }
@@ -48,22 +55,34 @@ async function request(method, path, payload = null, extraHeaders = {}) {
   let res;
 
   try {
-    // Try Pages first (no CORS)
-    res = await fetch(window.API_BASE + path, options);
-
-    // If Pages returns 404, fallback to Worker
-    if (res.status === 404) {
-      res = await fetch("https://rollshow.boardwalkclay1.workers.dev" + path, options);
-    }
-
+    // Try Pages first
+    res = await fetch(window.API_BASE_PAGES + path, options);
   } catch {
+    // Pages unreachable → go straight to Worker
+    res = await fetch(window.API_BASE_WORKER + path, options);
+    const body = await safeJson(res);
     return {
-      success: false,
-      status: 0,
-      data: null,
-      user: undefined,
-      error: { message: "Network error" }
+      success: body.success ?? res.ok ?? false,
+      status: res.status,
+      data: body.data ?? null,
+      user: body.user ?? undefined,
+      error: body.error ?? null
     };
+  }
+
+  // If Pages returns ANY non-OK status → fallback to Worker
+  if (!res.ok) {
+    try {
+      res = await fetch(window.API_BASE_WORKER + path, options);
+    } catch {
+      return {
+        success: false,
+        status: 0,
+        data: null,
+        user: undefined,
+        error: { message: "Network error" }
+      };
+    }
   }
 
   const body = await safeJson(res);
@@ -72,12 +91,14 @@ async function request(method, path, payload = null, extraHeaders = {}) {
     success: body.success ?? res.ok ?? false,
     status: res.status,
     data: body.data ?? null,
-    user: body.user ?? (body.data && body.data.user) ?? undefined,
+    user: body.user ?? undefined,
     error: body.error ?? (res.ok ? null : { message: "Request failed" })
   };
 }
 
-/* PUBLIC API — SAFE AGAINST DUPLICATE LOADS */
+/* -------------------------------------------------------
+   PUBLIC API (SAFE AGAINST DUPLICATE LOADS)
+------------------------------------------------------- */
 if (!window.API) {
   window.API = {
     get(path, headers = {}) {
