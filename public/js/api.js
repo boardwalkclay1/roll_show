@@ -1,6 +1,6 @@
-// ROLL SHOW — GLOBAL SAFE API CLIENT (FULL REBUILD)
+// ROLL SHOW — GLOBAL SAFE API CLIENT (CLEAN FINAL VERSION)
 
-// Always prefer Pages domain (no CORS), fallback to Worker for API routes
+// Prefer Pages (no CORS), fallback to Worker for API routes
 window.API_BASE_PAGES  = "https://roll-show.pages.dev";
 window.API_BASE_WORKER = "https://rollshow.boardwalkclay1.workers.dev";
 
@@ -35,7 +35,7 @@ async function safeJson(res) {
 }
 
 /* -------------------------------------------------------
-   INTERNAL REQUEST HANDLER (FULLY FIXED)
+   INTERNAL REQUEST HANDLER
 ------------------------------------------------------- */
 async function request(method, path, payload = null, extraHeaders = {}) {
   const headers = { ...extraHeaders };
@@ -54,8 +54,8 @@ async function request(method, path, payload = null, extraHeaders = {}) {
 
   let res;
 
+  // Try Pages first
   try {
-    // Try Pages first
     res = await fetch(window.API_BASE_PAGES + path, options);
   } catch {
     // Pages unreachable → go straight to Worker
@@ -70,7 +70,7 @@ async function request(method, path, payload = null, extraHeaders = {}) {
     };
   }
 
-  // If Pages returns ANY non-OK status → fallback to Worker
+  // If Pages returns ANY non-OK → fallback to Worker
   if (!res.ok) {
     try {
       res = await fetch(window.API_BASE_WORKER + path, options);
@@ -97,7 +97,7 @@ async function request(method, path, payload = null, extraHeaders = {}) {
 }
 
 /* -------------------------------------------------------
-   PUBLIC API (SAFE AGAINST DUPLICATE LOADS)
+   PUBLIC API
 ------------------------------------------------------- */
 if (!window.API) {
   window.API = {
