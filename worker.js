@@ -1,4 +1,4 @@
-// worker.js — CLEAN, MODERN, PBKDF2-COMPATIBLE
+// worker.js — CLEAN, MODERN, PBKDF2-COMPATIBLE (FULL REBUILD)
 
 import {
   cors,
@@ -7,7 +7,7 @@ import {
   signupBase
 } from "./users.js";
 
-import loginHandler from "./login.js";
+import loginHandler from "./api/login.js";
 
 import {
   signupBuyer,
@@ -48,7 +48,6 @@ import {
 
 import { ownerDashboard } from "./routes/owner.js";
 
-
 // ============================================================
 // CORS WRAPPER
 // ============================================================
@@ -60,7 +59,6 @@ function withCORS(response) {
   }
   return response;
 }
-
 
 // ============================================================
 // MAIN ROUTER
@@ -108,7 +106,7 @@ export default {
     }
 
     // ============================================================
-    // LOGIN — NOW USING ./login.js
+    // LOGIN
     // ============================================================
 
     if (path === "/api/login" && method === "POST") {
