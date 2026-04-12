@@ -3,6 +3,6 @@ main = "index.js"
 compatibility_date = "2024-01-01"
 
 [[d1_databases]]
-binding = "DB_users"
-database_name = "DB_users"
-database_id = "4688d694-1a33-4055-b2a4-6f5c2231a356"
+binding = "DB_roll"
+database_name = "rollshow"
+database_id = "c7f658f4-54f4-4717-a9de-cbb9f8e4b6ef"
