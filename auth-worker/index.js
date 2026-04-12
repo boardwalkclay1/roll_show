@@ -4,18 +4,36 @@ export default {
     const path = url.pathname;
     const method = request.method;
 
-    // Accept both direct and forwarded paths
-    const isHashRoute =
+    // Normalize: accept both direct and forwarded paths
+    const isHash =
       method === "POST" &&
       (path === "/hash" || path === "/api/auth/hash");
 
-    const isVerifyRoute =
+    const isVerify =
       method === "POST" &&
       (path === "/verify" || path === "/api/auth/verify");
 
+    // ============================
     // PBKDF2 HASH
-    if (isHashRoute) {
-      const { password } = await request.json();
+    // ============================
+    if (isHash) {
+      let body;
+      try {
+        body = await request.json();
+      } catch (err) {
+        return new Response(
+          JSON.stringify({ error: "Invalid JSON" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
+      const password = body.password;
+      if (!password) {
+        return new Response(
+          JSON.stringify({ error: "Missing password" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
 
       const salt = crypto.getRandomValues(new Uint8Array(16));
 
@@ -38,18 +56,37 @@ export default {
         256
       );
 
+      const hash = btoa(String.fromCharCode(...new Uint8Array(bits)));
+      const saltB64 = btoa(String.fromCharCode(...salt));
+
       return new Response(
-        JSON.stringify({
-          hash: btoa(String.fromCharCode(...new Uint8Array(bits))),
-          salt: btoa(String.fromCharCode(...salt))
-        }),
+        JSON.stringify({ hash, salt: saltB64 }),
         { headers: { "Content-Type": "application/json" } }
       );
     }
 
+    // ============================
     // PBKDF2 VERIFY
-    if (isVerifyRoute) {
-      const { password, hash, salt } = await request.json();
+    // ============================
+    if (isVerify) {
+      let body;
+      try {
+        body = await request.json();
+      } catch (err) {
+        return new Response(
+          JSON.stringify({ error: "Invalid JSON" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
+      const { password, hash, salt } = body;
+
+      if (!password || !hash || !salt) {
+        return new Response(
+          JSON.stringify({ error: "Missing fields" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
 
       const saltBytes = Uint8Array.from(atob(salt), c => c.charCodeAt(0));
 
@@ -80,6 +117,7 @@ export default {
       );
     }
 
+    // Default
     return new Response("Auth worker online");
   }
 };
