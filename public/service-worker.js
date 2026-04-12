@@ -1,94 +1,35 @@
-/* ============================================================
-   ROLL SHOW — AUTO-UPDATING SERVICE WORKER (FIXED)
-   - HTML → network-first
-   - JS/CSS → network-first
-   - Images → cache-first
-   - NEVER caches POST/PUT/PATCH/DELETE
-   - No precache list
-============================================================ */
+// ROLL SHOW — ZERO CACHE, AUTO UPDATE, NO INTERFERENCE
 
-const CACHE_NAME = "rollshow-dynamic-cache";
-
-/* INSTALL */
-self.addEventListener("install", event => {
+// INSTALL — activate immediately
+self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-/* ACTIVATE */
-self.addEventListener("activate", event => {
+// ACTIVATE — wipe ALL old caches + take control
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.map(k => caches.delete(k)))
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((key) => caches.delete(key)))
     )
   );
   self.clients.claim();
 });
 
-/* FETCH */
-self.addEventListener("fetch", event => {
+// FETCH — network only, no cache, no API interception
+self.addEventListener("fetch", (event) => {
   const req = event.request;
-  const method = req.method;
-  const accept = req.headers.get("accept") || "";
+  const url = new URL(req.url);
 
-  /* 🚫 NEVER CACHE NON-GET REQUESTS */
-  if (method !== "GET") {
-    event.respondWith(fetch(req));
+  // 1. Never touch API calls
+  if (url.pathname.startsWith("/api/")) {
+    return; // let browser hit Worker directly
+  }
+
+  // 2. Never touch auth, login, signup, dashboards
+  if (url.pathname.includes("auth") || url.pathname.includes("dashboard")) {
     return;
   }
 
-  /* HTML → network-first */
-  if (req.mode === "navigate" || accept.includes("text/html")) {
-    event.respondWith(
-      fetch(req)
-        .then(res => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
-          return res;
-        })
-        .catch(() => caches.match(req))
-    );
-    return;
-  }
-
-  /* JS/CSS → network-first */
-  if (req.url.endsWith(".js") || req.url.endsWith(".css")) {
-    event.respondWith(
-      fetch(req)
-        .then(res => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
-          return res;
-        })
-        .catch(() => caches.match(req))
-    );
-    return;
-  }
-
-  /* Images → cache-first */
-  if (req.url.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/i)) {
-    event.respondWith(
-      caches.match(req).then(cached => {
-        return (
-          cached ||
-          fetch(req).then(res => {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
-            return res;
-          })
-        );
-      })
-    );
-    return;
-  }
-
-  /* Default GET → network-first */
-  event.respondWith(
-    fetch(req)
-      .then(res => {
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
-        return res;
-      })
-      .catch(() => caches.match(req))
-  );
+  // 3. Always fetch from network, no caching
+  event.respondWith(fetch(req));
 });
