@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB_roll"
 database_name = "rollshow"
-database_id = "rollshow"
+database_id = "<PASTE_REAL_ID_HERE>"
 
 [[kv_namespaces]]
 binding = "KV"
