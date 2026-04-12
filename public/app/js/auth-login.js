@@ -1,4 +1,4 @@
-// /app/js/auth-login.js — FINAL CLEAN VERSION
+// /app/js/auth-login.js — FINAL PRODUCTION VERSION
 
 const form = document.getElementById("auth-login-form");
 
@@ -13,11 +13,17 @@ if (form) {
       password: fd.get("password")
     };
 
-    // Worker route: /api/login
-    const res = await API.post("/api/login", payload);
+    // Correct Worker route: /api/login
+    let res;
+    try {
+      res = await API.post("/api/login", payload);
+    } catch (err) {
+      alert("Network error. Try again.");
+      return;
+    }
 
     if (!res || !res.success || !res.user) {
-      alert(res?.error?.message || "Login failed. Check your email and password.");
+      alert(res?.message || res?.error?.message || "Login failed.");
       return;
     }
 
@@ -26,11 +32,12 @@ if (form) {
     const session = {
       id: user.id,
       role: user.role,
-      is_owner: user.is_owner || false
+      is_owner: user.is_owner === true
     };
 
     localStorage.setItem("user", JSON.stringify(session));
 
+    // Redirect logic
     let target = "/";
 
     if (session.is_owner) {
