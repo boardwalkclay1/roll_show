@@ -30,7 +30,7 @@ export default {
       return new Response(
         JSON.stringify({
           hash: btoa(String.fromCharCode(...new Uint8Array(bits))),
-          salt: btoa(String.fromCharCode(...salt)))
+          salt: btoa(String.fromCharCode(...salt))
         }),
         { headers: { "Content-Type": "application/json" } }
       );
