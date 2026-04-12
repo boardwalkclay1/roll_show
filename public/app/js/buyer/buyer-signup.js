@@ -16,7 +16,7 @@ form.addEventListener("submit", async (e) => {
     });
 
     if (!res.success) {
-      alert("Signup failed: " + res.error);
+      alert("Signup failed: " + (res.error?.message || res.error || "Unknown error"));
       return;
     }
 
