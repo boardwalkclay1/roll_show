@@ -1,4 +1,4 @@
-// worker.js — CLEAN, MODERN, REAL ARCHITECTURE ONLY
+// worker.js — CLEAN, MODERN, PBKDF2-COMPATIBLE
 
 import {
   cors,
@@ -80,20 +80,30 @@ export default {
     // AUTH WORKER FORWARDING (PBKDF2 HASH + VERIFY)
     // ============================================================
 
-    if (
-      (path === "/api/auth/hash" || path === "/api/auth/verify") &&
-      method === "POST"
-    ) {
-      const upstream = await env.AUTH.fetch(request);
-
-      // *** FIXED: preserve headers correctly ***
-      const wrapped = new Response(upstream.body, {
-        status: upstream.status,
-        statusText: upstream.statusText,
-        headers: upstream.headers
+    if (path === "/api/auth/hash" && method === "POST") {
+      const upstream = await fetch("https://rollshow-auth.boardwalkclay1.workers.dev/hash", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: await request.text()
       });
 
-      return withCORS(wrapped);
+      return withCORS(new Response(upstream.body, {
+        status: upstream.status,
+        headers: upstream.headers
+      }));
+    }
+
+    if (path === "/api/auth/verify" && method === "POST") {
+      const upstream = await fetch("https://rollshow-auth.boardwalkclay1.workers.dev/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: await request.text()
+      });
+
+      return withCORS(new Response(upstream.body, {
+        status: upstream.status,
+        headers: upstream.headers
+      }));
     }
 
     // ============================================================
