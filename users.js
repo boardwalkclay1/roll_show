@@ -1,6 +1,4 @@
-// users.js — PBKDF2 AUTH WORKER VERSION (UPDATED)
-// - verify now accepts iterations and forwards them to the AUTH worker
-// - hash returns iterations and signup stores password_iterations in DB
+// users.js — PBKDF2 AUTH + CORE USER UTILITIES
 
 const AUTH_URL = "https://rollshow-auth.boardwalkclay1.workers.dev";
 
@@ -16,35 +14,26 @@ export function cors() {
 }
 
 /* ============================================================
-   LOGGING
-============================================================ */
-function logRequest(request, extra = {}) {
-  const url = new URL(request.url);
-  console.log(JSON.stringify({
-    path: url.pathname,
-    method: request.method,
-    ...extra
-  }));
-}
-
-/* ============================================================
    JSON RESPONSE WRAPPER
 ============================================================ */
 export function apiJson(body, status = 200) {
   const success = status >= 200 && status < 300;
 
-  return new Response(JSON.stringify({
-    success,
-    status,
-    data: success ? body : null,
-    error: success ? null : body
-  }), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      ...cors()
+  return new Response(
+    JSON.stringify({
+      success,
+      status,
+      data: success ? body : null,
+      error: success ? null : body
+    }),
+    {
+      status,
+      headers: {
+        "Content-Type": "application/json",
+        ...cors()
+      }
     }
-  });
+  );
 }
 
 /* ============================================================
@@ -52,6 +41,20 @@ export function apiJson(body, status = 200) {
 ============================================================ */
 export function getUserId(request) {
   return request.headers.get("x-user-id");
+}
+
+/* ============================================================
+   LOGGING
+============================================================ */
+function logRequest(request, extra = {}) {
+  const url = new URL(request.url);
+  console.log(
+    JSON.stringify({
+      path: url.pathname,
+      method: request.method,
+      ...extra
+    })
+  );
 }
 
 /* ============================================================
@@ -98,7 +101,8 @@ export async function hash(password, env) {
 
 /* ============================================================
    PASSWORD VERIFY (PBKDF2)
-   - forwards iterations to AUTH worker when available
+   - returns full AUTH worker response object
+   - login.js interprets success/ok/verified
 ============================================================ */
 export async function verify(password, hashValue, saltValue, iterations, env) {
   const body = {
@@ -106,6 +110,7 @@ export async function verify(password, hashValue, saltValue, iterations, env) {
     hash: hashValue,
     salt: saltValue
   };
+
   if (typeof iterations === "number") {
     body.iterations = iterations;
   }
@@ -118,115 +123,86 @@ export async function verify(password, hashValue, saltValue, iterations, env) {
 
   const data = await safeAuthJson(res);
 
-  if (typeof data.ok !== "boolean") {
-    throw new Error("AUTH worker missing 'ok' field");
+  if (data.success !== true) {
+    return data;
   }
 
-  return data.ok;
+  // AUTH worker currently returns { success: true, ok: true, iterations: ... }
+  if (typeof data.ok !== "boolean" && typeof data.verified !== "boolean") {
+    throw new Error("AUTH worker missing ok/verified field");
+  }
+
+  return data;
 }
 
 /* ============================================================
    BASE SIGNUP (PBKDF2)
+   - used by role-specific signup routes
    - stores password_iterations returned by AUTH worker
 ============================================================ */
-export async function signupBase(env, { name, email, password, role }) {
+export async function signupBase(request, env, role) {
+  const { name, email, password } = await request.json();
+
   if (!name || !email || !password || !role) {
-    return { error: "Missing fields" };
+    return apiJson({ message: "Missing fields" }, 400);
   }
 
-  const exists = await env.DB_roll.prepare(
-    "SELECT id FROM users WHERE email = ?"
-  ).bind(email).first();
+  const exists = await env.DB_roll
+    .prepare("SELECT id FROM users WHERE email = ?")
+    .bind(email)
+    .first();
 
   if (exists) {
-    return { error: "Email already registered" };
+    return apiJson({ message: "Email already registered" }, 400);
   }
 
   const id = crypto.randomUUID();
   const created = new Date().toISOString();
 
-  // PBKDF2 HASH (now returns iterations)
-  const { hash: password_hash, salt: password_salt, iterations: password_iterations } = await hash(password, env);
+  const {
+    hash: password_hash,
+    salt: password_salt,
+    iterations: password_iterations
+  } = await hash(password, env);
 
-  await env.DB_roll.prepare(
-    `INSERT INTO users (id, name, email, password_hash, password_salt, password_iterations, role, "owner-1", created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)`
-  ).bind(id, name, email, password_hash, password_salt, password_iterations, role, created).run();
+  await env.DB_roll
+    .prepare(
+      `INSERT INTO users (
+         id,
+         name,
+         email,
+         password_hash,
+         password_salt,
+         password_iterations,
+         role,
+         "owner-1",
+         created_at
+       )
+       VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)`
+    )
+    .bind(
+      id,
+      name,
+      email,
+      password_hash,
+      password_salt,
+      password_iterations,
+      role,
+      created
+    )
+    .run();
 
-  return {
+  return apiJson({
     id,
     name,
     email,
     role,
     created_at: created
-  };
+  });
 }
 
 /* ============================================================
-   LOGIN (PBKDF2)
-   - passes stored password_iterations to verify()
-============================================================ */
-export async function login(request, env) {
-  try {
-    const { email, password } = await request.json();
-
-    if (!email || !password) {
-      return apiJson({ message: "Missing credentials" }, 400);
-    }
-
-    const row = await env.DB_roll.prepare(
-      "SELECT * FROM users WHERE email = ?"
-    ).bind(email).first();
-
-    if (!row) {
-      return apiJson({ message: "Invalid credentials" }, 401);
-    }
-
-    if (!row.password_hash || !row.password_salt) {
-      return apiJson({ message: "User missing PBKDF2 fields" }, 500);
-    }
-
-    // determine iterations from DB (fallback to 100000 if missing/invalid)
-    const iterations = Number(row.password_iterations) || 100000;
-
-    const valid = await verify(
-      password,
-      row.password_hash,
-      row.password_salt,
-      iterations,
-      env
-    );
-
-    if (!valid) {
-      return apiJson({ message: "Invalid credentials" }, 401);
-    }
-
-    const is_owner =
-      row.role === "owner" ||
-      row["owner-1"] == 1 ||
-      row["owner-1"] === true;
-
-    return apiJson({
-      user: {
-        id: row.id,
-        name: row.name,
-        email: row.email,
-        role: row.role,
-        is_owner,
-        created_at: row.created_at
-      }
-    });
-
-  } catch (err) {
-    return apiJson(
-      { message: "Server error", detail: String(err) },
-      500
-    );
-  }
-}
-
-/* ============================================================
-   ROLE GUARD (UNCHANGED)
+   ROLE GUARD
 ============================================================ */
 export async function requireRole(request, env, allowedRoles, handler) {
   try {
@@ -237,9 +213,10 @@ export async function requireRole(request, env, allowedRoles, handler) {
       return apiJson({ message: "Unauthorized" }, 401);
     }
 
-    const user = await env.DB_roll.prepare(
-      "SELECT * FROM users WHERE id = ?"
-    ).bind(userId).first();
+    const user = await env.DB_roll
+      .prepare("SELECT * FROM users WHERE id = ?")
+      .bind(userId)
+      .first();
 
     if (!user) {
       return apiJson({ message: "Unauthorized" }, 401);
@@ -259,7 +236,6 @@ export async function requireRole(request, env, allowedRoles, handler) {
     }
 
     return handler(request, env, user);
-
   } catch (err) {
     return apiJson(
       { message: "Server error", detail: String(err) },
