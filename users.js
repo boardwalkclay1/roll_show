@@ -1,4 +1,6 @@
-// users.js — PBKDF2 AUTH WORKER VERSION
+// users.js — PBKDF2 AUTH WORKER VERSION (UPDATED)
+// - verify now accepts iterations and forwards them to the AUTH worker
+// - hash returns iterations and signup stores password_iterations in DB
 
 const AUTH_URL = "https://rollshow-auth.boardwalkclay1.workers.dev";
 
@@ -72,6 +74,7 @@ async function safeAuthJson(res) {
 
 /* ============================================================
    PASSWORD HASHING (PBKDF2)
+   - returns { hash, salt, iterations }
 ============================================================ */
 export async function hash(password, env) {
   const res = await fetch(`${AUTH_URL}/hash`, {
@@ -88,22 +91,29 @@ export async function hash(password, env) {
 
   return {
     hash: data.hash,
-    salt: data.salt
+    salt: data.salt,
+    iterations: Number(data.iterations) || 100000
   };
 }
 
 /* ============================================================
    PASSWORD VERIFY (PBKDF2)
+   - forwards iterations to AUTH worker when available
 ============================================================ */
-export async function verify(password, hashValue, saltValue, env) {
+export async function verify(password, hashValue, saltValue, iterations, env) {
+  const body = {
+    password,
+    hash: hashValue,
+    salt: saltValue
+  };
+  if (typeof iterations === "number") {
+    body.iterations = iterations;
+  }
+
   const res = await fetch(`${AUTH_URL}/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      password,
-      hash: hashValue,
-      salt: saltValue
-    })
+    body: JSON.stringify(body)
   });
 
   const data = await safeAuthJson(res);
@@ -117,6 +127,7 @@ export async function verify(password, hashValue, saltValue, env) {
 
 /* ============================================================
    BASE SIGNUP (PBKDF2)
+   - stores password_iterations returned by AUTH worker
 ============================================================ */
 export async function signupBase(env, { name, email, password, role }) {
   if (!name || !email || !password || !role) {
@@ -134,13 +145,13 @@ export async function signupBase(env, { name, email, password, role }) {
   const id = crypto.randomUUID();
   const created = new Date().toISOString();
 
-  // PBKDF2 HASH
-  const { hash: password_hash, salt: password_salt } = await hash(password, env);
+  // PBKDF2 HASH (now returns iterations)
+  const { hash: password_hash, salt: password_salt, iterations: password_iterations } = await hash(password, env);
 
   await env.DB_roll.prepare(
-    `INSERT INTO users (id, name, email, password_hash, password_salt, role, "owner-1", created_at)
-     VALUES (?, ?, ?, ?, ?, ?, 0, ?)`
-  ).bind(id, name, email, password_hash, password_salt, role, created).run();
+    `INSERT INTO users (id, name, email, password_hash, password_salt, password_iterations, role, "owner-1", created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)`
+  ).bind(id, name, email, password_hash, password_salt, password_iterations, role, created).run();
 
   return {
     id,
@@ -153,6 +164,7 @@ export async function signupBase(env, { name, email, password, role }) {
 
 /* ============================================================
    LOGIN (PBKDF2)
+   - passes stored password_iterations to verify()
 ============================================================ */
 export async function login(request, env) {
   try {
@@ -174,10 +186,14 @@ export async function login(request, env) {
       return apiJson({ message: "User missing PBKDF2 fields" }, 500);
     }
 
+    // determine iterations from DB (fallback to 100000 if missing/invalid)
+    const iterations = Number(row.password_iterations) || 100000;
+
     const valid = await verify(
       password,
       row.password_hash,
       row.password_salt,
+      iterations,
       env
     );
 
