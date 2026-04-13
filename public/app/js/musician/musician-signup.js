@@ -77,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const res = await API.post("/api/profiles/musician", profilePayload);
       if (res && res.success) return { ok: true, res };
-      // handle idempotent/existing profile responses
       if (res && (res.status === 409 || res.error === "profile_exists" || /exists/i.test(res.error?.message || ""))) {
         return { ok: true, res };
       }
@@ -87,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Main submit flow: signup -> profile
+  // Main submit flow: create user first, only then attempt profile
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearError();
@@ -110,10 +109,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setSubmitting(true);
 
-    // 1) Create users row
+    // 1) Create users row (musician signup)
     let signupRes;
     try {
-      signupRes = await API.post("/api/signup", { name, email, password, role });
+      signupRes = await API.post("/api/musician/signup", { name, email, password, role });
     } catch (err) {
       console.error("Signup network error", err);
       showError("Network error during signup. Please try again.");
@@ -128,7 +127,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 2) Create musician profile (server must derive user_id from session/token)
+    // If server created both user and profile in one call, skip profile step
+    if (signupRes.data && signupRes.data.profile_created === true) {
+      window.location.href = "/pages/musician/musician-dashboard.html";
+      return;
+    }
+
+    // 2) Create musician profile (server derives user_id)
     const profileResult = await createProfile(profilePayload);
 
     if (!profileResult.ok) {
