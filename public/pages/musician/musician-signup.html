@@ -28,56 +28,87 @@
       transition:.2s;
       font-family: "Dancing Script", cursive;
       font-size: 22px;
+      z-index:10;
     }
-    .back-btn:hover {
-      background:rgba(0,0,0,0.75);
-    }
+    .back-btn:hover { background:rgba(0,0,0,0.75); }
 
     /* LEARN MORE BUTTON — DEEP RED + CURSIVE */
     .learn-btn {
       display:block;
       margin-top:18px;
       text-align:center;
-      background:#7a0000;         /* deep red */
+      background:#7a0000;
       color:white;
       padding:12px 18px;
       border-radius:8px;
       font-weight:700;
       text-decoration:none;
       transition:.2s;
-      border:2px solid #000000;   /* black border */
+      border:2px solid #000000;
       font-family: "Dancing Script", cursive !important;
       font-size:24px;
       letter-spacing:0.5px;
     }
-    .learn-btn:hover {
-      background:#a30000;
+    .learn-btn:hover { background:#a30000; transform:translateY(-2px); }
+
+    .error { color:#ff4d4f; margin-top:12px; font-weight:600; display:none; }
+
+    .signup-form input,
+    .signup-form textarea,
+    .signup-form select,
+    .signup-form button {
+      display:block;
+      width:100%;
+      max-width:520px;
+      margin:10px 0;
+      padding:12px 14px;
+      border-radius:8px;
+      border:1px solid rgba(0,0,0,0.12);
+      font-size:16px;
+      box-sizing:border-box;
     }
+
+    .signup-shell { padding:48px 20px; max-width:720px; margin:0 auto; color:#fff; text-align:left; }
+    h1 { font-size:36px; margin-bottom:18px; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,0.45); }
+
+    label.small { display:block; color:#fff; margin-top:6px; font-size:14px; }
   </style>
 </head>
 
-<body style="background:url('/app/images/2nd-rd/roll-guitar.jpg') center/cover no-repeat;">
+<body data-role="musician" style="background:url('/app/images/2nd-rd/roll-guitar.jpg') center/cover no-repeat;">
 
   <a href="/index.html" class="back-btn">← Back</a>
 
   <main class="signup-shell">
     <h1>Join as an Indie Artist</h1>
 
-    <form id="musician-signup-form" class="signup-form">
-      <input name="name" placeholder="Artist Name" required>
-      <input name="email" type="email" placeholder="Email" required>
-      <input name="password" type="password" placeholder="Password" required>
+    <form id="musician-signup-form" class="signup-form" autocomplete="on" novalidate>
+      <!-- users fields -->
+      <input name="name" placeholder="Artist / Full Name" autocomplete="name" />
+      <input name="email" type="email" placeholder="Email" required autocomplete="email" />
+      <input name="password" type="password" placeholder="Password" required autocomplete="new-password" />
+
+      <!-- hidden role -->
+      <input type="hidden" name="role" value="musician" />
+
+      <!-- musician profile fields -->
+      <input name="stage_name" placeholder="Stage Name" required />
+      <input name="genre" placeholder="Genre (e.g., indie, hip-hop, electronic)" required />
+      <label class="small" for="bio">Short Bio (optional)</label>
+      <textarea name="bio" id="bio" placeholder="Tell fans a little about your sound"></textarea>
+
       <button type="submit">Create Account</button>
+
+      <div id="musician-signup-error" class="error" role="alert" aria-live="polite"></div>
     </form>
 
-    <!-- RED + CURSIVE LEARN BUTTON -->
     <a href="/pages/learn/learn-musician.html" class="learn-btn">
       Learn More About Being an Artist
     </a>
 
-    <p class="signup-login-link">
+    <p class="signup-login-link" style="color:#fff; margin-top:12px;">
       Already have an account?
-      <a href="/pages/auth-login.html?role=musician">Log in</a>
+      <a href="/pages/auth-login.html?role=musician" style="color:#fff; text-decoration:underline;">Log in</a>
     </p>
   </main>
 
