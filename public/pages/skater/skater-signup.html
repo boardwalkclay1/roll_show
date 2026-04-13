@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Skater Signup – Roll Show</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="/app/styles/styles.css">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/favicon.png" />
+  <link rel="stylesheet" href="/app/styles/styles.css" />
   <style>
     .back-btn {
       position:absolute; top:20px; left:20px;
@@ -16,7 +15,6 @@
       backdrop-filter:blur(4px); transition:.2s;
     }
     .back-btn:hover { background:rgba(0,0,0,0.75); }
-
     .learn-btn {
       display:block; margin-top:18px; text-align:center;
       background:#ffffff; color:#000000;
@@ -25,26 +23,25 @@
       transition:.2s;
     }
     .learn-btn:hover { background:#e6e6e6; }
+    .error { color:#ff4d4f; margin-top:12px; font-weight:600; }
   </style>
 </head>
 
-<body style="background:url('/app/images/roll-show.jpg') center -30px / cover no-repeat;">
-
+<body data-role="skater" style="background:url('/app/images/roll-show.jpg') center -30px / cover no-repeat;">
   <a href="/index.html" class="back-btn">← Back</a>
 
   <main class="signup-shell">
     <h1>Become a Skater</h1>
 
-    <form id="skater-signup-form" class="signup-form">
-      <input name="name" placeholder="Full Name" required>
-      <input name="email" type="email" placeholder="Email" required>
-      <input name="password" type="password" placeholder="Password" required>
+    <form id="skater-signup-form" class="signup-form" autocomplete="on" novalidate>
+      <input name="name" placeholder="Full Name" autocomplete="name" />
+      <input name="email" type="email" placeholder="Email" required autocomplete="email" />
+      <input name="password" type="password" placeholder="Password" required autocomplete="new-password" />
       <button type="submit">Create Account</button>
+      <div id="signup-error" class="error" role="alert" aria-live="polite" style="display:none"></div>
     </form>
 
-    <a href="/pages/learn/learn-skater.html" class="learn-btn">
-      Learn More About Being a Skater
-    </a>
+    <a href="/pages/learn/learn-skater.html" class="learn-btn">Learn More About Being a Skater</a>
 
     <p class="signup-login-link">
       Already have an account?
