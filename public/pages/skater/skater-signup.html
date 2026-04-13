@@ -13,8 +13,10 @@
       padding:10px 16px; border-radius:8px;
       color:white; font-weight:600; text-decoration:none;
       backdrop-filter:blur(4px); transition:.2s;
+      z-index:10;
     }
     .back-btn:hover { background:rgba(0,0,0,0.75); }
+
     .learn-btn {
       display:block; margin-top:18px; text-align:center;
       background:#ffffff; color:#000000;
@@ -23,7 +25,24 @@
       transition:.2s;
     }
     .learn-btn:hover { background:#e6e6e6; }
+
     .error { color:#ff4d4f; margin-top:12px; font-weight:600; display:none; }
+
+    .signup-form input,
+    .signup-form select,
+    .signup-form button {
+      display:block;
+      width:100%;
+      max-width:520px;
+      margin:10px 0;
+      padding:12px 14px;
+      border-radius:8px;
+      border:1px solid rgba(0,0,0,0.12);
+      font-size:16px;
+    }
+
+    .signup-shell { padding:48px 20px; max-width:720px; margin:0 auto; color:#fff; text-align:left; }
+    h1 { font-size:36px; margin-bottom:18px; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,0.45); }
   </style>
 </head>
 
@@ -35,10 +54,29 @@
     <h1>Become a Skater</h1>
 
     <form id="skater-signup-form" class="signup-form" autocomplete="on" novalidate>
+      <!-- users fields -->
       <input name="name" placeholder="Full Name" autocomplete="name" />
       <input name="email" type="email" placeholder="Email" required autocomplete="email" />
       <input name="password" type="password" placeholder="Password" required autocomplete="new-password" />
+
+      <!-- hidden role -->
+      <input type="hidden" name="role" value="skater" />
+
+      <!-- skater profile fields -->
+      <input name="stage_name" placeholder="Stage Name" required />
+      <label for="discipline" style="color:#fff; margin-top:6px;">Discipline</label>
+      <select name="discipline" id="discipline" required>
+        <option value="">Select discipline</option>
+        <option value="street">Street</option>
+        <option value="park">Park</option>
+        <option value="vert">Vert</option>
+        <option value="downhill">Downhill</option>
+        <option value="longboarder">Longboarder</option>
+      </select>
+      <input name="subclass" placeholder="Subclass (optional)" />
+
       <button type="submit">Create Account</button>
+
       <div id="skater-signup-error" class="error" role="alert" aria-live="polite"></div>
     </form>
 
@@ -46,9 +84,9 @@
       Learn More About Being a Skater
     </a>
 
-    <p class="signup-login-link">
+    <p class="signup-login-link" style="color:#fff; margin-top:12px;">
       Already have an account?
-      <a href="/pages/auth-login.html?role=skater">Log in</a>
+      <a href="/pages/auth-login.html?role=skater" style="color:#fff; text-decoration:underline;">Log in</a>
     </p>
   </main>
 
