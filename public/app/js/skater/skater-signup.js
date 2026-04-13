@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Main submit: create user first, only then attempt profile creation
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearError();
@@ -105,9 +106,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setSubmitting(true);
 
+    // 1) create users row (skater signup)
     let signupRes;
     try {
-      signupRes = await API.post("/api/signup", { name, email, password, role });
+      signupRes = await API.post("/api/skater/signup", { name, email, password, role });
     } catch (err) {
       console.error("Signup network error", err);
       showError("Network error during signup. Please try again.");
@@ -122,6 +124,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // If server created both user and profile in one call, skip profile step
+    if (signupRes.data && signupRes.data.profile_created === true) {
+      window.location.href = "/pages/skater/skater-dashboard.html";
+      return;
+    }
+
+    // 2) create skater profile (server derives user_id)
     const profileResult = await createProfile(profilePayload);
 
     if (!profileResult.ok) {
@@ -131,9 +140,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // success -> navigate to skater dashboard
     window.location.href = "/pages/skater/skater-dashboard.html";
   });
 
+  // Retry only profile creation
   retryEl.addEventListener("click", async () => {
     clearError();
     retryEl.style.display = "none";
