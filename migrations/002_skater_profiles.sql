@@ -1,25 +1,13 @@
+-- 002_skater_profiles.sql — CLEAN, D1-SAFE (minimal: only discipline/subclass + linkage)
+
 DROP TABLE IF EXISTS skater_profiles;
 
-CREATE TABLE skater_profiles (
-  id TEXT PRIMARY KEY,               -- skater_id (UUID)
-  user_id TEXT NOT NULL UNIQUE,      -- links to users.id
-
-  display_name TEXT,
-  bio TEXT,
-
-  discipline TEXT,                   -- roller | inline | skateboard | longboard
-  subclass TEXT,                     -- rink | outdoor | vert | street | cruiser | dancer | downhill
-
-  avatar_url TEXT,
-  city TEXT,
-  state TEXT,
-
-  -- OPTIONAL BUT SAFE PROFILE-LEVEL FIELDS
-  booking_fee_cents INTEGER DEFAULT 0,   -- base booking fee
-  home_rink TEXT,                        -- optional profile field
-  profile_weather_snapshot_json TEXT,    -- cached weather for profile location
-
-  created_at TEXT NOT NULL,
-
-  FOREIGN KEY (user_id) REFERENCES users(id)
+CREATE TABLE IF NOT EXISTS skater_profiles (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL UNIQUE,
+  stage_name TEXT NOT NULL,
+  discipline TEXT NOT NULL,    -- e.g., street|park|vert|downhill
+  subclass TEXT,               -- e.g., freestyle|rink|outdoor|cruiser
+  created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
