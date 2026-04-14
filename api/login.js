@@ -1,26 +1,15 @@
-// /api/login.js — FINAL FIXED VERSION
-// - Correct PBKDF2 verify
-// - Correct user lookup
-// - Correct role return
-// - Correct session cookie
-// - ADDS x-user-id + x-user-role headers (critical)
-// - Owner account works immediately
-
+// /api/login.js — FINAL WORKING VERSION
 import { cors, apiJson, verify } from "../users.js";
 
 const SESSION_COOKIE_NAME = "rs_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 function makeSessionCookieValue(payload) {
-  try {
-    return btoa(JSON.stringify(payload));
-  } catch {
-    return "";
-  }
+  return btoa(JSON.stringify(payload));
 }
 
 function makeSetCookieHeader(value) {
-  return `${SESSION_COOKIE_NAME}=${value}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${SESSION_MAX_AGE}`;
+  return `${SESSION_COOKIE_NAME}=${value}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=${SESSION_MAX_AGE}`;
 }
 
 export default async function login(request, env) {
@@ -54,26 +43,13 @@ export default async function login(request, env) {
 
     const iterations = Number(row.password_iterations) || 100000;
 
-    let isValid = false;
-    try {
-      isValid = await verify(
-        password,
-        row.password_hash,
-        row.password_salt,
-        iterations,
-        env
-      );
-    } catch (err) {
-      console.error("verify() error", String(err));
-      return apiJson(
-        {
-          success: false,
-          message: "Server error",
-          detail: "Authentication backend returned an unexpected response"
-        },
-        500
-      );
-    }
+    const isValid = await verify(
+      password,
+      row.password_hash,
+      row.password_salt,
+      iterations,
+      env
+    );
 
     if (!isValid) {
       return apiJson({ success: false, message: "Invalid credentials" }, 401);
@@ -86,9 +62,7 @@ export default async function login(request, env) {
     const is_owner =
       role === "owner" ||
       row["owner-1"] === 1 ||
-      row["owner-1"] === "1" ||
       row["is_owner"] === 1 ||
-      row["is_owner"] === "true" ||
       row["is_owner"] === true;
 
     const user = {
@@ -116,19 +90,22 @@ export default async function login(request, env) {
     };
     const redirect = redirectMap[user.role] || "/";
 
-    // ⭐ CRITICAL FIX: add x-user-id + x-user-role headers
-    const headers = {
-      "Content-Type": "application/json",
-      ...cors(),
-      "Set-Cookie": setCookie,
-      "x-user-id": user.id,
-      "x-user-role": user.role
-    };
+    // ⭐ FINAL FIX: FULL CORS WRAP
+    const response = new Response(
+      JSON.stringify({ success: true, user, redirect }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...cors(),
+          "Set-Cookie": setCookie,
+          "x-user-id": user.id,
+          "x-user-role": user.role
+        }
+      }
+    );
 
-    return new Response(JSON.stringify({ success: true, user, redirect }), {
-      status: 200,
-      headers
-    });
+    return response;
 
   } catch (err) {
     console.error("Login handler error", String(err));
