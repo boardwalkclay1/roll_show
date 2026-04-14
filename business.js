@@ -434,3 +434,25 @@ export async function businessSubmitDiscount(request, env, user) {
     return { success: false, message: "Server error", detail: String(err) };
   }
 }
+
+/* ============================================================
+   Safe factory for worker imports (prevents duplicate-export issues)
+   Worker can call makeBusinessApi() to get handlers.
+============================================================ */
+export function makeBusinessApi() {
+  return {
+    createBusinessProfile: typeof createBusinessProfile === "function" ? createBusinessProfile : async () => ({ success: false, message: "createBusinessProfile not implemented" }),
+    businessDashboard: typeof businessDashboard === "function" ? businessDashboard : async () => ({ success: false, message: "businessDashboard not implemented" }),
+    businessSubmitOffer: typeof businessSubmitOffer === "function" ? businessSubmitOffer : async () => ({ success: false, message: "businessSubmitOffer not implemented" }),
+    businessSubmitEvent: typeof businessSubmitEvent === "function" ? businessSubmitEvent : async () => ({ success: false, message: "businessSubmitEvent not implemented" }),
+    businessSubmitAd: typeof businessSubmitAd === "function" ? businessSubmitAd : async () => ({ success: false, message: "businessSubmitAd not implemented" }),
+    businessAddStaff: typeof businessAddStaff === "function" ? businessAddStaff : async () => ({ success: false, message: "businessAddStaff not implemented" }),
+    businessRemoveStaff: typeof businessRemoveStaff === "function" ? businessRemoveStaff : async () => ({ success: false, message: "businessRemoveStaff not implemented" }),
+    businessListStaff: typeof businessListStaff === "function" ? businessListStaff : async () => ({ success: false, message: "businessListStaff not implemented" }),
+    businessScanTicket: typeof businessScanTicket === "function" ? businessScanTicket : async () => ({ success: false, message: "businessScanTicket not implemented" }),
+    businessSubmitVenue: typeof businessSubmitVenue === "function" ? businessSubmitVenue : async () => ({ success: false, message: "businessSubmitVenue not implemented" }),
+    businessSubmitSponsorship: typeof businessSubmitSponsorship === "function" ? businessSubmitSponsorship : async () => ({ success: false, message: "businessSubmitSponsorship not implemented" }),
+    businessSubmitAffiliate: typeof businessSubmitAffiliate === "function" ? businessSubmitAffiliate : async () => ({ success: false, message: "businessSubmitAffiliate not implemented" }),
+    businessSubmitDiscount: typeof businessSubmitDiscount === "function" ? businessSubmitDiscount : async () => ({ success: false, message: "businessSubmitDiscount not implemented" })
+  };
+}
