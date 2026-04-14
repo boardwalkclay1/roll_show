@@ -351,19 +351,86 @@ export async function businessScanTicket(request, env, user) {
   }
 }
 
-/* --- Exports expected by worker.js (guarded) --- */
-export {
-  businessSubmitVenue,
-  businessSubmitSponsorship,
-  businessSubmitAffiliate,
-  businessSubmitDiscount,
-  businessSubmitOffer,
-  businessSubmitEvent,
-  businessSubmitAd,
-  businessAddStaff,
-  businessRemoveStaff,
-  businessListStaff,
-  businessScanTicket,
-  createBusinessProfile,
-  businessDashboard
-};
+/* ============================================================
+   Minimal stubs for additional submission types expected by worker.js
+   (These ensure the named exports exist; implement real logic later)
+============================================================ */
+export async function businessSubmitVenue(request, env, user) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const business = await getBusinessByUser(env, user.id);
+    if (!business) return { success: false, message: "Business not found." };
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    await env.DB_roll.prepare(
+      `INSERT INTO business_submissions
+         (id, business_id, submission_type, payload_json, status, created_at)
+       VALUES (?, ?, 'venue', ?, 'pending_owner', ?)`
+    )
+      .bind(id, business.id, JSON.stringify(body), now)
+      .run();
+    return { success: true, submissionId: id };
+  } catch (err) {
+    return { success: false, message: "Server error", detail: String(err) };
+  }
+}
+
+export async function businessSubmitSponsorship(request, env, user) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const business = await getBusinessByUser(env, user.id);
+    if (!business) return { success: false, message: "Business not found." };
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    await env.DB_roll.prepare(
+      `INSERT INTO business_submissions
+         (id, business_id, submission_type, payload_json, status, created_at)
+       VALUES (?, ?, 'sponsorship', ?, 'pending_owner', ?)`
+    )
+      .bind(id, business.id, JSON.stringify(body), now)
+      .run();
+    return { success: true, submissionId: id };
+  } catch (err) {
+    return { success: false, message: "Server error", detail: String(err) };
+  }
+}
+
+export async function businessSubmitAffiliate(request, env, user) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const business = await getBusinessByUser(env, user.id);
+    if (!business) return { success: false, message: "Business not found." };
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    await env.DB_roll.prepare(
+      `INSERT INTO business_submissions
+         (id, business_id, submission_type, payload_json, status, created_at)
+       VALUES (?, ?, 'affiliate', ?, 'pending_owner', ?)`
+    )
+      .bind(id, business.id, JSON.stringify(body), now)
+      .run();
+    return { success: true, submissionId: id };
+  } catch (err) {
+    return { success: false, message: "Server error", detail: String(err) };
+  }
+}
+
+export async function businessSubmitDiscount(request, env, user) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const business = await getBusinessByUser(env, user.id);
+    if (!business) return { success: false, message: "Business not found." };
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    await env.DB_roll.prepare(
+      `INSERT INTO business_submissions
+         (id, business_id, submission_type, payload_json, status, created_at)
+       VALUES (?, ?, 'discount', ?, 'pending_owner', ?)`
+    )
+      .bind(id, business.id, JSON.stringify(body), now)
+      .run();
+    return { success: true, submissionId: id };
+  } catch (err) {
+    return { success: false, message: "Server error", detail: String(err) };
+  }
+}
