@@ -1,91 +1,80 @@
-// /app/js/auth-login.js — FINAL PRODUCTION VERSION
+// /app/js/auth-login.js
+// Uses global API client (public/app/js/api.js).
+// Behavior:
+// - POST /api/login via API.post
+// - Expects normalized API response: { success, data: { user, redirect, ... } }
+// - On success: redirect to server-provided redirect or role-based mapping
+// - Uses credentials: same-origin via API client; no manual cookie handling
 
-const form = document.getElementById("auth-login-form");
+(function () {
+  const form = document.getElementById("auth-login-form");
+  const errEl = document.getElementById("auth-error");
 
-if (form) {
-  form.addEventListener("submit", async (e) => {
+  function showError(msg) {
+    errEl.textContent = msg || "Login failed";
+    errEl.hidden = false;
+  }
+
+  function clearError() {
+    errEl.textContent = "";
+    errEl.hidden = true;
+  }
+
+  function roleRedirect(role) {
+    const map = {
+      owner: "/pages/owner/owner-dashboard.html",
+      business: "/pages/business/business-dashboard.html",
+      buyer: "/pages/buyer/buyer-dashboard.html",
+      skater: "/pages/skater/skater-dashboard.html",
+      musician: "/pages/musician/musician-dashboard.html",
+      user: "/"
+    };
+    return map[role] || "/";
+  }
+
+  async function onSubmit(e) {
     e.preventDefault();
+    clearError();
 
-    const submitBtn = form.querySelector('button[type="submit"]');
-    if (submitBtn) submitBtn.disabled = true;
+    const email = (document.getElementById("email").value || "").trim();
+    const password = (document.getElementById("password").value || "");
+
+    if (!email || !password) {
+      showError("Email and password are required.");
+      return;
+    }
+
+    // Disable form while request in-flight
+    const submitBtn = form.querySelector("button[type='submit']");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Signing in…";
 
     try {
-      const fd = new FormData(form);
-      const emailRaw = (fd.get("email") || "").toString().trim();
-      const password = (fd.get("password") || "").toString();
+      // Use API client so credentials and fallback logic are consistent
+      const res = await API.post("/api/login", { email, password });
 
-      if (!emailRaw || !password) {
-        alert("Please enter both email and password.");
+      if (!res || res.success !== true) {
+        // Try to extract message from server-shaped response
+        const msg = (res && res.data && (res.data.message || res.data.error)) || (res && res.error && res.error.message) || "Invalid credentials";
+        showError(msg);
         return;
       }
 
-      const email = emailRaw.toLowerCase();
+      // Server may return user and redirect inside data
+      const payload = res.data || {};
+      const user = payload.user || payload;
+      const redirect = payload.redirect || (user && user.role ? roleRedirect(user.role) : "/");
 
-      const payload = { email, password };
-
-      let res;
-      try {
-        if (typeof API !== "undefined" && API && typeof API.post === "function") {
-          res = await API.post("/api/login", payload);
-        } else {
-          const r = await fetch("/api/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-            credentials: "same-origin"
-          });
-          res = await r.json().catch(() => null);
-        }
-      } catch (err) {
-        alert("Network error. Try again.");
-        return;
-      }
-
-      if (!res || res.success !== true || !res.user) {
-        alert(res?.message || res?.error?.message || "Login failed.");
-        return;
-      }
-
-      const user = res.user;
-
-      const session = {
-        id: user.id,
-        role: user.role || "user",
-        is_owner: user.is_owner === true,
-        email: user.email || email,
-        created_at: user.created_at || null
-      };
-
-      localStorage.setItem("user", JSON.stringify(session));
-
-      // Redirect logic
-      let target = "/";
-
-      if (session.is_owner) {
-        target = "/pages/owner/owner-dashboard.html";
-      } else {
-        switch (session.role) {
-          case "skater":
-            target = "/pages/skater/skater-dashboard.html";
-            break;
-          case "musician":
-            target = "/pages/musician/musician-dashboard.html";
-            break;
-          case "business":
-            target = "/pages/business/business-dashboard.html";
-            break;
-          case "buyer":
-            target = "/pages/buyer/buyer-dashboard.html";
-            break;
-          default:
-            target = "/";
-        }
-      }
-
-      // Use assign so back button behaves normally
-      window.location.assign(target);
+      // Successful login: navigate (cookie already set by server if cookie flow)
+      window.location.assign(redirect);
+    } catch (err) {
+      showError("Network error. Try again.");
+      console.error("Login error:", err);
     } finally {
-      if (submitBtn) submitBtn.disabled = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Log in";
     }
-  });
-}
+  }
+
+  form.addEventListener("submit", onSubmit);
+})();
