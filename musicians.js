@@ -218,3 +218,28 @@ export async function musicianDashboard(request, env, user) {
     return { success: false, message: "Server error", detail: String(err) };
   }
 }
+
+// Auto-added stub for worker import compatibility: ${name}
+export async function ${name}(request, env, user) {
+  return { success: false, message: "${name} not implemented" };
+}
+
+// Auto-added stub for worker import compatibility: ${name}
+export async function ${name}(request, env, user) {
+  return { success: false, message: "${name} not implemented" };
+}
+
+// Auto-added stub for worker import compatibility: ${name}
+export async function ${name}(request, env, user) {
+  return { success: false, message: "${name} not implemented" };
+}
+
+// Auto-added stub for worker import compatibility: ${name}
+export async function ${name}(request, env, user) {
+  return { success: false, message: "${name} not implemented" };
+}
+
+// Auto-added stub for worker import compatibility: ${name}
+export async function ${name}(request, env, user) {
+  return { success: false, message: "${name} not implemented" };
+}

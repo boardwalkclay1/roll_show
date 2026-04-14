@@ -70,3 +70,13 @@ export async function signupBuyer(request, env) {
     return apiJson({ success: false, message: "Server error", detail: String(err) }, 500);
   }
 }
+
+/* --- Exports expected by worker.js (guarded) --- */
+export {
+  listTickets,
+  createTicket,
+  partnerWebhook,
+  checkInTicket,
+  buyerDashboard,
+  signupBuyer
+};

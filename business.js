@@ -350,3 +350,20 @@ export async function businessScanTicket(request, env, user) {
     return { success: false, message: "Server error", detail: String(err) };
   }
 }
+
+/* --- Exports expected by worker.js (guarded) --- */
+export {
+  businessSubmitVenue,
+  businessSubmitSponsorship,
+  businessSubmitAffiliate,
+  businessSubmitDiscount,
+  businessSubmitOffer,
+  businessSubmitEvent,
+  businessSubmitAd,
+  businessAddStaff,
+  businessRemoveStaff,
+  businessListStaff,
+  businessScanTicket,
+  createBusinessProfile,
+  businessDashboard
+};
