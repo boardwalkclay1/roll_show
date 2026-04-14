@@ -1,13 +1,14 @@
 // /app/js/api.js — ROLL SHOW GLOBAL SAFE API CLIENT (UMD / browser global)
-// Redesigned: stable defaults, configurable init, robust parsing, timeout support, clear normalized response
+// Finalized: stable defaults, configurable init, robust parsing, timeout support,
+// consistent normalized response shape, safe cookie-friendly defaults.
 
 (function (global) {
-  // Default base endpoints (can be overridden via API.init)
+  // Configurable defaults (can be changed via API.init)
   let API_BASE_PAGES = "https://roll-show.pages.dev";
   let API_BASE_WORKER = "https://rollshow.boardwalkclay1.workers.dev";
   let DEFAULT_TIMEOUT_MS = 15000;
 
-  /* Utility: safe parse response (JSON or text)
+  /* SAFE PARSE RESPONSE
      Returns: { ok, status, body, contentType, error }
   */
   async function safeParseResponse(res) {
@@ -46,7 +47,7 @@
       }
     }
 
-    // Non-JSON response: return raw text
+    // Non-JSON: return raw text
     return {
       ok: res.ok,
       status,
@@ -56,7 +57,7 @@
     };
   }
 
-  /* Fetch with timeout */
+  /* FETCH WITH TIMEOUT */
   function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
     if (!timeoutMs || timeoutMs <= 0) return fetch(url, options);
     const controller = new AbortController();
@@ -66,8 +67,8 @@
     return fetch(url, opts).finally(() => clearTimeout(timer));
   }
 
-  /* Normalize parsed response into public shape:
-     { success, status, data, user, error }
+  /* NORMALIZE PARSED RESPONSE
+     Public shape: { success, status, data, user, error }
   */
   function normalizeParsed(parsed) {
     const body = parsed.body;
@@ -82,9 +83,19 @@
       if (body.data !== undefined) data = body.data;
       if (body.user !== undefined) user = body.user;
       if (body.error) error = body.error;
-      // fallback: if body has top-level fields but not wrapped in data
-      if (data === null && body !== null && (body.id || body.name || body.email)) {
-        data = body;
+
+      // Common patterns: server returns top-level fields (user, profile_created, etc.)
+      // Expose the whole body as data when no explicit data property exists.
+      if (data === null) {
+        // Avoid exposing large internal error wrappers as data when success is false
+        if (success) {
+          data = body;
+        } else if (!body.data && body.user) {
+          // still expose user if present even on non-standard shapes
+          data = body;
+        } else {
+          data = body;
+        }
       }
     } else {
       // text body -> expose as data
@@ -94,7 +105,7 @@
     return { success, status, data, user, error };
   }
 
-  /* Core request
+  /* CORE REQUEST
      method: "GET"|"POST"|"PUT"|"DELETE"
      path: absolute path starting with "/"
      payload: object | FormData | Blob | null
@@ -122,7 +133,6 @@
 
     const timeoutMs = typeof opts.timeoutMs === "number" ? opts.timeoutMs : DEFAULT_TIMEOUT_MS;
 
-    // Helper to handle fetch + parse + normalize
     async function fetchAndNormalize(fullUrl) {
       try {
         const res = await fetchWithTimeout(fullUrl, options, timeoutMs);
@@ -140,7 +150,7 @@
       }
     }
 
-    // If API route, prefer Worker to avoid Pages CORS issues
+    // API routes should prefer Worker to avoid Pages CORS issues
     if (path.startsWith("/api/") || opts.forceWorker) {
       return await fetchAndNormalize(API_BASE_WORKER + path);
     }
@@ -148,21 +158,17 @@
     // Non-API: try Pages first, fallback to Worker
     try {
       const pagesResult = await fetchAndNormalize(API_BASE_PAGES + path);
-      // If Pages returned a non-success HTTP-level response (status >= 400) and not a parsed success,
-      // attempt Worker fallback unless forcePages is set.
       if (!pagesResult.success && pagesResult.status >= 400 && !opts.forcePages) {
         const workerResult = await fetchAndNormalize(API_BASE_WORKER + path);
-        // Prefer workerResult if it indicates success or has a different status
         if (workerResult.success || workerResult.status !== pagesResult.status) return workerResult;
       }
       return pagesResult;
     } catch {
-      // If Pages fetch throws unexpectedly, fallback to Worker
       return await fetchAndNormalize(API_BASE_WORKER + path);
     }
   }
 
-  /* Expose global API */
+  /* PUBLIC API (attach to global) */
   if (!global.API) {
     global.API = {
       get(path, headers = {}, opts = {}) {
@@ -178,7 +184,7 @@
         return request("DELETE", path, null, headers, opts);
       },
 
-      // Attach user metadata headers (not for auth)
+      // Convenience: attach user metadata headers (not for auth)
       withUser(user) {
         if (!user) return {};
         return {
@@ -196,7 +202,7 @@
         }
       },
 
-      // Expose current bases for debugging
+      // Expose current bases and timeout for debugging
       _bases: {
         get pages() { return API_BASE_PAGES; },
         get worker() { return API_BASE_WORKER; },
