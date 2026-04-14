@@ -94,7 +94,8 @@
       <!-- users fields -->
       <input name="name" placeholder="Full Name" autocomplete="name" />
       <input name="email" type="email" placeholder="Email" required autocomplete="email" />
-      <input name="password" type="password" placeholder="Password" required autocomplete="new-password" />
+      <input id="password" name="password" type="password" placeholder="Password" required autocomplete="new-password" />
+      <input id="password-verify" name="password_verify" type="password" placeholder="Verify Password" required autocomplete="new-password" />
 
       <!-- hidden role (page-specific) -->
       <input type="hidden" name="role" value="buyer" />
@@ -103,7 +104,7 @@
       <input name="display_name" placeholder="Display Name" required />
       <textarea name="billing_address" placeholder="Billing Address (optional)"></textarea>
 
-      <button type="submit">Sign Up</button>
+      <button id="buyer-signup-submit" type="submit">Sign Up</button>
 
       <div id="buyer-signup-error" class="error" role="alert" aria-live="polite"></div>
     </form>
