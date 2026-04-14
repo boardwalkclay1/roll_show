@@ -1,1 +1,0 @@
-UPDATE users SET password_hash='rDYMBs+bygXjLJwaP+/L/dt9vOA4AtRWVGiIxfkfQQs=', password_salt='poB95Z2Ea5bJ3jNoeLqaMQ==', password_iterations=100000, password_algo='sha256' WHERE id='business-001';
