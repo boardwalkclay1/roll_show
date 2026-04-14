@@ -208,3 +208,15 @@ export async function skaterDashboard(request, env, user) {
     return { success: false, message: "Server error", detail: String(err) };
   }
 }
+
+/* ============================================================
+   makeSkatersApi factory expected by worker.js
+   Returns an object with the functions worker imports
+============================================================ */
+export function makeSkatersApi() {
+  return {
+    signupSkater: typeof signupSkater === "function" ? signupSkater : async () => ({ success: false, message: "signupSkater not implemented" }),
+    createSkaterProfile: typeof createSkaterProfile === "function" ? createSkaterProfile : async () => ({ success: false, message: "createSkaterProfile not implemented" }),
+    skaterDashboard: typeof skaterDashboard === "function" ? skaterDashboard : async () => ({ success: false, message: "skaterDashboard not implemented" })
+  };
+}
