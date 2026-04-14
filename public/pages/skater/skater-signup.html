@@ -7,23 +7,10 @@
   <link rel="icon" href="/favicon.png">
   <link rel="stylesheet" href="/app/styles/styles.css">
   <style>
-    .back-btn {
-      position:absolute; top:20px; left:20px;
-      background:rgba(0,0,0,0.55);
-      padding:10px 16px; border-radius:8px;
-      color:white; font-weight:600; text-decoration:none;
-      backdrop-filter:blur(4px); transition:.2s;
-      z-index:10;
-    }
+    .back-btn { position:absolute; top:20px; left:20px; background:rgba(0,0,0,0.55); padding:10px 16px; border-radius:8px; color:white; font-weight:600; text-decoration:none; backdrop-filter:blur(4px); transition:.2s; z-index:10; }
     .back-btn:hover { background:rgba(0,0,0,0.75); }
 
-    .learn-btn {
-      display:block; margin-top:18px; text-align:center;
-      background:#ffffff; color:#000000;
-      padding:12px 18px; border-radius:8px;
-      font-weight:700; text-decoration:none;
-      transition:.2s;
-    }
+    .learn-btn { display:block; margin-top:18px; text-align:center; background:#ffffff; color:#000000; padding:12px 18px; border-radius:8px; font-weight:700; text-decoration:none; transition:.2s; }
     .learn-btn:hover { background:#e6e6e6; }
 
     .error { color:#ff4d4f; margin-top:12px; font-weight:600; display:none; }
@@ -43,6 +30,7 @@
 
     .signup-shell { padding:48px 20px; max-width:720px; margin:0 auto; color:#fff; text-align:left; }
     h1 { font-size:36px; margin-bottom:18px; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,0.45); }
+    label { display:block; margin-top:8px; color:#fff; font-weight:600; }
   </style>
 </head>
 
@@ -57,25 +45,30 @@
       <!-- users fields -->
       <input name="name" placeholder="Full Name" autocomplete="name" />
       <input name="email" type="email" placeholder="Email" required autocomplete="email" />
-      <input name="password" type="password" placeholder="Password" required autocomplete="new-password" />
+      <input id="password" name="password" type="password" placeholder="Password" required autocomplete="new-password" />
+      <input id="password-verify" name="password_verify" type="password" placeholder="Verify Password" required autocomplete="new-password" />
 
       <!-- hidden role -->
       <input type="hidden" name="role" value="skater" />
 
       <!-- skater profile fields -->
       <input name="stage_name" placeholder="Stage Name" required />
-      <label for="discipline" style="color:#fff; margin-top:6px;">Discipline</label>
+
+      <label for="discipline">Discipline</label>
       <select name="discipline" id="discipline" required>
         <option value="">Select discipline</option>
-        <option value="street">Street</option>
-        <option value="park">Park</option>
-        <option value="vert">Vert</option>
-        <option value="downhill">Downhill</option>
         <option value="longboarder">Longboarder</option>
+        <option value="skate boarder">Skate boarder</option>
+        <option value="roller skater">Roller skater</option>
+        <option value="inline skater">Inline skater</option>
       </select>
-      <input name="subclass" placeholder="Subclass (optional)" />
 
-      <button type="submit">Create Account</button>
+      <label for="subclass">Subclass (optional)</label>
+      <select name="subclass" id="subclass" disabled>
+        <option value="">Select subclass (optional)</option>
+      </select>
+
+      <button id="skater-signup-submit" type="submit">Create Account</button>
 
       <div id="skater-signup-error" class="error" role="alert" aria-live="polite"></div>
     </form>
