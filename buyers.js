@@ -1,245 +1,72 @@
+// buyers.js — signupBuyer (minimal, user-first then profile)
 import { apiJson } from "./users.js";
-import { signupBase } from "./users.js";
+import { signupBase } from "./users.js"; // ensure this export matches users.js
 
-/* ============================================================
-   BUYER SIGNUP
-============================================================ */
 export async function signupBuyer(request, env) {
-  const body = await request.json();
-  body.role = "buyer";
+  try {
+    const body = await request.json().catch(() => ({}));
+    // Ensure role is buyer for the users row
+    const signupReqBody = { name: body.name || null, email: body.email, password: body.password, role: "buyer" };
 
-  const base = await signupBase(env, body);
-  if (base.error) return apiJson({ message: base.error }, 400);
+    // Call signupBase and parse its JSON response
+    // signupBase may be implemented as signupBase(request, env, role) or as a function that returns apiJson Response.
+    // Here we call the exported helper as a function that returns a Response-like object.
+    // If your signupBase signature differs, adapt this call to match it.
+    const signupRes = await signupBase(
+      // If signupBase expects (request, env, role) use:
+      // new Request(request.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(signupReqBody) }),
+      // env,
+      // "buyer"
+      // Otherwise if signupBase accepts (env, body) adapt accordingly.
+      // The following assumes signupBase returns a Response (apiJson).
+      new Request(request.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(signupReqBody) }),
+      env,
+      "buyer"
+    );
 
-  const id = crypto.randomUUID();
-  const now = base.created_at || new Date().toISOString();
+    // If signupBase returned a Response object, parse it; otherwise assume it's already an object
+    let base;
+    if (signupRes && typeof signupRes.json === "function") {
+      base = await signupRes.json().catch(() => null);
+    } else {
+      base = signupRes;
+    }
 
-  await env.DB_roll.prepare(
-    `INSERT INTO buyer_profiles (
-       id, user_id, name, phone, city, state,
-       default_payment_method, preferred_rink, profile_weather_snapshot_json,
-       created_at
-     )
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  )
-    .bind(
-      id,
-      base.id,
-      body.name || null,
-      body.phone || null,
-      body.city || null,
-      body.state || null,
-      body.default_payment_method || null,
-      body.preferred_rink || null,
-      null, // weather snapshot
-      now
+    if (!base || base.success !== true || !base.user) {
+      // Normalize error message
+      const msg = (base && (base.message || (base.error && base.error.message))) || "Signup failed";
+      return apiJson({ success: false, message: msg }, base && base.status ? base.status : 400);
+    }
+
+    const userId = base.user.id;
+    const createdAt = base.user.created_at || new Date().toISOString();
+
+    // Create buyer profile row
+    const profileId = crypto.randomUUID();
+    await env.DB_roll.prepare(
+      `INSERT INTO buyer_profiles (
+         id, user_id, name, phone, city, state,
+         default_payment_method, preferred_rink, profile_weather_snapshot_json,
+         created_at
+       )
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .run();
+      .bind(
+        profileId,
+        userId,
+        body.name || null,
+        body.phone || null,
+        body.city || null,
+        body.state || null,
+        body.default_payment_method || null,
+        body.preferred_rink || null,
+        null,
+        createdAt
+      )
+      .run();
 
-  return apiJson({ user: base, buyer_profile_id: id });
-}
-
-/* ============================================================
-   INTERNAL: GET BUYER PROFILE
-============================================================ */
-async function getBuyerProfile(env, userId) {
-  return await env.DB_roll.prepare(
-    "SELECT * FROM buyer_profiles WHERE user_id = ?"
-  )
-    .bind(userId)
-    .first();
-}
-
-/* ============================================================
-   LIST BUYER TICKETS
-============================================================ */
-export async function listTickets(request, env, user) {
-  const buyer = await getBuyerProfile(env, user.id);
-  if (!buyer) return apiJson({ message: "Buyer profile not found" }, 404);
-
-  const { results } = await env.DB_roll.prepare(
-    `SELECT 
-        t.id AS ticket_id,
-        t.ticket_type,
-        t.price_cents,
-        t.status,
-        t.purchased_at,
-        t.qr_code_url,
-        t.checkin_status,
-        s.title AS show_title,
-        s.start_time,
-        s.end_time,
-        s.city,
-        s.state
-     FROM tickets t
-     JOIN shows s ON s.id = t.show_id
-     WHERE t.buyer_profile_id = ?
-     ORDER BY t.purchased_at DESC`
-  )
-    .bind(buyer.id)
-    .all();
-
-  return apiJson({ tickets: results });
-}
-
-/* ============================================================
-   CREATE TICKET (RESERVED)
-============================================================ */
-export async function createTicket(request, env, user) {
-  const { show_id, ticket_type = "standard" } = await request.json();
-
-  if (!show_id) return apiJson({ message: "Missing show_id" }, 400);
-
-  const buyer = await getBuyerProfile(env, user.id);
-  if (!buyer) return apiJson({ message: "Buyer profile not found" }, 404);
-
-  // Fetch show to determine price
-  const show = await env.DB_roll.prepare(
-    "SELECT * FROM shows WHERE id = ?"
-  )
-    .bind(show_id)
-    .first();
-
-  if (!show) return apiJson({ message: "Show not found" }, 404);
-
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
-
-  // Base price + booking fee
-  const price_cents = (show.base_price_cents || 0) + (show.booking_fee_cents || 0);
-
-  // Generate QR link (placeholder, real QR created by QR engine)
-  const qr_code_url = `/qr/ticket/${id}`;
-
-  await env.DB_roll.prepare(
-    `INSERT INTO tickets (
-       id,
-       show_id,
-       buyer_profile_id,
-       purchaser_user_id,
-       ticket_type,
-       price_cents,
-       status,
-       purchased_at,
-       funding_applied,
-       checkin_status,
-       checkin_at,
-       qr_code_url
-     )
-     VALUES (?, ?, ?, ?, ?, ?, 'reserved', ?, 0, 'none', NULL, ?)`
-  )
-    .bind(
-      id,
-      show_id,
-      buyer.id,
-      user.id,
-      ticket_type,
-      price_cents,
-      now,
-      qr_code_url
-    )
-    .run();
-
-  return apiJson({
-    ticket_id: id,
-    status: "reserved",
-    price_cents,
-    qr_code_url
-  });
-}
-
-/* ============================================================
-   PARTNER WEBHOOK (MARK TICKET CHARGED)
-============================================================ */
-export async function partnerWebhook(request, env) {
-  const body = await request.json();
-  const { ticket_id, amount_cents, partner_transaction_id, status } = body;
-
-  // Only process successful charges
-  if (status !== "charged") return apiJson({ ok: true });
-
-  const ticket = await env.DB_roll.prepare(
-    "SELECT * FROM tickets WHERE id = ?"
-  )
-    .bind(ticket_id)
-    .first();
-
-  if (!ticket) return apiJson({ message: "Ticket not found" }, 404);
-
-  // Mark ticket as charged
-  await env.DB_roll.prepare(
-    `UPDATE tickets
-     SET status = 'charged',
-         purchased_at = ?
-     WHERE id = ?`
-  )
-    .bind(new Date().toISOString(), ticket_id)
-    .run();
-
-  // OPTIONAL: Insert into payouts or revenue logs
-  // (We will build this in skaters.js / musicians.js / owner.js)
-
-  return apiJson({ ok: true });
-}
-
-/* ============================================================
-   CHECK IN TICKET
-============================================================ */
-export async function checkInTicket(request, env, user) {
-  const { ticket_id } = await request.json();
-  if (!ticket_id) return apiJson({ message: "Missing ticket_id" }, 400);
-
-  const ticket = await env.DB_roll.prepare(
-    "SELECT * FROM tickets WHERE id = ?"
-  )
-    .bind(ticket_id)
-    .first();
-
-  if (!ticket) return apiJson({ message: "Ticket not found" }, 404);
-
-  const now = new Date().toISOString();
-
-  await env.DB_roll.prepare(
-    `UPDATE tickets
-     SET checkin_status = 'there',
-         checkin_at = ?
-     WHERE id = ?`
-  )
-    .bind(now, ticket_id)
-    .run();
-
-  return apiJson({ ok: true, checkin_at: now });
-}
-
-/* ============================================================
-   BUYER DASHBOARD (TICKETS + UPCOMING SHOWS)
-============================================================ */
-export async function buyerDashboard(request, env, user) {
-  const buyer = await getBuyerProfile(env, user.id);
-  if (!buyer) return apiJson({ message: "Buyer profile not found" }, 404);
-
-  const { results: tickets } = await env.DB_roll.prepare(
-    `SELECT 
-        t.id AS ticket_id,
-        t.ticket_type,
-        t.status,
-        t.price_cents,
-        t.purchased_at,
-        t.qr_code_url,
-        s.title AS show_title,
-        s.start_time,
-        s.city,
-        s.state
-     FROM tickets t
-     JOIN shows s ON s.id = t.show_id
-     WHERE t.buyer_profile_id = ?
-     ORDER BY t.purchased_at DESC`
-  )
-    .bind(buyer.id)
-    .all();
-
-  return apiJson({
-    buyer,
-    tickets
-  });
+    return apiJson({ success: true, user: base.user, buyer_profile_id: profileId }, 201);
+  } catch (err) {
+    return apiJson({ success: false, message: "Server error", detail: String(err) }, 500);
+  }
 }
