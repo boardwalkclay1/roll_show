@@ -3,20 +3,46 @@ import { apiJson } from "./users.js";
 import { signupBase } from "./users.js";
 
 /* ============================================================
+   Canonical discipline and subclass mapping
+   Keys are lowercase and must match client-side option values.
+============================================================ */
+const allowedDisciplines = ["longboarder", "skate boarder", "roller skater", "inline skater"];
+
+const subclassMap = {
+  "longboarder": ["cruiser", "downhill", "dancer"],
+  "skate boarder": ["street", "vert"],
+  "roller skater": ["rink", "outdoor", "skatepark"],
+  "inline skater": ["vert", "street", "rink"]
+};
+
+function normalizeString(v) {
+  if (!v && v !== "") return null;
+  return String(v).trim().toLowerCase();
+}
+
+/* ============================================================
    SIGNUP (user-first then optional profile)
    POST /api/skater/signup
    - Accepts JSON body with user fields and optional profile fields:
-     { name, email, password, stage_name, discipline, subclass }
+     { name, email, password, password_verify, stage_name, discipline, subclass }
    - Creates users row first via signupBase, then attempts profile insert
    - Returns { success, user, profile_created, profile?, profile_error? }
 ============================================================ */
 export async function signupSkater(request, env) {
   try {
     const body = await request.json().catch(() => ({}));
+
+    // Password confirmation (server-side authoritative)
+    const password = body.password || null;
+    const password_verify = body.password_verify || body.passwordConfirm || null;
+    if (!password || !password_verify || password !== password_verify) {
+      return apiJson({ success: false, message: "Passwords do not match" }, 400);
+    }
+
     const signupReqBody = {
       name: body.name || null,
       email: body.email,
-      password: body.password,
+      password: password,
       role: "skater"
     };
 
@@ -45,15 +71,19 @@ export async function signupSkater(request, env) {
     const userId = base.user.id;
     const createdAt = base.user.created_at || new Date().toISOString();
 
-    // Profile fields
+    // Profile fields (normalize)
     const stage_name = body.stage_name ? String(body.stage_name).trim() : null;
-    const discipline = body.discipline ? String(body.discipline).trim() : null;
-    const subclass = body.subclass ? String(body.subclass).trim() : null;
+    const disciplineRaw = body.discipline || null;
+    const subclassRaw = body.subclass || null;
+    const discipline = normalizeString(disciplineRaw);
+    const subclass = subclassRaw ? String(subclassRaw).trim().toLowerCase() : null;
 
+    // If no profile fields provided, return early (user created only)
     if (!stage_name && !discipline && !subclass) {
       return apiJson({ success: true, user: base.user, profile_created: false }, 201);
     }
 
+    // Required profile fields
     if (!stage_name || !discipline) {
       return apiJson({
         success: true,
@@ -61,6 +91,29 @@ export async function signupSkater(request, env) {
         profile_created: false,
         profile_error: "Missing required profile fields (stage_name, discipline)"
       }, 201);
+    }
+
+    // Validate discipline
+    if (!allowedDisciplines.includes(discipline)) {
+      return apiJson({
+        success: true,
+        user: base.user,
+        profile_created: false,
+        profile_error: `Invalid discipline. Allowed: ${allowedDisciplines.join(", ")}`
+      }, 201);
+    }
+
+    // Validate subclass if provided
+    if (subclass) {
+      const allowed = subclassMap[discipline] || [];
+      if (!allowed.includes(subclass)) {
+        return apiJson({
+          success: true,
+          user: base.user,
+          profile_created: false,
+          profile_error: `Invalid subclass for discipline ${discipline}. Allowed: ${allowed.join(", ")}`
+        }, 201);
+      }
     }
 
     const profileId = crypto.randomUUID();
@@ -120,16 +173,28 @@ export async function signupSkater(request, env) {
    POST /api/profiles/skater
    - Derives user_id from authenticated user (requireRole wraps this)
    - Accepts only: stage_name, discipline, subclass
+   - Validates discipline/subclass against canonical lists
 ============================================================ */
 export async function createSkaterProfile(request, env, user) {
   try {
     const body = await request.json().catch(() => ({}));
     const stage_name = body.stage_name ? String(body.stage_name).trim() : null;
-    const discipline = body.discipline ? String(body.discipline).trim() : null;
-    const subclass = body.subclass ? String(body.subclass).trim() : null;
+    const discipline = body.discipline ? normalizeString(body.discipline) : null;
+    const subclass = body.subclass ? String(body.subclass).trim().toLowerCase() : null;
 
     if (!stage_name || !discipline) {
       return { success: false, message: "Missing profile fields" };
+    }
+
+    if (!allowedDisciplines.includes(discipline)) {
+      return { success: false, message: `Invalid discipline. Allowed: ${allowedDisciplines.join(", ")}` };
+    }
+
+    if (subclass) {
+      const allowed = subclassMap[discipline] || [];
+      if (!allowed.includes(subclass)) {
+        return { success: false, message: `Invalid subclass for discipline ${discipline}. Allowed: ${allowed.join(", ")}` };
+      }
     }
 
     const existing = await env.DB_roll.prepare("SELECT * FROM skater_profiles WHERE user_id = ?").bind(user.id).first();
