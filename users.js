@@ -1,11 +1,10 @@
-// users.js — CLEAN + FIXED VERSION
+// users.js — CLEAN, CORRECT, FINAL
 // --------------------------------
-// - Correct PBKDF2 verify (matches auth-worker exactly)
-// - Correct salt handling
-// - Correct payload
-// - Correct CORS
-// - Owner bypass preserved
-// - Signup flows preserved
+// - PBKDF2 verify matches auth-worker exactly
+// - Correct salt + iterations handling
+// - CORS helper
+// - Owner bypass
+// - Signup + business signup
 
 export function cors() {
   return {
@@ -26,14 +25,14 @@ export function apiJson(obj, status = 200) {
 const AUTH_URL = "https://rollshow-auth.boardwalkclay1.workers.dev";
 
 /* ============================================================
-   PBKDF2 VERIFY — FIXED
+   PBKDF2 VERIFY — MATCHES AUTH-WORKER
    ============================================================ */
 export async function verify(password, hashValue, saltValue, iterations, env) {
   try {
     const payload = {
       password,
       hash: hashValue,
-      salt: saltValue,                 // ⭐ FIXED — correct salt
+      salt: saltValue,
       iterations: Number(iterations) || 100000
     };
 
