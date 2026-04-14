@@ -1,4 +1,4 @@
-// buyers.js — signupBuyer (minimal, user-first then profile)
+// buyers.js — signupBuyer (minimal, user-first then profile) + safe API factory
 import { apiJson } from "./users.js";
 import { signupBase } from "./users.js"; // ensure this export matches users.js
 
@@ -9,16 +9,8 @@ export async function signupBuyer(request, env) {
     const signupReqBody = { name: body.name || null, email: body.email, password: body.password, role: "buyer" };
 
     // Call signupBase and parse its JSON response
-    // signupBase may be implemented as signupBase(request, env, role) or as a function that returns apiJson Response.
-    // Here we call the exported helper as a function that returns a Response-like object.
-    // If your signupBase signature differs, adapt this call to match it.
+    // This assumes signupBase(request, env, role) returns a Response-like object or a plain object.
     const signupRes = await signupBase(
-      // If signupBase expects (request, env, role) use:
-      // new Request(request.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(signupReqBody) }),
-      // env,
-      // "buyer"
-      // Otherwise if signupBase accepts (env, body) adapt accordingly.
-      // The following assumes signupBase returns a Response (apiJson).
       new Request(request.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(signupReqBody) }),
       env,
       "buyer"
@@ -41,15 +33,14 @@ export async function signupBuyer(request, env) {
     const userId = base.user.id;
     const createdAt = base.user.created_at || new Date().toISOString();
 
-    // Create buyer profile row
+    // Create buyer profile row (idempotency handled by DB constraints if present)
     const profileId = crypto.randomUUID();
     await env.DB_roll.prepare(
       `INSERT INTO buyer_profiles (
          id, user_id, name, phone, city, state,
          default_payment_method, preferred_rink, profile_weather_snapshot_json,
          created_at
-       )
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
       .bind(
         profileId,
@@ -71,12 +62,36 @@ export async function signupBuyer(request, env) {
   }
 }
 
-/* --- Exports expected by worker.js (guarded) --- */
-export {
-  listTickets,
-  createTicket,
-  partnerWebhook,
-  checkInTicket,
-  buyerDashboard,
-  signupBuyer
-};
+/* Minimal safe stubs for other buyer handlers expected by worker.js
+   Replace these with full implementations as needed */
+export async function listTickets(request, env, user) {
+  return { success: false, message: "listTickets not implemented" };
+}
+
+export async function createTicket(request, env, user) {
+  return { success: false, message: "createTicket not implemented" };
+}
+
+export async function partnerWebhook(request, env) {
+  return { success: false, message: "partnerWebhook not implemented" };
+}
+
+export async function checkInTicket(request, env, user) {
+  return { success: false, message: "checkInTicket not implemented" };
+}
+
+export async function buyerDashboard(request, env, user) {
+  return { success: false, message: "buyerDashboard not implemented" };
+}
+
+/* Factory expected by worker.js to import buyer handlers without duplicate-export issues */
+export function makeBuyersApi() {
+  return {
+    signupBuyer: typeof signupBuyer === "function" ? signupBuyer : async () => ({ success: false, message: "signupBuyer not implemented" }),
+    listTickets: typeof listTickets === "function" ? listTickets : async () => ({ success: false, message: "listTickets not implemented" }),
+    createTicket: typeof createTicket === "function" ? createTicket : async () => ({ success: false, message: "createTicket not implemented" }),
+    partnerWebhook: typeof partnerWebhook === "function" ? partnerWebhook : async () => ({ success: false, message: "partnerWebhook not implemented" }),
+    checkInTicket: typeof checkInTicket === "function" ? checkInTicket : async () => ({ success: false, message: "checkInTicket not implemented" }),
+    buyerDashboard: typeof buyerDashboard === "function" ? buyerDashboard : async () => ({ success: false, message: "buyerDashboard not implemented" })
+  };
+}
