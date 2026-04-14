@@ -8,30 +8,14 @@
   <link rel="stylesheet" href="/app/styles/styles.css" />
 
   <style>
-    .back-btn {
-      position:absolute; top:20px; left:20px;
-      background:rgba(0,0,0,0.55);
-      padding:10px 16px; border-radius:8px;
-      color:white; font-weight:600; text-decoration:none;
-      backdrop-filter:blur(4px); transition:.2s; z-index:10;
-    }
+    .back-btn { position:absolute; top:20px; left:20px; background:rgba(0,0,0,0.55); padding:10px 16px; border-radius:8px; color:white; font-weight:600; text-decoration:none; backdrop-filter:blur(4px); transition:.2s; z-index:10; }
     .back-btn:hover { background:rgba(0,0,0,0.75); }
 
-    .learn-btn {
-      display:block; margin-top:18px; text-align:center;
-      background:#f5b400; color:#1a1200;
-      padding:12px 18px; border-radius:8px;
-      font-weight:700; text-decoration:none; transition:.2s;
-      max-width:520px;
-    }
+    .learn-btn { display:block; margin-top:18px; text-align:center; background:#f5b400; color:#1a1200; padding:12px 18px; border-radius:8px; font-weight:700; text-decoration:none; transition:.2s; max-width:520px; }
     .learn-btn:hover { background:#ffca33; transform:translateY(-2px); }
 
     .signup-shell { padding:48px 20px; max-width:720px; margin:0 auto; color:#111; }
-    .signup-form input, .signup-form select, .signup-form button {
-      display:block; width:100%; max-width:520px; margin:10px 0;
-      padding:12px 14px; border-radius:8px; border:1px solid rgba(0,0,0,0.12);
-      font-size:16px; box-sizing:border-box;
-    }
+    .signup-form input, .signup-form select, .signup-form button { display:block; width:100%; max-width:520px; margin:10px 0; padding:12px 14px; border-radius:8px; border:1px solid rgba(0,0,0,0.12); font-size:16px; box-sizing:border-box; }
     .error { color:#ff4d4f; margin-top:12px; font-weight:600; display:none; }
     h1 { font-size:32px; margin-bottom:12px; }
     .small-note { font-size:13px; color:#444; margin-top:6px; }
@@ -62,12 +46,13 @@
       <!-- users fields -->
       <input name="name" placeholder="Your Full Name" required autocomplete="name" />
       <input name="email" type="email" placeholder="Email" required autocomplete="email" />
-      <input name="password" type="password" placeholder="Password" required autocomplete="new-password" />
+      <input id="password" name="password" type="password" placeholder="Password" required autocomplete="new-password" />
+      <input id="password-verify" name="password_verify" type="password" placeholder="Verify Password" required autocomplete="new-password" />
 
       <!-- hidden role (page-specific) -->
       <input type="hidden" name="role" value="business" />
 
-      <button type="submit">Submit Application</button>
+      <button id="business-signup-submit" type="submit">Submit Application</button>
 
       <div id="business-signup-error" class="error" role="alert" aria-live="polite"></div>
     </form>
