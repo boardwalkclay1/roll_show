@@ -124,9 +124,6 @@ export default {
         return withCORS(await signupMusician(request.clone(), env));
       }
 
-      // Business signup: handled by signupBusiness exported from users.js
-      // signupBusiness will create the users row first and only then attempt to create
-      // the business_profiles row (using only the allowed fields).
       if (path === "/api/business/signup" && method === "POST") {
         return withCORS(await signupBusiness(request.clone(), env));
       }
@@ -280,6 +277,44 @@ export default {
       // OWNER ROUTES
       if (path === "/api/owner/dashboard" && method === "GET") {
         return withCORS(await requireRole(request.clone(), env, ["owner"], ownerDashboard));
+      }
+
+      // ============================================================
+      // NEW: LEGAL ACCEPTANCE ENDPOINT
+      // ============================================================
+      if (path === "/api/legal/accept" && method === "POST") {
+        return withCORS(
+          await requireRole(request.clone(), env, ["buyer","skater","musician","business","staff","owner"], async (req, envInner, user) => {
+            const form = await req.formData();
+
+            const agreement_type = form.get("agreement_type");
+            const agreement_version = form.get("agreement_version");
+            const role = form.get("role");
+
+            if (!agreement_type || !agreement_version || !role) {
+              return apiJson({ success: false, error: "Missing fields" }, 400);
+            }
+
+            try {
+              await env.DB_roll.prepare(
+                `INSERT OR IGNORE INTO legal_acceptances
+                 (user_id, role, agreement_type, agreement_version, ip_address, user_agent)
+                 VALUES (?, ?, ?, ?, ?, ?)`
+              ).bind(
+                user.id,
+                role,
+                agreement_type,
+                agreement_version,
+                req.headers.get("cf-connecting-ip") || null,
+                req.headers.get("user-agent") || null
+              ).run();
+
+              return apiJson({ success: true });
+            } catch (err) {
+              return apiJson({ success: false, error: String(err) }, 500);
+            }
+          })
+        );
       }
 
       // FALLBACK
