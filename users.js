@@ -1,9 +1,10 @@
 // users.js — AUTH HELPERS, PBKDF2 VERIFY, ROLE GUARD, SIGNUP BASE + signupBusiness
-// Updated with OWNER BYPASS + preserved logic
+// Updated with OWNER BYPASS + proper CORS for credentialed cross-site requests
 
 export function cors() {
   return {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": "https://roll-show.pages.dev",
+    "Access-Control-Allow-Credentials": "true",
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, x-user-id, x-user-role"
   };
@@ -24,7 +25,7 @@ export async function verify(password, hashValue, saltValue, iterations, env) {
     const payload = {
       password,
       hash: hashValue,
-      salt: saltValue,
+      salt: hashValue ? saltValue : saltValue,
       iterations: Number(iterations) || 100000
     };
 
