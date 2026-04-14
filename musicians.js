@@ -1,268 +1,220 @@
+// musicians.js — signup + profile + dashboard (user-first then profile, idempotent profile endpoint)
 import { apiJson } from "./users.js";
 import { signupBase } from "./users.js";
 
 /* ============================================================
-   MUSICIAN SIGNUP
+   SIGNUP (user-first then optional profile)
+   POST /api/musician/signup
+   - Accepts JSON body with user fields and optional profile fields:
+     { name, email, password, stage_name, genre, bio }
+   - Creates users row first via signupBase, then attempts profile insert
+   - Returns { success, user, profile_created, profile?, profile_error? }
 ============================================================ */
 export async function signupMusician(request, env) {
-  const body = await request.json();
-  body.role = "musician";
+  try {
+    const body = await request.json().catch(() => ({}));
+    const signupReqBody = {
+      name: body.name || null,
+      email: body.email,
+      password: body.password,
+      role: "musician"
+    };
 
-  const base = await signupBase(env, body);
-  if (base.error) return apiJson({ message: base.error }, 400);
+    // Call signupBase as implemented in users.js
+    const signupRes = await signupBase(
+      new Request(request.url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signupReqBody)
+      }),
+      env,
+      "musician"
+    );
 
-  const id = crypto.randomUUID();
-  const created_at = base.created_at || new Date().toISOString();
+    // signupBase returns a Response (apiJson) — parse it if so
+    let base;
+    if (signupRes && typeof signupRes.json === "function") {
+      base = await signupRes.json().catch(() => null);
+    } else {
+      base = signupRes;
+    }
 
-  await env.DB_roll.prepare(
-    `INSERT INTO musician_profiles (
-       id, user_id, name, bio, genre, avatar_url, city, state, created_at
-     )
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(
-    id,
-    base.id,
-    body.name || null,
-    body.bio || null,
-    body.genre || null,
-    body.avatar_url || null,
-    body.city || null,
-    body.state || null,
-    created_at
-  ).run();
+    if (!base || base.success !== true || !base.user) {
+      const msg = (base && (base.message || (base.error && base.error.message))) || "Signup failed";
+      return apiJson({ success: false, message: msg }, base && base.status ? base.status : 400);
+    }
 
-  return apiJson({ user: base, musician_profile_id: id });
+    const userId = base.user.id;
+    const createdAt = base.user.created_at || new Date().toISOString();
+
+    // Profile fields (only accept these)
+    const stage_name = body.stage_name ? String(body.stage_name).trim() : null;
+    const genre = body.genre ? String(body.genre).trim() : null;
+    const bio = body.bio ? String(body.bio).trim() : null;
+
+    // If no profile fields provided, return user created and profile_created:false
+    if (!stage_name && !genre && !bio) {
+      return apiJson({ success: true, user: base.user, profile_created: false }, 201);
+    }
+
+    // If profile fields incomplete, return user created but profile not created
+    if (!stage_name || !genre) {
+      return apiJson({
+        success: true,
+        user: base.user,
+        profile_created: false,
+        profile_error: "Missing required profile fields (stage_name, genre)"
+      }, 201);
+    }
+
+    // Attempt to insert musician profile
+    const profileId = crypto.randomUUID();
+    const now = new Date().toISOString();
+
+    try {
+      await env.DB_roll.prepare(
+        `INSERT INTO musician_profiles
+           (id, user_id, stage_name, genre, bio, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      )
+        .bind(profileId, userId, stage_name, genre, bio, now)
+        .run();
+
+      return apiJson({
+        success: true,
+        user: base.user,
+        profile_created: true,
+        profile: { id: profileId, user_id: userId, stage_name, genre, bio, created_at: now }
+      }, 201);
+    } catch (err) {
+      const msg = String(err).toLowerCase();
+      // Treat unique/constraint errors as idempotent success if profile exists
+      if (msg.includes("unique") || msg.includes("constraint") || /musician_profiles/.test(msg)) {
+        const existing = await env.DB_roll.prepare("SELECT * FROM musician_profiles WHERE user_id = ?").bind(userId).first();
+        if (existing) {
+          return apiJson({
+            success: true,
+            user: base.user,
+            profile_created: true,
+            profile_exists: true,
+            profile: {
+              id: existing.id,
+              user_id: existing.user_id,
+              stage_name: existing.stage_name,
+              genre: existing.genre,
+              bio: existing.bio,
+              created_at: existing.created_at
+            }
+          }, 201);
+        }
+      }
+
+      return apiJson({
+        success: true,
+        user: base.user,
+        profile_created: false,
+        profile_error: String(err)
+      }, 201);
+    }
+  } catch (err) {
+    return apiJson({ success: false, message: "Server error", detail: String(err) }, 500);
+  }
 }
 
 /* ============================================================
-   MUSICIAN DASHBOARD
+   PROFILE-ONLY endpoint (idempotent)
+   POST /api/profiles/musician
+   - Called after signup when session/auth is present
+   - Derives user_id from authenticated user (requireRole wraps this)
+   - Accepts only: stage_name, genre, bio
+   - Returns { success, profile_created|profile_exists, profile }
+============================================================ */
+export async function createMusicianProfile(request, env, user) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const stage_name = body.stage_name ? String(body.stage_name).trim() : null;
+    const genre = body.genre ? String(body.genre).trim() : null;
+    const bio = body.bio ? String(body.bio).trim() : null;
+
+    if (!stage_name || !genre) {
+      return { success: false, message: "Missing profile fields" };
+    }
+
+    // Check existing
+    const existing = await env.DB_roll.prepare("SELECT * FROM musician_profiles WHERE user_id = ?").bind(user.id).first();
+    if (existing) {
+      return {
+        success: true,
+        profile_exists: true,
+        profile: {
+          id: existing.id,
+          user_id: existing.user_id,
+          stage_name: existing.stage_name,
+          genre: existing.genre,
+          bio: existing.bio,
+          created_at: existing.created_at
+        }
+      };
+    }
+
+    const profileId = crypto.randomUUID();
+    const now = new Date().toISOString();
+
+    try {
+      await env.DB_roll.prepare(
+        `INSERT INTO musician_profiles
+           (id, user_id, stage_name, genre, bio, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      )
+        .bind(profileId, user.id, stage_name, genre, bio, now)
+        .run();
+
+      return {
+        success: true,
+        profile_created: true,
+        profile: { id: profileId, user_id: user.id, stage_name, genre, bio, created_at: now }
+      };
+    } catch (err) {
+      const msg = String(err).toLowerCase();
+      if (msg.includes("unique") || msg.includes("constraint") || /musician_profiles/.test(msg)) {
+        const p = await env.DB_roll.prepare("SELECT * FROM musician_profiles WHERE user_id = ?").bind(user.id).first();
+        if (p) {
+          return {
+            success: true,
+            profile_exists: true,
+            profile: {
+              id: p.id,
+              user_id: p.user_id,
+              stage_name: p.stage_name,
+              genre: p.genre,
+              bio: p.bio,
+              created_at: p.created_at
+            }
+          };
+        }
+      }
+      return { success: false, message: "Profile insert failed", detail: String(err) };
+    }
+  } catch (err) {
+    return { success: false, message: "Server error", detail: String(err) };
+  }
+}
+
+/* ============================================================
+   MUSICIAN DASHBOARD (requires musician role)
+   Called via requireRole(request, env, ["musician"], musicianDashboard)
+   Returns musician profile and list of tracks/offers (simple)
 ============================================================ */
 export async function musicianDashboard(request, env, user) {
-  const musician = await env.DB_roll.prepare(
-    "SELECT * FROM musician_profiles WHERE user_id = ?"
-  ).bind(user.id).first();
+  try {
+    const profile = await env.DB_roll.prepare("SELECT * FROM musician_profiles WHERE user_id = ?").bind(user.id).first();
+    if (!profile) return { success: false, message: "Musician profile not found" };
 
-  if (!musician) {
-    return apiJson({ message: "Musician profile not found" }, 404);
+    const { results: tracks } = await env.DB_roll.prepare("SELECT * FROM tracks WHERE musician_id = ? ORDER BY created_at DESC").bind(profile.id).all();
+    const { results: offers } = await env.DB_roll.prepare("SELECT * FROM musician_offers WHERE musician_id = ? ORDER BY created_at DESC").bind(profile.id).all();
+
+    return { success: true, profile, tracks, offers };
+  } catch (err) {
+    return { success: false, message: "Server error", detail: String(err) };
   }
-
-  const { results: tracks } = await env.DB_roll.prepare(
-    `SELECT *
-     FROM tracks
-     WHERE musician_id = ?
-     ORDER BY created_at DESC`
-  ).bind(musician.id).all();
-
-  const { results: licenses } = await env.DB_roll.prepare(
-    `SELECT l.*, t.title
-     FROM track_licenses l
-     JOIN tracks t ON l.track_id = t.id
-     WHERE l.musician_id = ?
-     ORDER BY l.created_at DESC`
-  ).bind(musician.id).all();
-
-  return apiJson({
-    musician,
-    tracks,
-    licenses
-  });
-}
-
-/* ============================================================
-   UPLOAD TRACK (R2 STORAGE)
-============================================================ */
-export async function uploadTrack(request, env, user) {
-  const {
-    title,
-    description,
-    genre,
-    bpm,
-    duration_seconds,
-    r2_key,
-    artwork_r2_key,
-    isrc,
-    visibility = "public",
-    price_cents = 100,
-    license_to_rollshow = 0,
-    royalty_split_json
-  } = await request.json();
-
-  if (!r2_key) {
-    return apiJson({ message: "Missing R2 key for uploaded file." }, 400);
-  }
-
-  const musician = await env.DB_roll.prepare(
-    "SELECT id FROM musician_profiles WHERE user_id = ?"
-  ).bind(user.id).first();
-
-  if (!musician) {
-    return apiJson({ message: "Musician profile not found" }, 404);
-  }
-
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
-
-  await env.DB_roll.prepare(
-    `INSERT INTO tracks (
-       id, musician_id, title, description, genre, bpm, duration_seconds,
-       r2_key, artwork_r2_key, isrc, visibility,
-       price_cents, license_to_rollshow, royalty_split_json,
-       status, created_at
-     )
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`
-  ).bind(
-    id,
-    musician.id,
-    title,
-    description || null,
-    genre || null,
-    bpm || null,
-    duration_seconds || null,
-    r2_key,
-    artwork_r2_key || null,
-    isrc || null,
-    visibility,
-    price_cents,
-    license_to_rollshow ? 1 : 0,
-    royalty_split_json ? JSON.stringify(royalty_split_json) : null,
-    now
-  ).run();
-
-  return apiJson({ trackId: id });
-}
-
-/* ============================================================
-   PUBLIC MUSIC LIBRARY
-============================================================ */
-export async function listMusic(env) {
-  const { results } = await env.DB_roll.prepare(
-    `SELECT
-       id,
-       musician_id,
-       title,
-       genre,
-       artwork_r2_key,
-       visibility,
-       created_at
-     FROM tracks
-     WHERE visibility = 'public'
-     ORDER BY created_at DESC`
-  ).all();
-
-  return apiJson({ tracks: results });
-}
-
-/* ============================================================
-   LICENSE TRACK (SKATER → MUSICIAN)
-============================================================ */
-export async function licenseTrack(request, env, user) {
-  const { trackId, amount_cents, license_type = "sync", terms_json } =
-    await request.json();
-
-  // Resolve skater profile for this user
-  const skater = await env.DB_roll.prepare(
-    "SELECT id FROM skater_profiles WHERE user_id = ?"
-  ).bind(user.id).first();
-
-  if (!skater) {
-    return apiJson({ message: "Only skaters can license music." }, 403);
-  }
-
-  const track = await env.DB_roll.prepare(
-    "SELECT * FROM tracks WHERE id = ?"
-  ).bind(trackId).first();
-
-  if (!track) {
-    return apiJson({ message: "Track not found." }, 404);
-  }
-
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
-
-  await env.DB_roll.prepare(
-    `INSERT INTO track_licenses (
-       id,
-       track_id,
-       musician_id,
-       granted_to_role,
-       granted_to_profile_id,
-       license_type,
-       amount_cents,
-       terms_json,
-       approved_by_owner,
-       created_at
-     )
-     VALUES (?, ?, ?, 'skater', ?, ?, ?, ?, 0, ?)`
-  ).bind(
-    id,
-    trackId,
-    track.musician_id,
-    skater.id,
-    license_type,
-    amount_cents || 1000,
-    terms_json ? JSON.stringify(terms_json) : null,
-    now
-  ).run();
-
-  return apiJson({ licenseId: id });
-}
-
-/* ============================================================
-   CREATE OFFER (MUSICIAN → SKATER)
-============================================================ */
-export async function musicianCreateOffer(request, env, user) {
-  const { skaterUserId, type, terms, amount_cents } = await request.json();
-
-  // Ensure target is a skater by checking skater_profiles
-  const skaterProfile = await env.DB_roll.prepare(
-    "SELECT id FROM skater_profiles WHERE user_id = ?"
-  ).bind(skaterUserId).first();
-
-  if (!skaterProfile) {
-    return apiJson({ message: "Musicians may only send offers to skaters." }, 403);
-  }
-
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
-
-  await env.DB_roll.prepare(
-    `INSERT INTO offers (
-       id,
-       from_user_id,
-       to_user_id,
-       type,
-       amount_cents,
-       terms,
-       status,
-       created_at
-     )
-     VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`
-  ).bind(
-    id,
-    user.id,
-    skaterUserId,
-    type,
-    amount_cents || 0,
-    terms || null,
-    now
-  ).run();
-
-  return apiJson({ offerId: id });
-}
-
-/* ============================================================
-   LIST MUSICIAN OFFERS
-============================================================ */
-export async function listMusicianOffers(request, env, user) {
-  const { results } = await env.DB_roll.prepare(
-    `SELECT
-       o.*,
-       u.name AS skater_name
-     FROM offers o
-     JOIN users u ON o.to_user_id = u.id
-     WHERE o.from_user_id = ?
-     ORDER BY o.created_at DESC`
-  ).bind(user.id).all();
-
-  return apiJson({ offers: results });
 }
