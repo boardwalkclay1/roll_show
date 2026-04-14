@@ -218,3 +218,26 @@ export async function musicianDashboard(request, env, user) {
     return { success: false, message: "Server error", detail: String(err) };
   }
 }
+
+/* ============================================================
+   Minimal stubs for worker imports (add real implementations later)
+============================================================ */
+export async function uploadTrack(request, env, user) {
+  return { success: false, message: "uploadTrack not implemented" };
+}
+
+export async function listMusic(request, env, user) {
+  return { success: false, message: "listMusic not implemented" };
+}
+
+export async function licenseTrack(request, env, user) {
+  return { success: false, message: "licenseTrack not implemented" };
+}
+
+export async function musicianCreateOffer(request, env, user) {
+  return { success: false, message: "musicianCreateOffer not implemented" };
+}
+
+export async function listMusicianOffers(request, env, user) {
+  return { success: false, message: "listMusicianOffers not implemented" };
+}
