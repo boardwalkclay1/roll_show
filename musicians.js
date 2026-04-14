@@ -6,17 +6,25 @@ import { signupBase } from "./users.js";
    SIGNUP (user-first then optional profile)
    POST /api/musician/signup
    - Accepts JSON body with user fields and optional profile fields:
-     { name, email, password, stage_name, genre, bio }
+     { name, email, password, password_verify, stage_name, genre }
    - Creates users row first via signupBase, then attempts profile insert
    - Returns { success, user, profile_created, profile?, profile_error? }
 ============================================================ */
 export async function signupMusician(request, env) {
   try {
     const body = await request.json().catch(() => ({}));
+
+    // Server-side password confirmation (authoritative)
+    const password = body.password || null;
+    const password_verify = body.password_verify || body.passwordConfirm || null;
+    if (!password || !password_verify || password !== password_verify) {
+      return apiJson({ success: false, message: "Passwords do not match" }, 400);
+    }
+
     const signupReqBody = {
       name: body.name || null,
       email: body.email,
-      password: body.password,
+      password: password,
       role: "musician"
     };
 
@@ -50,10 +58,9 @@ export async function signupMusician(request, env) {
     // Profile fields (only accept these)
     const stage_name = body.stage_name ? String(body.stage_name).trim() : null;
     const genre = body.genre ? String(body.genre).trim() : null;
-    const bio = body.bio ? String(body.bio).trim() : null;
 
     // If no profile fields provided, return user created and profile_created:false
-    if (!stage_name && !genre && !bio) {
+    if (!stage_name && !genre) {
       return apiJson({ success: true, user: base.user, profile_created: false }, 201);
     }
 
@@ -67,24 +74,24 @@ export async function signupMusician(request, env) {
       }, 201);
     }
 
-    // Attempt to insert musician profile
+    // Attempt to insert musician profile (omit bio)
     const profileId = crypto.randomUUID();
     const now = new Date().toISOString();
 
     try {
       await env.DB_roll.prepare(
         `INSERT INTO musician_profiles
-           (id, user_id, stage_name, genre, bio, created_at)
-         VALUES (?, ?, ?, ?, ?, ?)`
+           (id, user_id, stage_name, genre, created_at)
+         VALUES (?, ?, ?, ?, ?)`
       )
-        .bind(profileId, userId, stage_name, genre, bio, now)
+        .bind(profileId, userId, stage_name, genre, now)
         .run();
 
       return apiJson({
         success: true,
         user: base.user,
         profile_created: true,
-        profile: { id: profileId, user_id: userId, stage_name, genre, bio, created_at: now }
+        profile: { id: profileId, user_id: userId, stage_name, genre, created_at: now }
       }, 201);
     } catch (err) {
       const msg = String(err).toLowerCase();
@@ -102,7 +109,6 @@ export async function signupMusician(request, env) {
               user_id: existing.user_id,
               stage_name: existing.stage_name,
               genre: existing.genre,
-              bio: existing.bio,
               created_at: existing.created_at
             }
           }, 201);
@@ -126,7 +132,7 @@ export async function signupMusician(request, env) {
    POST /api/profiles/musician
    - Called after signup when session/auth is present
    - Derives user_id from authenticated user (requireRole wraps this)
-   - Accepts only: stage_name, genre, bio
+   - Accepts only: stage_name, genre
    - Returns { success, profile_created|profile_exists, profile }
 ============================================================ */
 export async function createMusicianProfile(request, env, user) {
@@ -134,7 +140,6 @@ export async function createMusicianProfile(request, env, user) {
     const body = await request.json().catch(() => ({}));
     const stage_name = body.stage_name ? String(body.stage_name).trim() : null;
     const genre = body.genre ? String(body.genre).trim() : null;
-    const bio = body.bio ? String(body.bio).trim() : null;
 
     if (!stage_name || !genre) {
       return { success: false, message: "Missing profile fields" };
@@ -151,7 +156,6 @@ export async function createMusicianProfile(request, env, user) {
           user_id: existing.user_id,
           stage_name: existing.stage_name,
           genre: existing.genre,
-          bio: existing.bio,
           created_at: existing.created_at
         }
       };
@@ -163,16 +167,16 @@ export async function createMusicianProfile(request, env, user) {
     try {
       await env.DB_roll.prepare(
         `INSERT INTO musician_profiles
-           (id, user_id, stage_name, genre, bio, created_at)
-         VALUES (?, ?, ?, ?, ?, ?)`
+           (id, user_id, stage_name, genre, created_at)
+         VALUES (?, ?, ?, ?, ?)`
       )
-        .bind(profileId, user.id, stage_name, genre, bio, now)
+        .bind(profileId, user.id, stage_name, genre, now)
         .run();
 
       return {
         success: true,
         profile_created: true,
-        profile: { id: profileId, user_id: user.id, stage_name, genre, bio, created_at: now }
+        profile: { id: profileId, user_id: user.id, stage_name, genre, created_at: now }
       };
     } catch (err) {
       const msg = String(err).toLowerCase();
@@ -187,7 +191,6 @@ export async function createMusicianProfile(request, env, user) {
               user_id: p.user_id,
               stage_name: p.stage_name,
               genre: p.genre,
-              bio: p.bio,
               created_at: p.created_at
             }
           };
