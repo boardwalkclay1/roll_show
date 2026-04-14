@@ -5,40 +5,110 @@
   <title>Privacy Policy – Roll Show</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="/app/styles/legal.css">
+  <link rel="stylesheet" href="/app/styles/legal-roll.css">
 </head>
-<body style="background:url('/app/images/bg-privacy.jpg') center/cover no-repeat;">
+
+<body class="legal">
+
+  <a href="/index.html" class="back-btn">← Back</a>
 
   <main class="legal-shell">
-    <h1>Privacy Policy</h1>
+    <div class="legal-header">
+      <h1 class="legal-title">Privacy Policy</h1>
+      <p class="legal-subtitle">Last updated: 2026</p>
+    </div>
 
-    <div id="agreement-body" class="legal-box">
+    <div id="agreement-body" class="legal-content">
+
       <h2>1. Overview</h2>
-      <p>This Privacy Policy explains how Roll Show collects, uses, and protects information about users of the Platform.</p>
+      <p>
+        This Privacy Policy explains how Roll Show collects, uses, stores, and protects information across the entire platform. 
+        This includes all user types: skaters, musicians, buyers, businesses, staff, and visitors.
+      </p>
 
       <h2>2. Information We Collect</h2>
-      <p>We may collect information you provide directly (such as name, email, role, profile details, content you upload) and information collected automatically (such as device information, log data, and usage data).</p>
+      <p>We collect information in three categories:</p>
+
+      <h3>A. Information You Provide</h3>
+      <p>This includes account details and profile information such as:</p>
+      <ul>
+        <li>Name, email, password</li>
+        <li>Role (skater, musician, buyer, business, etc.)</li>
+        <li>Profile details (stage name, discipline, company info, display name)</li>
+        <li>Uploaded content (images, videos, descriptions, show listings, offers)</li>
+      </ul>
+
+      <h3>B. Information Collected Automatically</h3>
+      <ul>
+        <li>Device information (browser, OS, IP address)</li>
+        <li>Usage data (pages visited, actions taken, timestamps)</li>
+        <li>Log data for security and diagnostics</li>
+      </ul>
+
+      <h3>C. Information From Platform Activity</h3>
+      <ul>
+        <li>Ticket purchases and wallet activity</li>
+        <li>Show hosting, bookings, submissions, and offers</li>
+        <li>Messages, comments, and interactions with other users</li>
+      </ul>
 
       <h2>3. How We Use Information</h2>
-      <p>We use information to operate and improve the Platform, process payments, enforce agreements, provide support, communicate with you, and comply with legal obligations.</p>
+      <p>Roll Show uses your information to:</p>
+      <ul>
+        <li>Operate and improve the platform</li>
+        <li>Deliver shows, bookings, and ticketing features</li>
+        <li>Process payments and prevent fraud</li>
+        <li>Verify business accounts and submissions</li>
+        <li>Personalize your experience</li>
+        <li>Provide customer support</li>
+        <li>Enforce our Terms of Service</li>
+        <li>Comply with legal obligations</li>
+      </ul>
 
       <h2>4. Sharing of Information</h2>
-      <p>We may share information with service providers (such as payment processors, hosting providers), with other users as necessary for Platform features (e.g., displaying your profile or content), and as required by law or to protect rights and safety.</p>
+      <p>We may share information with:</p>
+      <ul>
+        <li>Service providers (payment processors, hosting, analytics)</li>
+        <li>Other users when necessary for platform features (e.g., show listings, profiles)</li>
+        <li>Businesses you interact with (e.g., show hosts, sponsors)</li>
+        <li>Law enforcement or authorities when required by law</li>
+      </ul>
 
       <h2>5. Data Security</h2>
-      <p>We use reasonable technical and organizational measures to protect information, but no system is completely secure.</p>
+      <p>
+        We use encryption, secure communication, and restricted access to protect your data. 
+        No system is completely secure, but we take reasonable measures to safeguard your information.
+      </p>
 
       <h2>6. Data Retention</h2>
-      <p>We retain information as long as necessary to operate the Platform, comply with legal obligations, resolve disputes, and enforce agreements.</p>
+      <p>
+        We retain information as long as necessary to operate the platform, comply with legal obligations, 
+        resolve disputes, and enforce agreements.
+      </p>
 
-      <h2>7. Your Choices</h2>
-      <p>You may update certain account information through your profile. You may also request deletion of your account, subject to our need to retain certain data for legal or operational reasons.</p>
+      <h2>7. Your Rights</h2>
+      <p>You may:</p>
+      <ul>
+        <li>Update your account information</li>
+        <li>Request deletion of your account</li>
+        <li>Request access to the data we store about you</li>
+      </ul>
+      <p>
+        Some data may be retained for legal, security, or operational reasons even after account deletion.
+      </p>
 
       <h2>8. Children</h2>
-      <p>The Platform is not intended for children under the age where they can legally consent to data processing in their jurisdiction.</p>
+      <p>
+        Roll Show is not intended for children under the age where they can legally consent to data processing 
+        in their jurisdiction. We do not knowingly collect information from children.
+      </p>
 
       <h2>9. Changes to This Policy</h2>
-      <p>We may update this Privacy Policy from time to time. Continued use of the Platform after changes means you accept the updated Policy.</p>
+      <p>
+        We may update this Privacy Policy as the platform evolves. Continued use of Roll Show after changes 
+        means you accept the updated policy.
+      </p>
+
     </div>
 
     <div class="sign-block"
@@ -52,6 +122,7 @@
       <button id="sign-agreement-btn" disabled>Acknowledge</button>
       <p id="sign-status"></p>
     </div>
+
   </main>
 
   <script type="module" src="/app/js/legal/agreement-sign.js"></script>
