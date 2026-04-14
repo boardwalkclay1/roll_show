@@ -1,11 +1,11 @@
-// /app/js/api.js — ROLL SHOW GLOBAL SAFE API CLIENT (FINAL)
-// - Guaranteed cookie support (credentials: "include")
+// /app/js/api.js — ROLL SHOW GLOBAL SAFE API CLIENT (CLEAN FINAL)
+// - Cookie support (credentials: "include")
 // - Worker-first for /api/*
 // - Stable fallback logic
 // - Safe JSON parsing
 // - Unified normalized response shape
-// - Timeout support
-// - Zero ambiguity
+// - Timeout support (no .finally on fetch)
+// - Explicit error reporting
 
 (function (global) {
   let API_BASE_PAGES = "https://roll-show.pages.dev";
@@ -54,13 +54,17 @@
     };
   }
 
-  /* TIMEOUT WRAPPER */
-  function fetchWithTimeout(url, options, timeoutMs) {
+  /* TIMEOUT WRAPPER (NO .finally ON PROMISE) */
+  async function fetchWithTimeout(url, options, timeoutMs) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     const opts = { ...options, signal: controller.signal };
 
-    return fetch(url, opts).finally(() => clearTimeout(timer));
+    try {
+      return await fetch(url, opts);
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   /* NORMALIZE */
@@ -88,13 +92,15 @@
 
   /* CORE REQUEST */
   async function request(method, path, payload = null, extraHeaders = {}, opts = {}) {
-    if (!path.startsWith("/")) throw new Error("API path must start with '/'");
+    if (!path || typeof path !== "string" || !path.startsWith("/")) {
+      throw new Error("API path must be a string starting with '/'");
+    }
 
     const headers = { ...extraHeaders };
     const options = {
       method,
       headers,
-      credentials: "include" // ⭐ CRITICAL: allows session cookies
+      credentials: "include"
     };
 
     if (payload && !(payload instanceof FormData) && !(payload instanceof Blob)) {
@@ -112,13 +118,16 @@
         const parsed = await safeParseResponse(res);
         return normalize(parsed);
       } catch (err) {
-        const isAbort = err?.name === "AbortError";
+        const isAbort = err && err.name === "AbortError";
         return {
           success: false,
           status: 0,
           data: null,
           user: undefined,
-          error: { message: isAbort ? "Request timed out" : "Network error", detail: err?.message }
+          error: {
+            message: isAbort ? "Request timed out" : "Network error",
+            detail: err && err.message ? err.message : String(err || "Unknown error")
+          }
         };
       }
     }
@@ -132,7 +141,9 @@
     const pagesResult = await run(API_BASE_PAGES + path);
     if (!pagesResult.success && pagesResult.status >= 400 && !opts.forcePages) {
       const workerResult = await run(API_BASE_WORKER + path);
-      if (workerResult.success || workerResult.status !== pagesResult.status) return workerResult;
+      if (workerResult.success || workerResult.status !== pagesResult.status) {
+        return workerResult;
+      }
     }
     return pagesResult;
   }
