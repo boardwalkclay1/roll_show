@@ -84,34 +84,23 @@
       if (body.user !== undefined) user = body.user;
       if (body.error) error = body.error;
 
-      // Common patterns: server returns top-level fields (user, profile_created, etc.)
-      // Expose the whole body as data when no explicit data property exists.
       if (data === null) {
-        // Avoid exposing large internal error wrappers as data when success is false
         if (success) {
           data = body;
         } else if (!body.data && body.user) {
-          // still expose user if present even on non-standard shapes
           data = body;
         } else {
           data = body;
         }
       }
     } else {
-      // text body -> expose as data
       data = body;
     }
 
     return { success, status, data, user, error };
   }
 
-  /* CORE REQUEST
-     method: "GET"|"POST"|"PUT"|"DELETE"
-     path: absolute path starting with "/"
-     payload: object | FormData | Blob | null
-     extraHeaders: object
-     opts: { timeoutMs?: number, forceWorker?: boolean, forcePages?: boolean }
-  */
+  /* CORE REQUEST */
   async function request(method, path, payload = null, extraHeaders = {}, opts = {}) {
     if (!path || typeof path !== "string" || !path.startsWith("/")) {
       throw new Error("API request path must start with '/'");
@@ -121,7 +110,8 @@
     const options = {
       method,
       headers,
-      credentials: "same-origin"
+      // 🔥 CRITICAL FIX: allow cross-site cookies (Pages → Worker)
+      credentials: "include"
     };
 
     if (payload && !(payload instanceof FormData) && !(payload instanceof Blob)) {
@@ -150,7 +140,7 @@
       }
     }
 
-    // API routes should prefer Worker to avoid Pages CORS issues
+    // API routes should prefer Worker
     if (path.startsWith("/api/") || opts.forceWorker) {
       return await fetchAndNormalize(API_BASE_WORKER + path);
     }
@@ -168,7 +158,7 @@
     }
   }
 
-  /* PUBLIC API (attach to global) */
+  /* PUBLIC API */
   if (!global.API) {
     global.API = {
       get(path, headers = {}, opts = {}) {
@@ -184,7 +174,6 @@
         return request("DELETE", path, null, headers, opts);
       },
 
-      // Convenience: attach user metadata headers (not for auth)
       withUser(user) {
         if (!user) return {};
         return {
@@ -193,7 +182,6 @@
         };
       },
 
-      // Runtime configuration
       init({ pagesBase, workerBase, defaultTimeoutMs } = {}) {
         if (pagesBase && typeof pagesBase === "string") API_BASE_PAGES = pagesBase;
         if (workerBase && typeof workerBase === "string") API_BASE_WORKER = workerBase;
@@ -202,14 +190,12 @@
         }
       },
 
-      // Expose current bases and timeout for debugging
       _bases: {
         get pages() { return API_BASE_PAGES; },
         get worker() { return API_BASE_WORKER; },
         get timeoutMs() { return DEFAULT_TIMEOUT_MS; }
       },
 
-      // LEGAL / POLICY HELPERS
       legal: {
         accept(payload, headers = {}, opts = {}) {
           return request("POST", "/api/legal/accept", payload, headers, opts);
