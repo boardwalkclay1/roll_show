@@ -1,0 +1,202 @@
+/* /app/styles/legal.css
+   Clean, accessible styles for Terms / Privacy / Legal pages
+   Designed to match existing site look-and-feel while prioritizing readability.
+*/
+
+/* Base */
+:root{
+  --bg: #ffffff;
+  --panel-bg: rgba(255,255,255,0.92);
+  --text: #111111;
+  --muted: #6b6b6b;
+  --accent: #7a0000; /* matches musician learn button */
+  --accent-contrast: #ffffff;
+  --max-width: 900px;
+  --radius: 10px;
+  --gap: 18px;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  --font-serif: Georgia, "Times New Roman", serif;
+}
+
+/* Page */
+body.legal {
+  background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.00));
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  padding: 36px 18px;
+  margin: 0;
+}
+
+/* Container */
+.legal-shell {
+  max-width: var(--max-width);
+  margin: 28px auto;
+  background: var(--panel-bg);
+  padding: 28px;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* Header */
+.legal-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.legal-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+.legal-subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Back link (re-usable style consistent with site) */
+.back-btn {
+  display:inline-block;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background .15s ease, transform .08s ease;
+}
+.back-btn:hover { background: rgba(0,0,0,0.75); transform: translateY(-2px); }
+
+/* Content */
+.legal-content {
+  margin-top: var(--gap);
+  color: var(--text);
+  font-size: 16px;
+}
+
+/* Headings inside legal content */
+.legal-content h2 {
+  font-size: 20px;
+  margin: 22px 0 10px;
+  font-weight: 700;
+}
+.legal-content h3 {
+  font-size: 18px;
+  margin: 18px 0 8px;
+  font-weight: 700;
+}
+.legal-content p {
+  margin: 10px 0;
+  color: var(--text);
+}
+
+/* Lists */
+.legal-content ul,
+.legal-content ol {
+  margin: 10px 0 10px 20px;
+  color: var(--text);
+}
+
+/* Definitions / callouts */
+.legal-note {
+  background: #fff8e6;
+  border-left: 4px solid #ffd27a;
+  padding: 12px 14px;
+  margin: 14px 0;
+  color: #5a4a00;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+/* Table for data or change logs */
+.legal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 15px;
+}
+.legal-table th,
+.legal-table td {
+  padding: 10px 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+  text-align: left;
+}
+.legal-table th {
+  background: rgba(0,0,0,0.03);
+  font-weight: 700;
+}
+
+/* Signature / acceptance block */
+.legal-sign {
+  margin-top: 22px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.legal-sign .sig-line {
+  border-top: 1px dashed rgba(0,0,0,0.12);
+  padding-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Footer small print */
+.legal-footer {
+  margin-top: 26px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Buttons (consistent with site) */
+.btn-cta {
+  display:inline-block;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  border: 2px solid rgba(0,0,0,0.08);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+/* Accessibility helpers */
+.sr-only {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+
+/* Print-friendly */
+@media print {
+  body.legal { background: #fff; padding: 12px; }
+  .legal-shell { box-shadow: none; border: none; padding: 0; }
+  .back-btn, .btn-cta, .learn-btn { display: none; }
+  .legal-content { font-size: 12pt; }
+}
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+  .legal-shell { padding: 18px; margin: 12px; }
+  .legal-title { font-size: 22px; }
+  .legal-content { font-size: 15px; }
+}
+
+/* Small utility spacing */
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mb-12 { margin-bottom: 12px; }
