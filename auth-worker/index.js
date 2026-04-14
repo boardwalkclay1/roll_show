@@ -1,4 +1,6 @@
-// auth-worker/index.js — PBKDF2 hash/verify worker (100000 iterations, always JSON)
+// auth-worker/index.js — FINAL PBKDF2 HASH + VERIFY (MATCHES LOGIN WORKER)
+// -------------------------------------------------------------------------
+
 const ITERATIONS = 100000;
 
 function jsonResponse(obj, status = 200) {
@@ -8,13 +10,16 @@ function jsonResponse(obj, status = 200) {
   });
 }
 
+// Base64 helpers
 function toB64(u8) {
   return btoa(String.fromCharCode(...new Uint8Array(u8)));
 }
+
 function fromB64(s) {
-  return Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  return Uint8Array.from(atob(s), c => c.charCodeAt(0));
 }
 
+// PBKDF2 derive
 async function derive(password, saltBytes, iterations) {
   const enc = new TextEncoder();
   const key = await crypto.subtle.importKey(
@@ -47,10 +52,14 @@ export default {
 
     const isHash =
       method === "POST" && (path === "/hash" || path === "/api/auth/hash");
+
     const isVerify =
       method === "POST" && (path === "/verify" || path === "/api/auth/verify");
 
     try {
+      // ----------------------------------------------------------
+      // HASH
+      // ----------------------------------------------------------
       if (isHash) {
         let body;
         try {
@@ -59,12 +68,13 @@ export default {
           return jsonResponse({ success: false, error: "Invalid JSON" }, 400);
         }
 
-        const password = body && body.password ? String(body.password) : "";
+        const password = body?.password ? String(body.password) : "";
         if (!password) {
           return jsonResponse({ success: false, error: "Missing password" }, 400);
         }
 
         const salt = crypto.getRandomValues(new Uint8Array(16));
+
         try {
           const hashBytes = await derive(password, salt, ITERATIONS);
           return jsonResponse({
@@ -72,12 +82,19 @@ export default {
             hash: toB64(hashBytes),
             salt: toB64(salt),
             iterations: ITERATIONS
-          }, 200);
+          });
         } catch (err) {
-          return jsonResponse({ success: false, error: "PBKDF2 failed", detail: String(err) }, 500);
+          return jsonResponse({
+            success: false,
+            error: "PBKDF2 failed",
+            detail: String(err)
+          }, 500);
         }
       }
 
+      // ----------------------------------------------------------
+      // VERIFY
+      // ----------------------------------------------------------
       if (isVerify) {
         let body;
         try {
@@ -86,10 +103,10 @@ export default {
           return jsonResponse({ success: false, error: "Invalid JSON" }, 400);
         }
 
-        const password = body && body.password ? String(body.password) : "";
-        const hash = body && body.hash ? String(body.hash) : "";
-        const salt = body && body.salt ? String(body.salt) : "";
-        const iterations = Number(body && body.iterations) || ITERATIONS;
+        const password = body?.password ? String(body.password) : "";
+        const hash = body?.hash ? String(body.hash) : "";
+        const salt = body?.salt ? String(body.salt) : "";
+        const iterations = Number(body?.iterations) || ITERATIONS;
 
         if (!password || !hash || !salt) {
           return jsonResponse({ success: false, error: "Missing fields" }, 400);
@@ -99,16 +116,35 @@ export default {
           const saltBytes = fromB64(salt);
           const bits = await derive(password, saltBytes, iterations);
           const newHash = toB64(bits);
-          return jsonResponse({ success: true, ok: newHash === hash, iterations }, 200);
+
+          return jsonResponse({
+            success: true,
+            ok: newHash === hash,
+            iterations
+          });
         } catch (err) {
-          return jsonResponse({ success: false, error: "Verify failed", detail: String(err) }, 500);
+          return jsonResponse({
+            success: false,
+            error: "Verify failed",
+            detail: String(err)
+          }, 500);
         }
       }
 
-      // health
-      return jsonResponse({ success: true, message: "Auth worker online", iterations: ITERATIONS }, 200);
+      // ----------------------------------------------------------
+      // HEALTH CHECK
+      // ----------------------------------------------------------
+      return jsonResponse({
+        success: true,
+        message: "Auth worker online",
+        iterations: ITERATIONS
+      });
     } catch (err) {
-      return jsonResponse({ success: false, error: "Unhandled error", detail: String(err) }, 500);
+      return jsonResponse({
+        success: false,
+        error: "Unhandled error",
+        detail: String(err)
+      }, 500);
     }
   }
 };
