@@ -6,15 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="/favicon.png">
   <link rel="stylesheet" href="/app/styles/legal-roll.css">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="legal">
 
   <a href="/index.html" class="back-btn">← Back</a>
 
   <main class="legal-shell">
+
     <div class="legal-header">
       <h1 class="legal-title">Business Policy</h1>
       <p class="legal-subtitle">Applies to all businesses using Roll Show</p>
@@ -83,26 +86,19 @@
       </p>
 
     </div>
-  </main>
-</body>
-</html>
-    </div>
 
-    <div class="sign-block"
-         data-agreement-type="business_policy"
-         data-agreement-version="v1"
-         data-agreement-role="business">
-      <label>
-        <input type="checkbox" id="sign-agree-checkbox">
-        I understand and agree to the Business Policy.
-      </label>
-      <button id="sign-agreement-btn" class="learn-btn" disabled>
-        Acknowledge & Continue
+    <!-- BIG ROLL SHOW BUTTON — POSTS DIRECTLY TO YOUR API -->
+    <form action="/api/legal/accept" method="POST" class="legal-accept-form">
+      <input type="hidden" name="agreement_type" value="business_policy">
+      <input type="hidden" name="agreement_version" value="v1">
+      <input type="hidden" name="role" value="business">
+
+      <button class="learn-btn" style="margin-top:40px; width:100%; font-size:1.3rem;">
+        I Understand & Agree — Continue
       </button>
-      <p id="sign-status"></p>
-    </div>
+    </form>
+
   </main>
 
-  <script type="module" src="/app/js/legal/acceptance.js"></script>
 </body>
 </html>
