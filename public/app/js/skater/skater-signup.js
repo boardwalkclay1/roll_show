@@ -5,7 +5,6 @@ const subclassSelect = document.getElementById("subclass");
 const errorEl = document.getElementById("skater-signup-error");
 const submitBtn = document.getElementById("skater-signup-submit");
 
-// canonical mapping (keys must match discipline option values)
 const subclassMap = {
   "longboarder": ["cruiser", "downhill", "dancer"],
   "skate boarder": ["street", "vert"],
@@ -13,52 +12,27 @@ const subclassMap = {
   "inline skater": ["vert", "street", "rink"]
 };
 
-function showError(msg) {
-  errorEl.textContent = msg;
-  errorEl.style.display = "block";
-}
+function showError(msg){ errorEl.textContent = msg; errorEl.style.display = "block"; }
+function clearError(){ errorEl.textContent = ""; errorEl.style.display = "none"; }
+function normalizeDiscipline(raw){ if(!raw) return ""; return String(raw).trim().toLowerCase(); }
 
-function clearError() {
-  errorEl.textContent = "";
-  errorEl.style.display = "none";
-}
-
-function normalizeDiscipline(raw) {
-  if (!raw) return "";
-  return String(raw).trim().toLowerCase();
-}
-
-function populateSubclassOptions(rawDiscipline) {
-  // normalize the incoming value to match keys
+function populateSubclassOptions(rawDiscipline){
   const discipline = normalizeDiscipline(rawDiscipline);
-
-  // find matching key in subclassMap (keys are lowercase)
-  // allow keys with spaces (e.g., "skate boarder")
   const subs = subclassMap[discipline] || [];
-
-  if (!subs.length) {
+  if(!subs.length){
     subclassSelect.innerHTML = `<option value="">Select subclass (optional)</option>`;
     subclassSelect.disabled = true;
     return;
   }
-
-  // build options; values are canonical lowercase
   const options = [`<option value="">Select subclass (optional)</option>`]
-    .concat(subs.map(s => `<option value="${s}">${s.charAt(0).toUpperCase() + s.slice(1)}</option>`))
+    .concat(subs.map(s => `<option value="${s}">${s.charAt(0).toUpperCase()+s.slice(1)}</option>`))
     .join("");
-
   subclassSelect.innerHTML = options;
   subclassSelect.disabled = false;
 }
 
-// Event: discipline changed
-disciplineSelect.addEventListener("change", () => {
-  // use the raw select.value but normalize inside populate
-  populateSubclassOptions(disciplineSelect.value);
-  clearError();
-});
+disciplineSelect.addEventListener("change", () => { populateSubclassOptions(disciplineSelect.value); clearError(); });
 
-// Form submit handler
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearError();
@@ -70,25 +44,19 @@ form.addEventListener("submit", async (e) => {
   const passwordVerify = fd.get("password_verify") || "";
   const stage_name = (fd.get("stage_name") || "").trim();
 
-  // normalize discipline/subclass before sending
   const rawDiscipline = fd.get("discipline") || "";
   const rawSubclass = fd.get("subclass") || "";
   const discipline = normalizeDiscipline(rawDiscipline);
   const subclass = rawSubclass ? String(rawSubclass).trim().toLowerCase() : "";
 
-  // Basic client-side validation
   if (!email) return showError("Please enter an email.");
   if (!password) return showError("Please enter a password.");
   if (password !== passwordVerify) return showError("Passwords do not match.");
   if (!stage_name) return showError("Please enter a stage name.");
   if (!discipline) return showError("Please select a discipline.");
-
-  // Validate subclass matches discipline if provided
   if (subclass) {
     const allowed = subclassMap[discipline] || [];
-    if (!allowed.includes(subclass)) {
-      return showError("Invalid subclass for selected discipline.");
-    }
+    if (!allowed.includes(subclass)) return showError("Invalid subclass for selected discipline.");
   }
 
   submitBtn.disabled = true;
@@ -100,13 +68,13 @@ form.addEventListener("submit", async (e) => {
       email,
       password,
       password_verify: passwordVerify,
-      role: fd.get("role") || "skater",
+      role: "skater",
       stage_name,
-      discipline, // normalized
+      discipline,
       subclass: subclass || null
     };
 
-    const res = await fetch("/api/signup/skater", {
+    const res = await fetch("/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -136,7 +104,4 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// Initialize subclass state on load (in case discipline preselected)
-document.addEventListener("DOMContentLoaded", () => {
-  populateSubclassOptions(disciplineSelect.value);
-});
+document.addEventListener("DOMContentLoaded", () => { populateSubclassOptions(disciplineSelect.value); });
