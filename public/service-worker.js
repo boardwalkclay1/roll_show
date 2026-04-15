@@ -8,9 +8,7 @@ self.addEventListener("install", (event) => {
 // ACTIVATE — wipe ALL old caches + take control
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((key) => caches.delete(key)))
-    )
+    caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
   );
   self.clients.claim();
 });
@@ -19,8 +17,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
-
-  const path = url.pathname;
+  const path = url.pathname || "/";
 
   // 1. Never touch API calls
   if (path.startsWith("/api/")) return;
