@@ -1,4 +1,4 @@
-// /app/js/dev-owner.js — full owner bypass for development
+// /app/js/dev-owner.js — owner bypass for development
 
 // Always pretend the user is the OWNER
 const devOwner = {
@@ -26,7 +26,7 @@ Object.defineProperty(document, "cookie", {
   set: () => true
 });
 
-// If you're on login page, skip it
+// ONLY redirect ONCE when landing on login page
 if (location.pathname.includes("login")) {
-  location.href = "/pages/owner-dashboard.html";
+  location.href = "/pages/owner/owner-dashboard.html";
 }
