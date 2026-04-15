@@ -1,35 +1,40 @@
-// routes/owner.js — FINAL PBKDF2-CLEAN OWNER DASHBOARD
+// routes/owner.js — cleaned owner dashboard
 import { apiJson, requireRole } from "../users.js";
 
 export async function ownerDashboard(request, env) {
   return requireRole(request, env, ["owner"], async () => {
     const db = env.DB_roll;
 
-    /* ------------------------------
-       SAFE COUNT HELPERS
-    ------------------------------ */
-    async function count(table) {
-      const row = await db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first();
-      return row?.n || 0;
-    }
+    // parallel counts
+    const tables = [
+      "users",
+      "skater_profiles",
+      "business_profiles",
+      "musician_profiles",
+      "buyer_profiles",
+      "shows",
+      "tickets",
+      "merch_orders",
+      "skate_card_sales"
+    ];
 
-    /* ------------------------------
-       HIGH-LEVEL COUNTS
-    ------------------------------ */
-    const total_users = await count("users");
-    const total_skaters = await count("skater_profiles");
-    const total_businesses = await count("business_profiles");
-    const total_musicians = await count("musician_profiles");
-    const total_buyers = await count("buyer_profiles");
+    const countPromises = tables.map((t) =>
+      db.prepare(`SELECT COUNT(*) AS n FROM ${t}`).first()
+    );
+    const countRows = await Promise.all(countPromises);
+    const [
+      total_users,
+      total_skaters,
+      total_businesses,
+      total_musicians,
+      total_buyers,
+      total_shows,
+      total_tickets,
+      total_merch_orders,
+      total_skatecard_sales
+    ] = countRows.map(r => Number(r?.n || 0));
 
-    const total_shows = await count("shows");
-    const total_tickets = await count("tickets");
-    const total_merch_orders = await count("merch_orders");
-    const total_skatecard_sales = await count("skate_card_sales");
-
-    /* ------------------------------
-       TOTAL REVENUE (SAFE)
-    ------------------------------ */
+    // total revenue (cents)
     const revenueRow = await db.prepare(`
       SELECT COALESCE(SUM(price_cents), 0) AS total
       FROM (
@@ -40,43 +45,34 @@ export async function ownerDashboard(request, env) {
         SELECT price_cents FROM skate_card_sales
       )
     `).first();
+    const total_revenue = Number(revenueRow?.total || 0);
 
-    const total_revenue = revenueRow?.total || 0;
+    // recent activity
+    const recentUsersRes = await db.prepare(`
+      SELECT id, email, role, created_at
+      FROM users
+      ORDER BY created_at DESC
+      LIMIT 10
+    `).all();
+    const recent_users = recentUsersRes?.results || [];
 
-    /* ------------------------------
-       RECENT ACTIVITY
-    ------------------------------ */
-    const recent_users = (
-      await db.prepare(`
-        SELECT id, email, role, created_at
-        FROM users
-        ORDER BY created_at DESC
-        LIMIT 10
-      `).all()
-    ).results || [];
+    const recentReportsRes = await db.prepare(`
+      SELECT r.*, u.email AS reporter_email
+      FROM feed_reports r
+      LEFT JOIN users u ON u.id = r.reporter_id
+      ORDER BY r.created_at DESC
+      LIMIT 10
+    `).all();
+    const recent_reports = recentReportsRes?.results || [];
 
-    const recent_reports = (
-      await db.prepare(`
-        SELECT r.*, u.email AS reporter_email
-        FROM feed_reports r
-        LEFT JOIN users u ON u.id = r.reporter_id
-        ORDER BY r.created_at DESC
-        LIMIT 10
-      `).all()
-    ).results || [];
+    const recentErrorsRes = await db.prepare(`
+      SELECT *
+      FROM error_logs
+      ORDER BY created_at DESC
+      LIMIT 10
+    `).all();
+    const recent_errors = recentErrorsRes?.results || [];
 
-    const recent_errors = (
-      await db.prepare(`
-        SELECT *
-        FROM error_logs
-        ORDER BY created_at DESC
-        LIMIT 10
-      `).all()
-    ).results || [];
-
-    /* ------------------------------
-       ANALYTICS CHIPS
-    ------------------------------ */
     const analytics_chips = [
       { label: "Users", value: total_users, link: "/owner/users" },
       { label: "Skaters", value: total_skaters, link: "/owner/skaters" },
@@ -90,9 +86,6 @@ export async function ownerDashboard(request, env) {
       { label: "Revenue", value: total_revenue / 100, link: "/owner/revenue" }
     ];
 
-    /* ------------------------------
-       GHOST BUTTONS
-    ------------------------------ */
     const ghost_buttons = [
       { label: "Users", icon: "users", link: "/owner/users" },
       { label: "Skaters", icon: "skate", link: "/owner/skaters" },
@@ -108,9 +101,6 @@ export async function ownerDashboard(request, env) {
       { label: "Sponsorships", icon: "star", link: "/owner/sponsorships" }
     ];
 
-    /* ------------------------------
-       BURGER MENU
-    ------------------------------ */
     const burger_menu = [
       { label: "Owner Dashboard", link: "/owner" },
       { label: "Skater Dashboard", link: "/skater" },
@@ -120,9 +110,6 @@ export async function ownerDashboard(request, env) {
       { label: "Admin Tools", link: "/admin" }
     ];
 
-    /* ------------------------------
-       FINAL RESPONSE
-    ------------------------------ */
     return apiJson({
       layout: "owner_dashboard",
       analytics_chips,
