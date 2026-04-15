@@ -1,5 +1,9 @@
 name = "rollshow-auth"
 main = "index.js"
 compatibility_date = "2024-01-01"
-
 workers_dev = true
+
+[[d1_databases]]
+binding = "DB_roll"
+database_name = "rollshow"
+database_id = "c7f658f4-54f4-4717-a9de-cbb9f8e4b6ef"
