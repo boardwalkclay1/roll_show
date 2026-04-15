@@ -1,9 +1,5 @@
 // /app/js/api.js — XHR-ONLY VERSION (NO FETCH)
-// - Cookie support (withCredentials)
-// - Worker-first for /api/*
-// - Timeout support
-// - Safe JSON parsing
-// - Unified normalized response shape
+// Aligned to use the Worker for /api/* routes by default
 
 (function (global) {
   let API_BASE_PAGES = "https://roll-show.pages.dev";
@@ -16,6 +12,7 @@
       const xhr = new XMLHttpRequest();
       xhr.open(options.method || "GET", url, true);
 
+      // cookie support for cross-site requests
       xhr.withCredentials = options.credentials === "include";
 
       if (options.headers) {
@@ -29,7 +26,7 @@
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4) {
           const headers = new Headers();
-          const raw = xhr.getAllResponseHeaders().trim().split(/[\r\n]+/);
+          const raw = (xhr.getAllResponseHeaders() || "").trim().split(/[\r\n]+/);
           for (const line of raw) {
             const parts = line.split(": ");
             const key = parts.shift();
@@ -157,7 +154,7 @@
       }
     }
 
-    // API routes → Worker only
+    // API routes → Worker only (ensures auth endpoints, /api/* go to worker)
     if (path.startsWith("/api/") || opts.forceWorker) {
       return await run(API_BASE_WORKER + path);
     }
@@ -210,6 +207,7 @@
 
       legal: {
         accept(payload, headers = {}, opts = {}) {
+          // legal acceptance endpoint expects form-data; keep as POST to /api/legal/accept
           return request("POST", "/api/legal/accept", payload, headers, opts);
         }
       }
