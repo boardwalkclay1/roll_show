@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let data;
     try {
-      const res = await fetch("https://rollshow.boardwalkclay1.workers.dev/api/login", {
+      const res = await fetch("https://rollshow-auth.boardwalkclay1.workers.dev/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: payload
