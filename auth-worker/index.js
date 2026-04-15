@@ -1,7 +1,6 @@
-// auth-worker/index.js — FINAL PBKDF2 HASH + VERIFY (MATCHES LOGIN WORKER)
-// -------------------------------------------------------------------------
-
-const ITERATIONS = 100000;
+// auth-worker/index.js — bcrypt-based auth worker (signup + login)
+// Uses D1 binding at env.DB; adjust SQL/table names to match your DB.
+import { genSaltSync, hashSync, compareSync } from "bcrypt-edge";
 
 function jsonResponse(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
@@ -10,141 +9,74 @@ function jsonResponse(obj, status = 200) {
   });
 }
 
-// Base64 helpers
-function toB64(u8) {
-  return btoa(String.fromCharCode(...new Uint8Array(u8)));
-}
-
-function fromB64(s) {
-  return Uint8Array.from(atob(s), c => c.charCodeAt(0));
-}
-
-// PBKDF2 derive
-async function derive(password, saltBytes, iterations) {
-  const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(password),
-    { name: "PBKDF2" },
-    false,
-    ["deriveBits"]
-  );
-
-  const bits = await crypto.subtle.deriveBits(
-    {
-      name: "PBKDF2",
-      hash: "SHA-256",
-      salt: saltBytes,
-      iterations
-    },
-    key,
-    256
-  );
-
-  return new Uint8Array(bits);
-}
-
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const url = new URL(request.url);
-    const path = url.pathname;
+    const path = url.pathname.replace(/\/+$/, "");
     const method = request.method.toUpperCase();
 
-    const isHash =
-      method === "POST" && (path === "/hash" || path === "/api/auth/hash");
-
-    const isVerify =
-      method === "POST" && (path === "/verify" || path === "/api/auth/verify");
-
     try {
-      // ----------------------------------------------------------
-      // HASH
-      // ----------------------------------------------------------
-      if (isHash) {
+      // Signup: POST /api/signup
+      if (method === "POST" && (path === "/api/signup" || path === "/api/signup/")) {
         let body;
-        try {
-          body = await request.json();
-        } catch {
-          return jsonResponse({ success: false, error: "Invalid JSON" }, 400);
-        }
+        try { body = await request.json(); } catch { return jsonResponse({ success: false, error: "Invalid JSON" }, 400); }
 
+        const email = body?.email ? String(body.email).trim().toLowerCase() : "";
         const password = body?.password ? String(body.password) : "";
-        if (!password) {
-          return jsonResponse({ success: false, error: "Missing password" }, 400);
+        const role = body?.role ? String(body.role) : "user";
+        const stage_name = body?.stage_name ? String(body.stage_name) : null;
+        const discipline = body?.discipline ? String(body.discipline) : null;
+        const subclass = body?.subclass ? String(body.subclass) : null;
+
+        if (!email || !password) return jsonResponse({ success: false, error: "Missing email or password" }, 400);
+
+        // check existing
+        const existsRes = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email).all();
+        if (existsRes && existsRes.results && existsRes.results.length) {
+          return jsonResponse({ success: false, error: "Email already registered" }, 409);
         }
 
-        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const salt = genSaltSync(10);
+        const hash = hashSync(password, salt);
 
-        try {
-          const hashBytes = await derive(password, salt, ITERATIONS);
-          return jsonResponse({
-            success: true,
-            hash: toB64(hashBytes),
-            salt: toB64(salt),
-            iterations: ITERATIONS
-          });
-        } catch (err) {
-          return jsonResponse({
-            success: false,
-            error: "PBKDF2 failed",
-            detail: String(err)
-          }, 500);
-        }
+        // insert (adjust columns to your schema)
+        await env.DB.prepare(
+          `INSERT INTO users (email, password_hash, role, stage_name, discipline, subclass, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, datetime('now'))`
+        ).bind(email, hash, role, stage_name, discipline, subclass).run();
+
+        return jsonResponse({ success: true, email, role }, 201);
       }
 
-      // ----------------------------------------------------------
-      // VERIFY
-      // ----------------------------------------------------------
-      if (isVerify) {
+      // Login: POST /api/login
+      if (method === "POST" && (path === "/api/login" || path === "/api/login/")) {
         let body;
-        try {
-          body = await request.json();
-        } catch {
-          return jsonResponse({ success: false, error: "Invalid JSON" }, 400);
-        }
+        try { body = await request.json(); } catch { return jsonResponse({ success: false, error: "Invalid JSON" }, 400); }
 
+        const email = body?.email ? String(body.email).trim().toLowerCase() : "";
         const password = body?.password ? String(body.password) : "";
-        const hash = body?.hash ? String(body.hash) : "";
-        const salt = body?.salt ? String(body.salt) : "";
-        const iterations = Number(body?.iterations) || ITERATIONS;
 
-        if (!password || !hash || !salt) {
-          return jsonResponse({ success: false, error: "Missing fields" }, 400);
-        }
+        if (!email || !password) return jsonResponse({ success: false, error: "Missing email or password" }, 400);
 
-        try {
-          const saltBytes = fromB64(salt);
-          const bits = await derive(password, saltBytes, iterations);
-          const newHash = toB64(bits);
+        const q = await env.DB.prepare("SELECT id, email, password_hash, role FROM users WHERE email = ?").bind(email).all();
+        const user = q && q.results && q.results[0] ? q.results[0] : null;
+        if (!user) return jsonResponse({ success: false, error: "Invalid credentials" }, 401);
 
-          return jsonResponse({
-            success: true,
-            ok: newHash === hash,
-            iterations
-          });
-        } catch (err) {
-          return jsonResponse({
-            success: false,
-            error: "Verify failed",
-            detail: String(err)
-          }, 500);
-        }
+        const ok = compareSync(password, user.password_hash);
+        if (!ok) return jsonResponse({ success: false, error: "Invalid credentials" }, 401);
+
+        // return minimal user info; set cookie/session elsewhere if needed
+        return jsonResponse({ success: true, id: user.id, email: user.email, role: user.role }, 200);
       }
 
-      // ----------------------------------------------------------
-      // HEALTH CHECK
-      // ----------------------------------------------------------
-      return jsonResponse({
-        success: true,
-        message: "Auth worker online",
-        iterations: ITERATIONS
-      });
+      // Health
+      if (method === "GET" && (path === "/health" || path === "/")) {
+        return jsonResponse({ success: true, message: "Auth worker (bcrypt) online" });
+      }
+
+      return jsonResponse({ success: false, message: "Not found" }, 404);
     } catch (err) {
-      return jsonResponse({
-        success: false,
-        error: "Unhandled error",
-        detail: String(err)
-      }, 500);
+      return jsonResponse({ success: false, error: "Server error", detail: String(err) }, 500);
     }
   }
 };
