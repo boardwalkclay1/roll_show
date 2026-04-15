@@ -1,52 +1,53 @@
-// buyers.js — signupBuyer (minimal, user-first then profile) + safe API factory
-import { apiJson } from "./users.js";
-import { signupBase } from "./users.js"; // ensure this export matches users.js
+// buyers.js — profile-only + buyer handlers (signup removed)
+// - Auth/signup is handled by the separate auth-worker
+// - This module exposes buyer profile creation and other buyer APIs expected by worker.js
 
-export async function signupBuyer(request, env) {
+import { apiJson } from "./users.js";
+
+/* ============================================================
+   Create Buyer Profile (idempotent)
+   POST /api/profiles/buyer
+   - Derives user_id from authenticated user (requireRole wraps this)
+   - Accepts: name, phone, city, state, default_payment_method, preferred_rink
+   ============================================================ */
+export async function createBuyerProfile(request, env, user) {
   try {
     const body = await request.json().catch(() => ({}));
 
-    // Server-side password confirmation (authoritative)
-    const password = body.password || null;
-    const password_verify = body.password_verify || body.passwordConfirm || null;
-    if (!password || !password_verify || password !== password_verify) {
-      return apiJson({ success: false, message: "Passwords do not match" }, 400);
+    const name = body.name ? String(body.name).trim() : null;
+    const phone = body.phone ? String(body.phone).trim() : null;
+    const city = body.city ? String(body.city).trim() : null;
+    const state = body.state ? String(body.state).trim() : null;
+    const default_payment_method = body.default_payment_method ? String(body.default_payment_method).trim() : null;
+    const preferred_rink = body.preferred_rink ? String(body.preferred_rink).trim() : null;
+
+    // Basic required-field check (adjust as needed)
+    if (!name && !phone && !city && !state && !default_payment_method && !preferred_rink) {
+      return { success: false, message: "No profile fields provided" };
     }
 
-    // Ensure role is buyer for the users row
-    const signupReqBody = {
-      name: body.name || null,
-      email: body.email,
-      password: password,
-      role: "buyer"
-    };
-
-    // Call signupBase and parse its JSON response
-    const signupRes = await signupBase(
-      new Request(request.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(signupReqBody) }),
-      env,
-      "buyer"
-    );
-
-    // If signupBase returned a Response object, parse it; otherwise assume it's already an object
-    let base;
-    if (signupRes && typeof signupRes.json === "function") {
-      base = await signupRes.json().catch(() => null);
-    } else {
-      base = signupRes;
+    // If profile already exists, return it (idempotent)
+    const existing = await env.DB_roll.prepare("SELECT * FROM buyer_profiles WHERE user_id = ?").bind(user.id).first();
+    if (existing) {
+      return {
+        success: true,
+        profile_exists: true,
+        profile: {
+          id: existing.id,
+          user_id: existing.user_id,
+          name: existing.name,
+          phone: existing.phone,
+          city: existing.city,
+          state: existing.state,
+          default_payment_method: existing.default_payment_method,
+          preferred_rink: existing.preferred_rink,
+          created_at: existing.created_at
+        }
+      };
     }
 
-    if (!base || base.success !== true || !base.user) {
-      // Normalize error message
-      const msg = (base && (base.message || (base.error && base.error.message))) || "Signup failed";
-      return apiJson({ success: false, message: msg }, base && base.status ? base.status : 400);
-    }
-
-    const userId = base.user.id;
-    const createdAt = base.user.created_at || new Date().toISOString();
-
-    // Create buyer profile row (idempotency handled by DB constraints if present)
     const profileId = crypto.randomUUID();
+    const now = new Date().toISOString();
 
     try {
       await env.DB_roll.prepare(
@@ -58,39 +59,66 @@ export async function signupBuyer(request, env) {
       )
         .bind(
           profileId,
-          userId,
-          body.name || null,
-          body.phone || null,
-          body.city || null,
-          body.state || null,
-          body.default_payment_method || null,
-          body.preferred_rink || null,
+          user.id,
+          name,
+          phone,
+          city,
+          state,
+          default_payment_method,
+          preferred_rink,
           null,
-          createdAt
+          now
         )
         .run();
 
-      return apiJson({ success: true, user: base.user, buyer_profile_id: profileId }, 201);
+      return {
+        success: true,
+        profile_created: true,
+        profile: {
+          id: profileId,
+          user_id: user.id,
+          name,
+          phone,
+          city,
+          state,
+          default_payment_method,
+          preferred_rink,
+          created_at: now
+        }
+      };
     } catch (err) {
       const msg = String(err).toLowerCase();
-      // Treat unique/constraint errors as idempotent success if profile exists
       if (msg.includes("unique") || msg.includes("constraint") || /buyer_profiles/.test(msg)) {
-        const existing = await env.DB_roll.prepare("SELECT * FROM buyer_profiles WHERE user_id = ?").bind(userId).first();
-        if (existing) {
-          return apiJson({ success: true, user: base.user, buyer_profile_id: existing.id, profile_exists: true }, 201);
+        const existing2 = await env.DB_roll.prepare("SELECT * FROM buyer_profiles WHERE user_id = ?").bind(user.id).first();
+        if (existing2) {
+          return {
+            success: true,
+            profile_exists: true,
+            profile: {
+              id: existing2.id,
+              user_id: existing2.user_id,
+              name: existing2.name,
+              phone: existing2.phone,
+              city: existing2.city,
+              state: existing2.state,
+              default_payment_method: existing2.default_payment_method,
+              preferred_rink: existing2.preferred_rink,
+              created_at: existing2.created_at
+            }
+          };
         }
       }
-
-      // Other DB error: return failure so client can retry later
-      return apiJson({ success: false, message: "Buyer profile insert failed", detail: String(err) }, 500);
+      return { success: false, message: "Profile insert failed", detail: String(err) };
     }
   } catch (err) {
-    return apiJson({ success: false, message: "Server error", detail: String(err) }, 500);
+    return { success: false, message: "Server error", detail: String(err) };
   }
 }
 
-/* Minimal safe stubs for other buyer handlers expected by worker.js
-   Replace these with full implementations as needed */
+/* ============================================================
+   Buyer handlers (stubs / safe defaults)
+   - Implementations can be expanded as needed; worker.js expects these exports
+   ============================================================ */
 export async function listTickets(request, env, user) {
   return { success: false, message: "listTickets not implemented" };
 }
@@ -111,10 +139,13 @@ export async function buyerDashboard(request, env, user) {
   return { success: false, message: "buyerDashboard not implemented" };
 }
 
-/* Factory expected by worker.js to import buyer handlers without duplicate-export issues */
+/* ============================================================
+   Factory expected by worker.js
+   - No signupBuyer exported here; signup is handled by auth-worker
+   ============================================================ */
 export function makeBuyersApi() {
   return {
-    signupBuyer: typeof signupBuyer === "function" ? signupBuyer : async () => ({ success: false, message: "signupBuyer not implemented" }),
+    createBuyerProfile: typeof createBuyerProfile === "function" ? createBuyerProfile : async () => ({ success: false, message: "createBuyerProfile not implemented" }),
     listTickets: typeof listTickets === "function" ? listTickets : async () => ({ success: false, message: "listTickets not implemented" }),
     createTicket: typeof createTicket === "function" ? createTicket : async () => ({ success: false, message: "createTicket not implemented" }),
     partnerWebhook: typeof partnerWebhook === "function" ? partnerWebhook : async () => ({ success: false, message: "partnerWebhook not implemented" }),
