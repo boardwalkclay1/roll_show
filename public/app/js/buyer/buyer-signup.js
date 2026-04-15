@@ -1,40 +1,28 @@
 // /app/js/buyer/buyer-signup.js
-// Client-side signup logic: password verify, basic validation, POST to API.
-
 const form = document.getElementById("buyer-signup-form");
 const errorEl = document.getElementById("buyer-signup-error");
 const submitBtn = document.getElementById("buyer-signup-submit");
 
-function showError(msg) {
-  errorEl.textContent = msg;
-  errorEl.style.display = "block";
-}
-
-function clearError() {
-  errorEl.textContent = "";
-  errorEl.style.display = "none";
-}
+function showError(msg){ errorEl.textContent = msg; errorEl.style.display = "block"; }
+function clearError(){ errorEl.textContent = ""; errorEl.style.display = "none"; }
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearError();
 
-  const formData = new FormData(form);
-  const name = (formData.get("name") || "").trim();
-  const email = (formData.get("email") || "").trim();
-  const password = formData.get("password") || "";
-  const passwordVerify = formData.get("password_verify") || "";
-  const display_name = (formData.get("display_name") || "").trim();
-  const billing_address = (formData.get("billing_address") || "").trim();
-  const role = formData.get("role") || "buyer";
+  const fd = new FormData(form);
+  const name = (fd.get("name") || "").trim();
+  const email = (fd.get("email") || "").trim();
+  const password = fd.get("password") || "";
+  const passwordVerify = fd.get("password_verify") || "";
+  const display_name = (fd.get("display_name") || "").trim();
+  const billing_address = (fd.get("billing_address") || "").trim();
 
-  // Basic client-side validation
   if (!email) return showError("Please enter an email.");
   if (!password) return showError("Please enter a password.");
   if (password !== passwordVerify) return showError("Passwords do not match.");
   if (!display_name) return showError("Please enter a display name.");
 
-  // Disable submit while request is in-flight
   submitBtn.disabled = true;
   submitBtn.textContent = "Signing up…";
 
@@ -44,12 +32,12 @@ form.addEventListener("submit", async (e) => {
       email,
       password,
       password_verify: passwordVerify,
-      role,
+      role: "buyer",
       display_name,
       billing_address: billing_address || null
     };
 
-    const res = await fetch("/api/signup/buyer", {
+    const res = await fetch("/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -66,7 +54,6 @@ form.addEventListener("submit", async (e) => {
     }
 
     if (data.success) {
-      // Redirect to onboarding or dashboard as appropriate
       window.location.href = data.redirect || "/pages/onboarding-buyer.html";
       return;
     } else {
