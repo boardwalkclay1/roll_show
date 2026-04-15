@@ -1,5 +1,4 @@
-// /app/js/login.js — minimal login handler for bcrypt Worker
-// ----------------------------------------------------------
+// /app/js/login.js — direct fetch login handler
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("auth-login-form");
@@ -13,36 +12,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
-    // Build payload
     const payload = JSON.stringify({ email, password });
 
-    // Send raw request through the dumb API client
-    const res = await API.raw(
-      "/api/login",
-      "POST",
-      payload,
-      { "Content-Type": "application/json" }
-    );
-
-    // Parse response text safely
-    let data = null;
+    let data;
     try {
-      data = JSON.parse(res.text);
-    } catch {
-      errorBox.textContent = "Invalid server response";
+      const res = await fetch("https://rollshow.boardwalkclay1.workers.dev/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload
+      });
+
+      data = await res.json();
+    } catch (err) {
+      errorBox.textContent = "Network error";
       errorBox.hidden = false;
       return;
     }
 
-    // Handle login failure
     if (!data.success) {
       errorBox.textContent = data.error || "Login failed";
       errorBox.hidden = false;
       return;
     }
 
-    // SUCCESS — user is authenticated
-    // Redirect them inside the app
     window.location.href = "/pages/dashboard.html";
   });
 });
