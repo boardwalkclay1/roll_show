@@ -1,8 +1,10 @@
 name = "rollshow"
-main = "worker.js"
+main = "dist/worker.js"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = true
 
+# Top-level bindings (used for local / default env)
 [[d1_databases]]
 binding = "DB_roll"
 database_name = "rollshow"
@@ -17,6 +19,28 @@ binding = "R2"
 bucket_name = "rollshow"
 
 [[services]]
+binding = "AUTH"
+service = "rollshow-auth"
+environment = "production"
+
+# Production environment (explicitly declared so --env production works)
+[env.production]
+vars = { AUTH_UPSTREAM = "https://rollshow-auth.boardwalkclay1.workers.dev" }
+
+[[env.production.d1_databases]]
+binding = "DB_roll"
+database_name = "rollshow"
+database_id = "c7f658f4-54f4-4717-a9de-cbb9f8e4b6ef"
+
+[[env.production.kv_namespaces]]
+binding = "KV"
+id = "94027daf38234d6a914cfd48c91e55f3"
+
+[[env.production.r2_buckets]]
+binding = "R2"
+bucket_name = "rollshow"
+
+[[env.production.services]]
 binding = "AUTH"
 service = "rollshow-auth"
 environment = "production"
