@@ -1,4 +1,4 @@
-// public/app/js/business/business-signup.js
+// /public/app/js/business/business-signup.js
 import API from "/app/js/api.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const RETRY_ID = "business-profile-retry";
   const SUBMIT_BTN = form.querySelector('button[type="submit"]');
 
-  // error element
   let errorEl = document.getElementById(ERROR_ID);
   if (!errorEl) {
     errorEl = document.createElement("div");
@@ -22,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
     form.appendChild(errorEl);
   }
 
-  // retry button (for profile-only retries)
   let retryEl = document.getElementById(RETRY_ID);
   if (!retryEl) {
     retryEl = document.createElement("button");
@@ -54,7 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
     SUBMIT_BTN.textContent = isSubmitting ? "Saving…" : "Submit Application";
   }
 
-  // collect signup payload (users table only)
   function collectSignupPayload() {
     const fd = new FormData(form);
     const name = (fd.get("name") || "").trim() || null;
@@ -65,7 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return { name, email, password, role };
   }
 
-  // collect profile payload (only fields in business_profiles)
   function collectProfilePayload() {
     const fd = new FormData(form);
     const company_name = (fd.get("company_name") || "").trim();
@@ -75,7 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return { company_name, contact_name, contact_email, country };
   }
 
-  // create profile; treat existing profile as success (idempotent)
   async function createProfile(profilePayload) {
     try {
       const res = await API.post("/api/profiles/business", profilePayload);
@@ -89,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // main submit flow: create user first, only then attempt profile
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearError();
@@ -120,11 +114,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setSubmitting(true);
 
-    // 1) create users row (only users fields)
     let signupRes;
     try {
-      // POST to business signup user endpoint (create users row)
-      signupRes = await API.post("/api/business/signup", { name, email, password, role });
+      // POST to unified signup endpoint; role is included in payload
+      signupRes = await API.post("/api/signup", { name, email, password, role });
     } catch (err) {
       console.error("Signup network error", err);
       showError("Network error during signup. Please try again.");
@@ -139,15 +132,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // If server created the user and also created the profile server-side, treat as success.
-    // Some server implementations may create both in one call; handle that gracefully.
+    // If server created profile server-side, navigate
     if (signupRes.data && signupRes.data.profile_created === true) {
-      // server already created profile; navigate
       window.location.href = "/pages/business/business-dashboard.html";
       return;
     }
 
-    // 2) create business profile (server derives user_id)
     const profileResult = await createProfile(profilePayload);
 
     if (!profileResult.ok) {
@@ -157,11 +147,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // success -> navigate to business dashboard
     window.location.href = "/pages/business/business-dashboard.html";
   });
 
-  // retry only profile creation
   retryEl.addEventListener("click", async () => {
     clearError();
     retryEl.style.display = "none";
