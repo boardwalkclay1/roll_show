@@ -1,4 +1,4 @@
-// /api/login.js — FINAL WORKING VERSION
+// /api/login.js — CLEAN REBUILT VERSION
 import { cors, apiJson, verify } from "../users.js";
 
 const SESSION_COOKIE_NAME = "rs_session";
@@ -14,9 +14,17 @@ function makeSetCookieHeader(value) {
 
 export default async function login(request, env) {
   try {
+    // -----------------------------
+    // Parse JSON body safely
+    // -----------------------------
     const body = await request.json().catch(() => null);
-    const emailRaw = body?.email?.trim() || "";
-    const password = body?.password || "";
+
+    if (!body || typeof body !== "object") {
+      return apiJson({ success: false, message: "Missing credentials" }, 400);
+    }
+
+    const emailRaw = body.email?.trim() || "";
+    const password = body.password || "";
 
     if (!emailRaw || !password) {
       return apiJson({ success: false, message: "Missing credentials" }, 400);
@@ -24,7 +32,9 @@ export default async function login(request, env) {
 
     const email = emailRaw.toLowerCase();
 
-    // Fetch user
+    // -----------------------------
+    // Fetch user from D1
+    // -----------------------------
     const row = await env.DB_roll
       .prepare("SELECT * FROM users WHERE email = ?")
       .bind(email)
@@ -43,6 +53,9 @@ export default async function login(request, env) {
 
     const iterations = Number(row.password_iterations) || 100000;
 
+    // -----------------------------
+    // Verify password via PBKDF2 worker
+    // -----------------------------
     const isValid = await verify(
       password,
       row.password_hash,
@@ -55,10 +68,11 @@ export default async function login(request, env) {
       return apiJson({ success: false, message: "Invalid credentials" }, 401);
     }
 
-    // Normalize role
+    // -----------------------------
+    // Normalize role + owner
+    // -----------------------------
     const role = row.role || "user";
 
-    // Owner detection
     const is_owner =
       role === "owner" ||
       row["owner-1"] === 1 ||
@@ -74,12 +88,16 @@ export default async function login(request, env) {
       created_at: row.created_at
     };
 
+    // -----------------------------
     // Create session cookie
+    // -----------------------------
     const sessionPayload = { id: user.id, role: user.role, ts: Date.now() };
     const cookieValue = makeSessionCookieValue(sessionPayload);
     const setCookie = makeSetCookieHeader(cookieValue);
 
+    // -----------------------------
     // Redirect map
+    // -----------------------------
     const redirectMap = {
       owner: "/pages/owner/owner-dashboard.html",
       business: "/pages/business/business-dashboard.html",
@@ -88,9 +106,12 @@ export default async function login(request, env) {
       musician: "/pages/musician/musician-dashboard.html",
       user: "/"
     };
+
     const redirect = redirectMap[user.role] || "/";
 
-    // ⭐ FINAL FIX: FULL CORS WRAP
+    // -----------------------------
+    // Final response with CORS + cookie
+    // -----------------------------
     const response = new Response(
       JSON.stringify({ success: true, user, redirect }),
       {
@@ -108,7 +129,7 @@ export default async function login(request, env) {
     return response;
 
   } catch (err) {
-    console.error("Login handler error", String(err));
+    console.error("Login handler error:", String(err));
     return apiJson(
       { success: false, message: "Server error", detail: String(err) },
       500
