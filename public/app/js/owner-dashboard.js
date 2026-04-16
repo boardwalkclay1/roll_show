@@ -1,58 +1,32 @@
 // ============================================================
-// OWNER DASHBOARD JS — CLEAN, STABLE, DEV-OWNER SAFE
+// OWNER DASHBOARD JS — FINAL VERSION (WORKS WITH NEW api.js)
 // ============================================================
 
-// Pull globals from app.js (already loaded in HTML)
-const API = window.API;
-const API_BASE = window.API_BASE;
-
-// In dev-owner mode, requireUser doesn't exist.
-// So we fallback to getUser() from dev-owner.js.
 let owner = null;
 
+// Wait until DOM + app.js are ready
 window.addEventListener("DOMContentLoaded", () => {
+  // dev-owner.js provides getUser()
   owner = (typeof requireUser === "function")
     ? requireUser(["owner"])
-    : getUser(); // <-- dev-owner fallback
+    : getUser();
 
   initOwnerDashboard();
 });
 
 // ============================================================
-// AUTHED HELPERS
+// AUTHED HELPERS (using restored API.get/post/delete)
 // ============================================================
 async function authedGet(path) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "x-user-id": owner.id
-    }
-  });
-  return res.json();
+  return API.get(path, owner);
 }
 
 async function authedPost(path, body) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-user-id": owner.id
-    },
-    body: JSON.stringify(body || {})
-  });
-  return res.json();
+  return API.post(path, body, owner);
 }
 
 async function authedDelete(path) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      "x-user-id": owner.id
-    }
-  });
-  return res.json();
+  return API.delete(path, owner);
 }
 
 // ============================================================
@@ -91,7 +65,7 @@ const btnUploadBrandAssets = document.getElementById("btn-upload-brand-assets");
 
 async function loadBranding() {
   const res = await authedGet("/api/owner/settings/branding");
-  if (!res || !res.data) return;
+  if (!res?.data) return;
 
   const b = res.data;
 
@@ -160,7 +134,7 @@ if (btnUploadBrandAssets) {
 }
 
 // ============================================================
-// OWNER NOTES
+// NOTES
 // ============================================================
 const notesList = document.getElementById("notes-list");
 const noteText = document.getElementById("note-text");
@@ -168,7 +142,7 @@ const btnAddNote = document.getElementById("btn-add-note");
 
 async function loadNotes() {
   const res = await authedGet("/api/owner/settings/notes");
-  if (!res.data || !notesList) return;
+  if (!res?.data || !notesList) return;
 
   const notes = res.data.notes || [];
 
@@ -208,7 +182,7 @@ const adsTableBody = document.querySelector("#ads-table tbody");
 
 async function loadAds() {
   const res = await authedGet("/api/owner/ads");
-  if (!res.data || !adsTableBody) return;
+  if (!res?.data || !adsTableBody) return;
 
   const ads = res.data.ads || [];
 
@@ -254,7 +228,7 @@ const sponsorshipsTableBody = document.querySelector("#sponsorships-table tbody"
 
 async function loadSponsorships() {
   const res = await authedGet("/api/owner/sponsorships");
-  if (!res.data || !sponsorshipsTableBody) return;
+  if (!res?.data || !sponsorshipsTableBody) return;
 
   const rows = res.data.sponsorships || [];
 
