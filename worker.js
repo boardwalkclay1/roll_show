@@ -178,6 +178,23 @@ export default {
         return withCORS(await ownerDashboard(request, env, {}));
       }
 
+      /* OWNER SETTINGS — MATCH owner-dashboard.js CALLS */
+      if (path === "/api/owner/settings/branding" && method === "GET") {
+        return withCORS(apiJson({ success: true, branding: {} }));
+      }
+
+      if (path === "/api/owner/settings/notes" && method === "GET") {
+        return withCORS(apiJson({ success: true, notes: [] }));
+      }
+
+      if (path === "/api/owner/ads" && method === "GET") {
+        return withCORS(apiJson({ success: true, ads: [] }));
+      }
+
+      if (path === "/api/owner/sponsorships" && method === "GET") {
+        return withCORS(apiJson({ success: true, sponsorships: [] }));
+      }
+
       /* LEGAL ACCEPTANCE */
       if (path === "/api/legal/accept" && method === "POST") {
         return withCORS(apiJson({ success: true }));
