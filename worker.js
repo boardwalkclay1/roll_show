@@ -1,10 +1,4 @@
-// worker.js — MODULE WORKER (auth removed; profile/dashboard handlers only)
-// ----------------------------------------------------------------------
-// - Auth (signup/login/hash/verify) is handled by a separate auth-worker.
-// - This worker exposes role-protected APIs and profile endpoints.
-// - Handlers return plain objects; requireRole wraps them into JSON Responses.
-
-import { cors, apiJson, requireRole } from "./users.js";
+import { cors, apiJson, requireRole as realRequireRole } from "./users.js";
 
 import {
   listTickets,
@@ -44,9 +38,9 @@ import {
 
 import { ownerDashboard } from "./routes/owner.js";
 
-/* ---------------------------
-   Utilities
-   --------------------------- */
+/* ------------------------------------------------------------
+   UTILITIES
+------------------------------------------------------------ */
 function withCORS(response) {
   const headers = cors();
   for (const [k, v] of Object.entries(headers)) {
@@ -61,9 +55,36 @@ function normalizePath(path) {
   return path;
 }
 
-/* ---------------------------
-   Module worker entrypoint
-   --------------------------- */
+/* ------------------------------------------------------------
+   DEV BYPASS WRAPPER
+------------------------------------------------------------ */
+function makeRequireRole(request) {
+  const devRole = request.headers.get("x-user-role");
+  const devId = request.headers.get("x-user-id");
+
+  // If no dev headers → use real auth
+  if (!devRole || !devId) return realRequireRole;
+
+  // DEV MODE ACTIVE
+  const devUser = {
+    id: Number(devId),
+    role: devRole,
+    email: "dev@local",
+    devBypass: true
+  };
+
+  // Override requireRole ONLY for this request
+  return async (req, env, allowedRoles, handler) => {
+    if (allowedRoles.includes(devRole)) {
+      return handler(req, env, devUser);
+    }
+    return apiJson({ success: false, error: "Forbidden (dev bypass mismatch)" }, 403);
+  };
+}
+
+/* ------------------------------------------------------------
+   WORKER ENTRYPOINT
+------------------------------------------------------------ */
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -71,20 +92,20 @@ export default {
     const path = normalizePath(rawPath);
     const method = (request.method || "GET").toUpperCase();
 
+    // Build requireRole for this request (dev or real)
+    const requireRole = makeRequireRole(request);
+
     // CORS preflight
     if (method === "OPTIONS") {
       return new Response(null, { status: 204, headers: cors() });
     }
 
     try {
-      // Initialize domain APIs (factories return available handlers)
       const Skaters = makeSkatersApi ? makeSkatersApi(env.DB_roll) : {};
-      // Business and musician profile helpers are imported above
 
-      /* ---------------------------
-         SKATER ROUTES (profile + dashboard)
-         - Signup/login removed; profile creation is idempotent and requires auth
-         --------------------------- */
+      /* ------------------------------------------------------------
+         SKATER ROUTES
+      ------------------------------------------------------------ */
       if (path === "/api/profiles/skater" && method === "POST") {
         return withCORS(
           await requireRole(request.clone(), env, ["skater"], async (req, envInner, user) => {
@@ -107,9 +128,9 @@ export default {
         );
       }
 
-      /* ---------------------------
-         MUSICIAN ROUTES (profile + dashboard)
-         --------------------------- */
+      /* ------------------------------------------------------------
+         MUSICIAN ROUTES
+      ------------------------------------------------------------ */
       if (path === "/api/profiles/musician" && method === "POST") {
         return withCORS(
           await requireRole(request.clone(), env, ["musician"], async (req, envInner, user) => {
@@ -137,9 +158,9 @@ export default {
         return withCORS(await requireRole(request.clone(), env, ["musician"], licenseTrack));
       }
 
-      /* ---------------------------
-         BUSINESS ROUTES (profile + dashboard + submissions)
-         --------------------------- */
+      /* ------------------------------------------------------------
+         BUSINESS ROUTES
+      ------------------------------------------------------------ */
       if (path === "/api/profiles/business" && method === "POST") {
         return withCORS(
           await requireRole(request.clone(), env, ["business"], async (req, envInner, user) => {
@@ -183,7 +204,6 @@ export default {
         return withCORS(await requireRole(request.clone(), env, ["business"], businessSubmitDiscount));
       }
 
-      /* Staff management */
       if (path === "/api/business/staff" && method === "POST") {
         return withCORS(await requireRole(request.clone(), env, ["business"], businessAddStaff));
       }
@@ -200,9 +220,9 @@ export default {
         return withCORS(await requireRole(request.clone(), env, ["business"], businessScanTicket));
       }
 
-      /* ---------------------------
+      /* ------------------------------------------------------------
          BUYER ROUTES
-         --------------------------- */
+      ------------------------------------------------------------ */
       if (path === "/api/buyer/dashboard" && method === "GET") {
         return withCORS(await requireRole(request.clone(), env, ["buyer"], buyerDashboard));
       }
@@ -216,7 +236,6 @@ export default {
       }
 
       if (path === "/api/buyer/partner-webhook" && method === "POST") {
-        // partner webhook may be unauthenticated depending on integration
         return withCORS(await partnerWebhook(request.clone(), env));
       }
 
@@ -224,54 +243,60 @@ export default {
         return withCORS(await requireRole(request.clone(), env, ["buyer"], checkInTicket));
       }
 
-      /* ---------------------------
+      /* ------------------------------------------------------------
          OWNER ROUTES
-         --------------------------- */
+      ------------------------------------------------------------ */
       if (path === "/api/owner/dashboard" && method === "GET") {
         return withCORS(await requireRole(request.clone(), env, ["owner"], ownerDashboard));
       }
 
-      /* ---------------------------
-         LEGAL ACCEPTANCE (idempotent)
-         --------------------------- */
+      /* ------------------------------------------------------------
+         LEGAL ACCEPTANCE
+      ------------------------------------------------------------ */
       if (path === "/api/legal/accept" && method === "POST") {
         return withCORS(
-          await requireRole(request.clone(), env, ["buyer", "skater", "musician", "business", "staff", "owner"], async (req, envInner, user) => {
-            const form = await req.formData();
-            const agreement_type = form.get("agreement_type");
-            const agreement_version = form.get("agreement_version");
-            const role = form.get("role");
+          await requireRole(
+            request.clone(),
+            env,
+            ["buyer", "skater", "musician", "business", "staff", "owner"],
+            async (req, envInner, user) => {
+              const form = await req.formData();
+              const agreement_type = form.get("agreement_type");
+              const agreement_version = form.get("agreement_version");
+              const role = form.get("role");
 
-            if (!agreement_type || !agreement_version || !role) {
-              return apiJson({ success: false, error: "Missing fields" }, 400);
+              if (!agreement_type || !agreement_version || !role) {
+                return apiJson({ success: false, error: "Missing fields" }, 400);
+              }
+
+              try {
+                await env.DB_roll.prepare(
+                  `INSERT OR IGNORE INTO legal_acceptances
+                   (user_id, role, agreement_type, agreement_version, ip_address, user_agent)
+                   VALUES (?, ?, ?, ?, ?, ?)`
+                ).bind(
+                  user.id,
+                  role,
+                  agreement_type,
+                  agreement_version,
+                  req.headers.get("cf-connecting-ip") || null,
+                  req.headers.get("user-agent") || null
+                ).run();
+
+                return apiJson({ success: true });
+              } catch (err) {
+                return apiJson({ success: false, error: String(err) }, 500);
+              }
             }
-
-            try {
-              await env.DB_roll.prepare(
-                `INSERT OR IGNORE INTO legal_acceptances
-                 (user_id, role, agreement_type, agreement_version, ip_address, user_agent)
-                 VALUES (?, ?, ?, ?, ?, ?)`
-              ).bind(
-                user.id,
-                role,
-                agreement_type,
-                agreement_version,
-                req.headers.get("cf-connecting-ip") || null,
-                req.headers.get("user-agent") || null
-              ).run();
-
-              return apiJson({ success: true });
-            } catch (err) {
-              return apiJson({ success: false, error: String(err) }, 500);
-            }
-          })
+          )
         );
       }
 
-      /* ---------------------------
-         Fallback
-         --------------------------- */
+      /* ------------------------------------------------------------
+         FALLBACK
+      ------------------------------------------------------------ */
       return withCORS(apiJson({ success: false, message: "Not found" }, 404));
+
     } catch (err) {
       console.error("Worker fetch error:", String(err));
       return withCORS(apiJson({ success: false, message: "Server error", detail: String(err) }, 500));
