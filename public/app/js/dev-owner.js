@@ -26,7 +26,11 @@ Object.defineProperty(document, "cookie", {
   set: () => true
 });
 
-// ONLY redirect ONCE when landing on login page
-if (location.pathname.includes("login")) {
+// Redirect ONLY when landing on login page
+if (
+  location.pathname.includes("login") ||
+  location.pathname.endsWith("/login.html") ||
+  location.pathname.endsWith("/login")
+) {
   location.href = "/pages/owner/owner-dashboard.html";
 }
