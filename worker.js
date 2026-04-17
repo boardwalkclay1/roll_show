@@ -56,16 +56,16 @@ function normalizePath(path) {
 }
 
 /* ------------------------------------------------------------
-   DEV BYPASS WRAPPER
+   DEV BYPASS (OWNER, SKATER, BUSINESS, MUSICIAN, BUYER)
 ------------------------------------------------------------ */
 function makeRequireRole(request) {
   const devRole = request.headers.get("x-user-role");
   const devId = request.headers.get("x-user-id");
 
-  // If no dev headers → use real auth
+  // No dev headers → use real auth
   if (!devRole || !devId) return realRequireRole;
 
-  // DEV MODE ACTIVE
+  // Dev user object
   const devUser = {
     id: Number(devId),
     role: devRole,
@@ -88,8 +88,7 @@ function makeRequireRole(request) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const rawPath = url.pathname;
-    const path = normalizePath(rawPath);
+    const path = normalizePath(url.pathname);
     const method = (request.method || "GET").toUpperCase();
 
     // Build requireRole for this request (dev or real)
@@ -109,7 +108,7 @@ export default {
       if (path === "/api/profiles/skater" && method === "POST") {
         return withCORS(
           await requireRole(request.clone(), env, ["skater"], async (req, envInner, user) => {
-            if (typeof Skaters.createSkaterProfile === "function") {
+            if (Skaters.createSkaterProfile) {
               return Skaters.createSkaterProfile(req, envInner, user);
             }
             return { success: false, message: "Skater profile endpoint not implemented" };
@@ -120,7 +119,7 @@ export default {
       if (path === "/api/skater/dashboard" && method === "GET") {
         return withCORS(
           await requireRole(request.clone(), env, ["skater"], async (req, envInner, user) => {
-            if (typeof Skaters.skaterDashboard === "function") {
+            if (Skaters.skaterDashboard) {
               return Skaters.skaterDashboard(req, envInner, user);
             }
             return { success: false, message: "Skater dashboard not implemented" };
@@ -134,7 +133,7 @@ export default {
       if (path === "/api/profiles/musician" && method === "POST") {
         return withCORS(
           await requireRole(request.clone(), env, ["musician"], async (req, envInner, user) => {
-            if (typeof createMusicianProfile === "function") {
+            if (createMusicianProfile) {
               return createMusicianProfile(req, envInner, user);
             }
             return { success: false, message: "Musician profile endpoint not implemented" };
@@ -164,7 +163,7 @@ export default {
       if (path === "/api/profiles/business" && method === "POST") {
         return withCORS(
           await requireRole(request.clone(), env, ["business"], async (req, envInner, user) => {
-            if (typeof createBusinessProfile === "function") {
+            if (createBusinessProfile) {
               return createBusinessProfile(req, envInner, user);
             }
             return { success: false, message: "Business profile endpoint not implemented" };
