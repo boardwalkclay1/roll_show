@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Owner Dashboard</title>
 
   <link rel="icon" href="/img/favicon.png" />
@@ -20,51 +20,34 @@
       min-height: 100vh;
       width: 100%;
       overflow-x: hidden;
-      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .safe-message {
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 20px;
+      margin: 40px auto;
+      max-width: 600px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 20px;
+      backdrop-filter: blur(10px);
     }
   </style>
 </head>
 
 <body>
 
-  <!-- BURGER MENU -->
-  <nav id="rs-burger-menu" class="rs-burger-menu"></nav>
-
-  <!-- HERO -->
   <header class="rs-hero">
     <h1>Platform Owner</h1>
     <p>Roll Show Control Center</p>
   </header>
 
-  <!-- ANALYTICS CHIPS -->
-  <section id="owner-analytics-chips" class="rs-chip-scroll"></section>
-
-  <!-- GHOST ACTION BUTTONS -->
-  <section id="owner-ghost-actions" class="rs-ghost-grid"></section>
-
-  <!-- RECENT USERS -->
-  <section class="rs-section">
-    <h2>Recent Users</h2>
-    <div id="owner-recent-users" class="rs-list"></div>
-  </section>
-
-  <!-- RECENT REPORTS -->
-  <section class="rs-section">
-    <h2>Recent Reports</h2>
-    <div id="owner-recent-reports" class="rs-list"></div>
-  </section>
-
-  <!-- RECENT ERRORS -->
-  <section class="rs-section">
-    <h2>System Errors</h2>
-    <div id="owner-recent-errors" class="rs-list"></div>
-  </section>
-
-  <!-- REQUIRED ORDER -->
-  <script src="/app/js/app.js"></script>
-  <script src="/app/js/api.js"></script>
-  <script type="module" src="/app/js/owner/owner-dashboard.js"></script>
-  <script src="/app/js/dev-owner.js" defer></script>
+  <div class="safe-message">
+    <strong>Owner Dashboard Loaded (Safe Mode)</strong><br><br>
+    All JavaScript and API calls are disabled so the page can load without errors.<br>
+    Once you're ready, we can re‑enable features one by one.
+  </div>
 
 </body>
 </html>
