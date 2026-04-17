@@ -1,10 +1,5 @@
-// users.js — CLEAN, CORRECT, FINAL
-// --------------------------------
-// - PBKDF2 verify matches auth-worker exactly
-// - Correct salt + iterations handling
-// - CORS helper
-// - Owner bypass
-// - Signup + business signup
+// users.js — CLEAN, NO ROLE AUTH, FINAL
+// -------------------------------------
 
 export function cors() {
   return {
@@ -53,37 +48,9 @@ export async function verify(password, hashValue, saltValue, iterations, env) {
 }
 
 /* ============================================================
-   ROLE CHECKER — OWNER BYPASS
+   NO ROLE CHECKER — REMOVED COMPLETELY
    ============================================================ */
-export async function requireRole(request, env, roles, handler) {
-  try {
-    const userId = request.headers.get("x-user-id");
-    const userRole = request.headers.get("x-user-role");
-
-    if (!userId || !userRole) {
-      return apiJson({ success: false, message: "Unauthorized" }, 401);
-    }
-
-    // OWNER CAN DO ANYTHING
-    if (userRole === "owner") {
-      const result = await handler(request, env, { id: userId, role: userRole });
-      return apiJson(result);
-    }
-
-    if (!roles.includes(userRole)) {
-      return apiJson({ success: false, message: "Unauthorized" }, 401);
-    }
-
-    const result = await handler(request, env, { id: userId, role: userRole });
-    return apiJson(result);
-
-  } catch (err) {
-    return apiJson(
-      { success: false, message: "Server error", detail: String(err) },
-      500
-    );
-  }
-}
+// requireRole removed as requested
 
 /* ============================================================
    BASE SIGNUP
